@@ -10,3 +10,4 @@ Our shared folder is located [here](https://drive.google.com/drive/folders/1Yfgw
 
 - Kyle Chen
 - Ramos Jacosalem
+- Andrew Krawiec
