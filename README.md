@@ -1,9 +1,12 @@
-# Communication channel
+# Communication Channel
 
-< Add a link/bookmark to your Discord/Slack channel. >
+We use [Discord](https://discord.gg/MQ7MB2ep) to discuss our project.
 
-# Shared Google folder
-https://drive.google.com/drive/u/2/folders/1Yfgw8HaCEl7aFqRQXRUGOCotDveUUP4-
+# Shared Google Folder
 
+Our shared folder is located [here](https://drive.google.com/drive/folders/1Yfgw8HaCEl7aFqRQXRUGOCotDveUUP4-?usp=drive_link).
 
-Kyle Chen
+# Team Members
+
+- Kyle Chen
+- Ramos Jacosalem
