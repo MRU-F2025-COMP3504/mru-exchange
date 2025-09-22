@@ -6,7 +6,7 @@
 > MRU Exchange is student-only (verified `@mtroyal` email) and emphasizes saftey/trust/convenience.
 > The aim is a single, reliable hub for student needs---simpler, safer, cheaper.
 
---- Proposed by Sahil Grewal & Sebastian Samaco
+--- Proposed by Sahil Grewal & Sebastian Samaco ([Proposal Document](https://drive.google.com/file/d/1FB7ih2Xl4OU3PR1JkczAumkkc5G4f7C8/view?usp=drive_link))
 
 # Project Management
 
