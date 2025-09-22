@@ -5,6 +5,7 @@
 > This idea is similar to systems like Facebook Marketplace or Kijiji, but unlike these public platforms,
 > MRU Exchange is student-only (verified `@mtroyal` email) and emphasizes saftey/trust/convenience.
 > The aim is a single, reliable hub for student needs---simpler, safer, cheaper.
+
 --- Proposed by Sahil Grewal & Sebastian Samaco
 
 # Project Management
