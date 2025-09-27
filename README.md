@@ -31,4 +31,4 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - Ramos Jacosalem ([@cjaco906](https://github.com/cjaco906))
 - Andrew Krawiec ([@AndrewTries](https://github.com/AndrewTries))
 - Mitchell Johnson ([@Mjohn572](https://github.com/Mjohn572))
-- (your name) ([@SahilGrewalx](https://github.com/SahilGrewalx))
+- Sahil Grewal ([@SahilGrewalx](https://github.com/SahilGrewalx))
