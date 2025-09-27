@@ -16,7 +16,7 @@ The latest project status (issues, pull requests, etc.) can be found [here](http
 
 ## Communication Channel
 
-We use [Discord](https://discord.gg/MQ7MB2ep) to discuss our project.
+We use [Discord](https://discord.gg/nW2RACDt) to discuss our project.
 
 ## Shared Google Folder
 
