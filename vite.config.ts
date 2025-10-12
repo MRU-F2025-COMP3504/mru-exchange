@@ -11,4 +11,12 @@ export default defineConfig({
       usePolling: true, // Update on file changes
     },
   },
+  resolve: {
+    alias: {
+      '@features': './src/features',
+      '@pages': './src/pages',
+      '@assets': './src/assets',
+      '@shared': './src/shared',
+    }
+  },
 });
