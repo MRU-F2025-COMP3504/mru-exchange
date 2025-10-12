@@ -12,5 +12,5 @@
       "@assets/*": ["./assets/*"],
       "@shared/*": ["./shared/*"]
     }
-  },
+  }
 }
