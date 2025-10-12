@@ -1,13 +1,18 @@
 {
   "name": "mru-exchange",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "d:dev": "docker compose -f compose.dev.yml up",
+    "dd:dev": "docker compose -f compose.dev.yml down",
+    "dr:dev": "docker compose -f compose.dev.yml up --build",
+    "d:prod": "docker compose -f compose.yml up",
+    "dd:prod": "docker compose -f compose.yml down",
+    "dr:prod": "docker compose -f compose.yml up --build",
     "lint": "eslint .",
-    "format": "prettier --format .",
+    "format": "prettier --write .",
     "preview": "vite preview"
   },
   "dependencies": {
