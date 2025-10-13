@@ -1,5 +1,11 @@
 export type Result<T> = { ok: true; data: T } | { ok: false; error: string };
 
+export enum SortingOrder {
+  NATURAL,
+  ASCENDING,
+  DESCENDING,
+}
+
 export interface Product {
   title: string;
   description: string;
