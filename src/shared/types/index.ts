@@ -10,7 +10,7 @@ export interface ProductStock {
   unit: number;
 }
 
-interface Product {
+export interface Product {
   attributes: ProductAttributes;
   stock: ProductStock;
 }
