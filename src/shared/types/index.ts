@@ -14,3 +14,7 @@ interface Product {
   attributes: ProductAttributes;
   stock: ProductStock;
 }
+
+export interface Buyer {}
+
+export interface Seller {}
