@@ -1,5 +1,4 @@
 export interface ProductAttributes {
-  seller: number;
   title: string;
   description: string;
   image: string;
@@ -13,6 +12,11 @@ export interface ProductStock {
 export interface Product {
   attributes: ProductAttributes;
   stock: ProductStock;
+}
+
+export interface ProductSeller {
+  seller: Seller;
+  item: Product;
 }
 
 export interface Buyer {}
