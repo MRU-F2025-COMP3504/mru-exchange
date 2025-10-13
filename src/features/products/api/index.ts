@@ -23,16 +23,6 @@ export function getProductInformation(id: number): Result<Product> {
 }
 
 /**
- * @param id the product seller
- */
-export function getProductSeller(
-  product: Product,
-  seller: Seller,
-): Result<Product> {
-  throw new Error('TODO');
-}
-
-/**
  * @param keywords the search keywords
  * @param filters the unique filters that narrows results
  */
