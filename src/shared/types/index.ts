@@ -10,6 +10,7 @@ export interface ProductStock {
 }
 
 export interface Product {
+  id: number;
   attributes: ProductAttributes;
   stock: ProductStock;
 }
