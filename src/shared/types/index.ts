@@ -16,8 +16,8 @@ export interface Product {
 }
 
 export interface ProductSeller {
+  product: Product;
   seller: Seller;
-  item: Product;
 }
 
 export interface Buyer {
