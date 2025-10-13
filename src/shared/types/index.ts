@@ -1,3 +1,5 @@
+export type Result<T> = { ok: true; data: T } | { ok: false; error: string };
+
 export interface Product {
   title: string;
   description: string;
