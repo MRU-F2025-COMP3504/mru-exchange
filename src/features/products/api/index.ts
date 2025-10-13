@@ -13,7 +13,7 @@ export function getProduct(id: number): Result<Product> {
 /**
  * @param id the seller identifier
  */
-export function getProductsBySeller(id: number): Result<Product[]> {
+export function getProductsBySeller(seller: Seller): Result<Product[]> {
   throw new Error('TODO');
 }
 
