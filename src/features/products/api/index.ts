@@ -18,7 +18,7 @@ export interface ProductFilter {
 /**
  * @param id the product identifier
  */
-export function getProductInformation(id: number): Result<Product> {
+export function getProduct(id: number): Result<Product> {
   throw new Error('TODO');
 }
 
