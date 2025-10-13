@@ -1,17 +1,9 @@
-export interface ProductAttributes {
+export interface Product {
   title: string;
   description: string;
   image: string;
-}
-
-export interface ProductStock {
   price: number;
-  unit: number;
-}
-
-export interface Product {
-  attributes: ProductAttributes;
-  stock: ProductStock;
+  stock: number;
 }
 
 export interface ProductSeller {
