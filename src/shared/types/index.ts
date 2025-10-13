@@ -10,12 +10,12 @@ export interface ProductStock {
 }
 
 export interface Product {
-  id: number;
   attributes: ProductAttributes;
   stock: ProductStock;
 }
 
 export interface ProductSeller {
+  id: number;
   product: Product;
   seller: Seller;
 }
