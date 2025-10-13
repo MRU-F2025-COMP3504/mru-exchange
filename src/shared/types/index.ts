@@ -20,6 +20,10 @@ export interface ProductSeller {
   item: Product;
 }
 
-export interface Buyer {}
+export interface Buyer {
+  id: number;
+}
 
-export interface Seller {}
+export interface Seller {
+  id: number;
+}
