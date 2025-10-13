@@ -1,19 +1,7 @@
+import { ProductFilter, ProductFilterType } from '@features/products/types';
 import { Product, Result, Seller, SortingOrder } from '@shared/types';
 import { ok, err } from '@shared/utils';
 // import {} from '@shared/api'; // database access
-
-export enum ProductFilterType {
-  CATEGORY,
-  SELLER,
-  PRICE_RANGE,
-  STOCK_RANGE,
-}
-
-export interface ProductFilter {
-  type: ProductFilterType;
-  order: SortingOrder;
-  content: string;
-}
 
 /**
  * @param id the product identifier
