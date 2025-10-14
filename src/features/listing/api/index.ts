@@ -18,6 +18,11 @@ export function create(product: Partial<Product>): Result<Product> {
   return ok(record);
 }
 
+export function remove(product: Product): boolean {
+  // database access
+  return true;
+}
+
 export function modify(
   target: Product,
   modify: Partial<Product>,
