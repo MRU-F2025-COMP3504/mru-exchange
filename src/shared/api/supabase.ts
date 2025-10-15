@@ -1,14 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@shared/types/database.types.ts';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const url = process.env.SUPABASE_URL;
+const key = process.env.SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!url || !key) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+export default createClient<Database>(url, key, {
   db: {
     schema: 'mru_dev', // Use mru_dev schema instead of public
   },
