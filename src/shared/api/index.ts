@@ -4,7 +4,7 @@
  * Central export for all API modules
  */
 
-export { authApi } from '../../features/auth/api/auth.api.ts';
+export { index } from '../../features/auth/api';
 export { productsApi } from './products.api';
 export { messagesApi } from './messages.api';
 export { cartApi } from './cart.api';

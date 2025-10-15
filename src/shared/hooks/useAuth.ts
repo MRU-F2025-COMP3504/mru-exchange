@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { authApi } from '../../features/auth/api/auth.api.ts';
+import { index } from '../../features/auth/api';
 import type { User } from '@supabase/supabase-js';
 import type { UserInformation } from '../types/database.types';
 
@@ -13,7 +13,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     // Get initial session
-    authApi.getSession().then(({ data }) => {
+    index.getSession().then(({ data }) => {
       setUser(data.session?.user ?? null);
       if (data.session?.user) {
         loadUserInfo(data.session.user.id);
@@ -25,7 +25,7 @@ export const useAuth = () => {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = authApi.onAuthStateChange(async (event, session) => {
+    } = index.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         await loadUserInfo(session.user.id);
@@ -41,7 +41,7 @@ export const useAuth = () => {
   }, []);
 
   const loadUserInfo = async (supabaseId: string) => {
-    const { data } = await authApi.getUserInfo(supabaseId);
+    const { data } = await index.getUserInfo(supabaseId);
     setUserInfo(data);
     setLoading(false);
   };
@@ -53,7 +53,7 @@ export const useAuth = () => {
     lastName?: string,
     userName?: string,
   ) => {
-    const result = await authApi.signUp(
+    const result = await index.signUp(
       email,
       password,
       firstName,
@@ -64,12 +64,12 @@ export const useAuth = () => {
   };
 
   const signIn = async (email: string, password: string) => {
-    const result = await authApi.signIn(email, password);
+    const result = await index.signIn(email, password);
     return result;
   };
 
   const signOut = async () => {
-    const result = await authApi.signOut();
+    const result = await index.signOut();
     setUser(null);
     setUserInfo(null);
     return result;
@@ -83,7 +83,7 @@ export const useAuth = () => {
   }) => {
     if (!user) return { data: null, error: { message: 'Not authenticated' } };
 
-    const result = await authApi.updateUserInfo(user.id, updates);
+    const result = await index.updateUserInfo(user.id, updates);
     if (result.data) {
       setUserInfo(result.data);
     }
