@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export type DatabaseTypes = {
+export type Database = {
   mru_dev: {
     Tables: {
       Category_Assigned_Products: {
@@ -482,7 +482,7 @@ export type DatabaseTypes = {
         Returns: boolean;
       };
       is_chat_visible_to_user: {
-        Args: { chat_row: DatabaseTypes['mru_dev']['Tables']['Chats']['Row'] };
+        Args: { chat_row: Database['mru_dev']['Tables']['Chats']['Row'] };
         Returns: boolean;
       };
       is_user_interaction_blocked: {
@@ -499,10 +499,10 @@ export type DatabaseTypes = {
   };
 };
 
-type DatabaseWithoutInternals = Omit<DatabaseTypes, '__InternalSupabase'>;
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>;
 
 type DefaultSchema = DatabaseWithoutInternals[Extract<
-  keyof DatabaseTypes,
+  keyof Database,
   'public'
 >];
 
