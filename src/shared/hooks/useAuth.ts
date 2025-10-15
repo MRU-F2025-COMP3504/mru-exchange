@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { authApi } from '../api/auth.api';
+import { authApi } from '../../features/auth/api/auth.api.ts';
 import type { User } from '@supabase/supabase-js';
 import type { UserInformation } from '../types/database.types';
 
@@ -51,9 +51,15 @@ export const useAuth = () => {
     password: string,
     firstName?: string,
     lastName?: string,
-    userName?: string
+    userName?: string,
   ) => {
-    const result = await authApi.signUp(email, password, firstName, lastName, userName);
+    const result = await authApi.signUp(
+      email,
+      password,
+      firstName,
+      lastName,
+      userName,
+    );
     return result;
   };
 
@@ -76,7 +82,7 @@ export const useAuth = () => {
     email?: string;
   }) => {
     if (!user) return { data: null, error: { message: 'Not authenticated' } };
-    
+
     const result = await authApi.updateUserInfo(user.id, updates);
     if (result.data) {
       setUserInfo(result.data);

@@ -1,5 +1,5 @@
 import { supabase } from '../utils/supabase';
-import type { UserInformation } from '../types/database.types';
+import type { UserInformation } from '../../../shared/types/database.types.ts';
 
 export const authApi = {
   signUp: async (email: string, password: string, firstName?: string, lastName?: string, userName?: string) => {
