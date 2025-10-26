@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { index } from '../../features/auth/api';
 import type { User } from '@supabase/supabase-js';
-import type { UserInformation } from '../types/database.types';
+import type { UserInformation } from '../types/database.ts';
 
 /**
  * Hook to manage authentication state
