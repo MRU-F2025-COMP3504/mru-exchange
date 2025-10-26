@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@shared/contexts/AuthContext';
 
 export default function SignInPage() {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function SignInPage() {
     setIsSubmitting(true);
     try {
       const { error } = await signIn(formData.email, formData.password);
-      
+
       if (error) {
         setErrors({ general: 'Invalid email or password' });
         return;
@@ -52,9 +52,9 @@ export default function SignInPage() {
   };
 
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[field];
         return newErrors;
@@ -90,33 +90,44 @@ export default function SignInPage() {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(to bottom right, #EFF6FF, #E0E7FF)',
-      padding: '3rem 1rem',
-    }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(to bottom right, #EFF6FF, #E0E7FF)',
+        padding: '3rem 1rem',
+      }}
+    >
       <div style={{ width: '100%', maxWidth: '24rem' }}>
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '0.75rem',
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-          padding: '2rem',
-        }}>
+        <div
+          style={{
+            backgroundColor: 'white',
+            borderRadius: '0.75rem',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            padding: '2rem',
+          }}
+        >
           <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-            <img 
-              src="/MruExchangeLogo.png" 
-              alt="MRU Exchange Logo" 
-              style={{ 
-                width: '100px', 
-                height: 'auto', 
+            <img
+              src='/MruExchangeLogo.png'
+              alt='MRU Exchange Logo'
+              style={{
+                width: '100px',
+                height: 'auto',
                 marginBottom: '1rem',
-                margin: '0 auto 1rem'
-              }} 
+                margin: '0 auto 1rem',
+              }}
             />
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.25rem' }}>
+            <h2
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#111827',
+                marginBottom: '0.25rem',
+              }}
+            >
               Sign In
             </h2>
             <p style={{ color: '#6B7280', fontSize: '0.875rem' }}>
@@ -124,15 +135,24 @@ export default function SignInPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.875rem',
+            }}
+          >
             <div>
-              <label htmlFor="email" style={labelStyle}>Email</label>
+              <label htmlFor='email' style={labelStyle}>
+                Email
+              </label>
               <input
-                id="email"
-                type="email"
+                id='email'
+                type='email'
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
-                placeholder="yourname@mtroyal.ca"
+                placeholder='yourname@mtroyal.ca'
                 style={inputStyle(!!errors.email)}
               />
               {errors.email && (
@@ -143,13 +163,15 @@ export default function SignInPage() {
             </div>
 
             <div>
-              <label htmlFor="password" style={labelStyle}>Password</label>
+              <label htmlFor='password' style={labelStyle}>
+                Password
+              </label>
               <input
-                id="password"
-                type="password"
+                id='password'
+                type='password'
                 value={formData.password}
                 onChange={(e) => handleChange('password', e.target.value)}
-                placeholder="Enter your password"
+                placeholder='Enter your password'
                 style={inputStyle(!!errors.password)}
               />
               {errors.password && (
@@ -160,13 +182,23 @@ export default function SignInPage() {
             </div>
 
             {errors.general && (
-              <div style={{
-                backgroundColor: '#FEF2F2',
-                border: '1px solid #FEE2E2',
-                borderRadius: '0.375rem',
-                padding: '0.625rem',
-              }}>
-                <p style={{ fontSize: '0.75rem', color: '#DC2626', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <div
+                style={{
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #FEE2E2',
+                  borderRadius: '0.375rem',
+                  padding: '0.625rem',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '0.75rem',
+                    color: '#DC2626',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                  }}
+                >
                   <span>✕</span> {errors.general}
                 </p>
               </div>
@@ -174,7 +206,7 @@ export default function SignInPage() {
 
             <div style={{ marginTop: '0.5rem' }}>
               <button
-                type="submit"
+                type='submit'
                 disabled={isSubmitting}
                 style={{
                   width: '100%',
@@ -192,10 +224,17 @@ export default function SignInPage() {
               </button>
             </div>
 
-            <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#6B7280', marginTop: '0.25rem' }}>
+            <p
+              style={{
+                textAlign: 'center',
+                fontSize: '0.75rem',
+                color: '#6B7280',
+                marginTop: '0.25rem',
+              }}
+            >
               Don't have an account?{' '}
               <button
-                type="button"
+                type='button'
                 onClick={() => navigate('/create-account')}
                 style={{
                   color: '#2563EB',

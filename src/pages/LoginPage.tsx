@@ -1,14 +1,14 @@
 import { useState, type FormEvent } from 'react';
-import { useAuth } from '@shared/hooks';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuthUser } from '@features/auth';
 
-export const LoginPage = () => {
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { signIn } = useAuth();
+  const { signIn } = useAuthUser();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -20,23 +20,20 @@ export const LoginPage = () => {
     if (!email.endsWith('@mtroyal.ca')) {
       setError('Please use a valid @mtroyal.ca email address');
       setIsLoading(false);
+
       return;
     }
 
-    try {
-      const { error: signInError } = await signIn(email, password);
+    const result = await signIn(email, password);
 
-      if (signInError) {
-        setError(signInError.message);
-      } else {
-        // Redirect to home page on successful login
-        navigate('/');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-    } finally {
-      setIsLoading(false);
+    if (result.ok) {
+      // Redirect to home page on successful login
+      navigate('/');
+    } else {
+      setError(result.error.message);
     }
+
+    setIsLoading(false);
   };
 
   return (
@@ -155,4 +152,4 @@ export const LoginPage = () => {
       </div>
     </div>
   );
-};
+}

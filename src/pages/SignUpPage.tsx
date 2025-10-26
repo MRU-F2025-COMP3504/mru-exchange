@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react';
-import { useAuth } from '@shared/hooks';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuthUser } from '@features/auth';
 
-export const SignUpPage = () => {
+export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -13,11 +13,12 @@ export const SignUpPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const { signUp } = useAuth();
+  const { signUp } = useAuthUser();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     setError('');
     setSuccessMessage('');
     setIsLoading(true);
@@ -26,46 +27,34 @@ export const SignUpPage = () => {
     if (!email.endsWith('@mtroyal.ca')) {
       setError('Please use a valid @mtroyal.ca email address');
       setIsLoading(false);
-      return;
-    }
 
-    // Validate password match
-    if (password !== confirmPassword) {
+      return;
+    } else if (password !== confirmPassword) {
+      // Validate password match
       setError('Passwords do not match');
       setIsLoading(false);
-      return;
-    }
 
-    // Validate password length
-    if (password.length < 6) {
+      return;
+    } else if (password.length < 6) {
+      // Validate password length
       setError('Password must be at least 6 characters long');
       setIsLoading(false);
+
       return;
     }
 
-    try {
-      const { error: signUpError } = await signUp(
-        email,
-        password,
-        firstName,
-        lastName,
-        userName,
+    const result = await signUp(email, password);
+
+    if (result.ok) {
+      setSuccessMessage(
+        'Account created successfully! Please check your email to verify your account.',
       );
 
-      if (signUpError) {
-        setError(signUpError.message);
-      } else {
-        setSuccessMessage(
-          'Account created successfully! Please check your email to verify your account.',
-        );
-        // Optionally redirect after a delay
-        setTimeout(() => navigate('/login'), 3000);
-      }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-    } finally {
-      setIsLoading(false);
+      // Optionally redirect after a delay
+      setTimeout(() => navigate('/login'), 3000);
     }
+
+    setIsLoading(false);
   };
 
   return (
@@ -262,4 +251,4 @@ export const SignUpPage = () => {
       </div>
     </div>
   );
-};
+}
