@@ -1,11 +1,11 @@
 import { supabase } from '../utils/supabase';
-import type { Report } from '../types/database.types';
+import type { Report } from '../types/database.ts';
 
 export const reportsApi = {
   createReport: async (
     reporterId: string,
     reportedUserId: string,
-    linkedInformation: string
+    linkedInformation: string,
   ) => {
     const { data, error } = await supabase
       .from('Reports')
@@ -43,7 +43,7 @@ export const reportsApi = {
           email,
           supabase_id
         )
-      `
+      `,
       )
       .order('created_at', { ascending: false });
 
@@ -67,7 +67,7 @@ export const reportsApi = {
           last_name,
           user_name
         )
-      `
+      `,
       )
       .eq('created_by_id', userId)
       .order('created_at', { ascending: false });
@@ -86,7 +86,7 @@ export const reportsApi = {
           last_name,
           user_name
         )
-      `
+      `,
       )
       .eq('created_on_id', userId)
       .order('created_at', { ascending: false });
@@ -134,7 +134,10 @@ export const reportsApi = {
   },
 
   deleteReport: async (reportId: number) => {
-    const { error } = await supabase.from('Reports').delete().eq('id', reportId);
+    const { error } = await supabase
+      .from('Reports')
+      .delete()
+      .eq('id', reportId);
 
     return { error };
   },

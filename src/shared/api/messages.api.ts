@@ -1,5 +1,5 @@
 import { supabase } from '../utils/supabase';
-import type { Chat, Message } from '../types/database.types';
+import type { Chat, Message } from '../types/database.ts';
 
 export const messagesApi = {
   getUserChats: async (userId: string) => {
@@ -22,7 +22,7 @@ export const messagesApi = {
           user_name,
           supabase_id
         )
-      `
+      `,
       )
       .or(`user_id_1.eq.${userId},user_id_2.eq.${userId}`)
       .order('created_at', { ascending: false });
@@ -35,7 +35,7 @@ export const messagesApi = {
       .from('Chats')
       .select('*')
       .or(
-        `and(user_id_1.eq.${userId1},user_id_2.eq.${userId2}),and(user_id_1.eq.${userId2},user_id_2.eq.${userId1})`
+        `and(user_id_1.eq.${userId1},user_id_2.eq.${userId2}),and(user_id_1.eq.${userId2},user_id_2.eq.${userId1})`,
       )
       .single();
 
@@ -70,7 +70,7 @@ export const messagesApi = {
           user_name,
           supabase_id
         )
-      `
+      `,
       )
       .eq('chat_id', chatId)
       .eq('visible', true)
@@ -106,13 +106,20 @@ export const messagesApi = {
   },
 
   deleteMessage: async (messageId: number) => {
-    const { error } = await supabase.from('Messages').delete().eq('id', messageId);
+    const { error } = await supabase
+      .from('Messages')
+      .delete()
+      .eq('id', messageId);
 
     return { error };
   },
 
   hideChat: async (chatId: number, userId: string) => {
-    const { data: chat } = await supabase.from('Chats').select('*').eq('id', chatId).single();
+    const { data: chat } = await supabase
+      .from('Chats')
+      .select('*')
+      .eq('id', chatId)
+      .single();
 
     if (!chat) {
       return { error: { message: 'Chat not found' } };
@@ -132,7 +139,11 @@ export const messagesApi = {
   },
 
   showChat: async (chatId: number, userId: string) => {
-    const { data: chat } = await supabase.from('Chats').select('*').eq('id', chatId).single();
+    const { data: chat } = await supabase
+      .from('Chats')
+      .select('*')
+      .eq('id', chatId)
+      .single();
 
     if (!chat) {
       return { error: { message: 'Chat not found' } };
@@ -171,7 +182,10 @@ export const messagesApi = {
     return { count, error };
   },
 
-  subscribeToChat: (chatId: number, callback: (payload: { new: Message }) => void) => {
+  subscribeToChat: (
+    chatId: number,
+    callback: (payload: { new: Message }) => void,
+  ) => {
     return supabase
       .channel(`chat-${chatId}`)
       .on(
@@ -182,12 +196,15 @@ export const messagesApi = {
           table: 'Messages',
           filter: `chat_id=eq.${chatId}`,
         },
-        callback
+        callback,
       )
       .subscribe();
   },
 
-  subscribeToUserChats: (userId: string, callback: (payload: { new: Chat }) => void) => {
+  subscribeToUserChats: (
+    userId: string,
+    callback: (payload: { new: Chat }) => void,
+  ) => {
     return supabase
       .channel(`user-chats-${userId}`)
       .on(
@@ -198,7 +215,7 @@ export const messagesApi = {
           table: 'Chats',
           filter: `user_id_1=eq.${userId}`,
         },
-        callback
+        callback,
       )
       .on(
         'postgres_changes',
@@ -208,7 +225,7 @@ export const messagesApi = {
           table: 'Chats',
           filter: `user_id_2=eq.${userId}`,
         },
-        callback
+        callback,
       )
       .subscribe();
   },

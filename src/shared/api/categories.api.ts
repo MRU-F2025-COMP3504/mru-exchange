@@ -1,5 +1,5 @@
 import { supabase } from '../utils/supabase';
-import type { CategoryTag } from '../types/database.types';
+import type { CategoryTag } from '../types/database.ts';
 
 export const categoriesApi = {
   getAllCategories: async () => {
@@ -39,7 +39,7 @@ export const categoriesApi = {
     updates: {
       name?: string;
       description?: string;
-    }
+    },
   ) => {
     const { data, error } = await supabase
       .from('Catagory_Tags')
@@ -52,7 +52,10 @@ export const categoriesApi = {
   },
 
   deleteCategory: async (id: number) => {
-    const { error } = await supabase.from('Catagory_Tags').delete().eq('id', id);
+    const { error } = await supabase
+      .from('Catagory_Tags')
+      .delete()
+      .eq('id', id);
 
     return { error };
   },
@@ -71,7 +74,7 @@ export const categoriesApi = {
             user_name
           )
         )
-      `
+      `,
       )
       .eq('category_id', categoryId);
 

@@ -1,5 +1,5 @@
 import { supabase } from '../utils/supabase';
-import type { UserInteraction } from '../types/database.types';
+import type { UserInteraction } from '../types/database.ts';
 
 export const userInteractionsApi = {
   getOrCreateInteraction: async (userId1: string, userId2: string) => {
@@ -7,7 +7,7 @@ export const userInteractionsApi = {
       .from('User_Interactions')
       .select('*')
       .or(
-        `and(user_id_1.eq.${userId1},user_id_2.eq.${userId2}),and(user_id_1.eq.${userId2},user_id_2.eq.${userId1})`
+        `and(user_id_1.eq.${userId1},user_id_2.eq.${userId2}),and(user_id_1.eq.${userId2},user_id_2.eq.${userId1})`,
       )
       .single();
 
@@ -32,10 +32,8 @@ export const userInteractionsApi = {
   },
 
   blockUser: async (blockerId: string, blockedId: string) => {
-    const { data: interaction } = await userInteractionsApi.getOrCreateInteraction(
-      blockerId,
-      blockedId
-    );
+    const { data: interaction } =
+      await userInteractionsApi.getOrCreateInteraction(blockerId, blockedId);
 
     if (!interaction) {
       return { error: { message: 'Could not create interaction' } };
@@ -55,10 +53,8 @@ export const userInteractionsApi = {
   },
 
   unblockUser: async (blockerId: string, blockedId: string) => {
-    const { data: interaction } = await userInteractionsApi.getOrCreateInteraction(
-      blockerId,
-      blockedId
-    );
+    const { data: interaction } =
+      await userInteractionsApi.getOrCreateInteraction(blockerId, blockedId);
 
     if (!interaction) {
       return { error: { message: 'Interaction not found' } };
@@ -78,10 +74,8 @@ export const userInteractionsApi = {
   },
 
   muteUser: async (muterId: string, mutedId: string) => {
-    const { data: interaction } = await userInteractionsApi.getOrCreateInteraction(
-      muterId,
-      mutedId
-    );
+    const { data: interaction } =
+      await userInteractionsApi.getOrCreateInteraction(muterId, mutedId);
 
     if (!interaction) {
       return { error: { message: 'Could not create interaction' } };
@@ -101,10 +95,8 @@ export const userInteractionsApi = {
   },
 
   unmuteUser: async (muterId: string, mutedId: string) => {
-    const { data: interaction } = await userInteractionsApi.getOrCreateInteraction(
-      muterId,
-      mutedId
-    );
+    const { data: interaction } =
+      await userInteractionsApi.getOrCreateInteraction(muterId, mutedId);
 
     if (!interaction) {
       return { error: { message: 'Interaction not found' } };
@@ -128,7 +120,7 @@ export const userInteractionsApi = {
       .from('User_Interactions')
       .select('*')
       .or(
-        `and(user_id_1.eq.${userId},user_id_2.eq.${otherUserId}),and(user_id_1.eq.${otherUserId},user_id_2.eq.${userId})`
+        `and(user_id_1.eq.${userId},user_id_2.eq.${otherUserId}),and(user_id_1.eq.${otherUserId},user_id_2.eq.${userId})`,
       )
       .single();
 
@@ -145,7 +137,7 @@ export const userInteractionsApi = {
       .from('User_Interactions')
       .select('*')
       .or(
-        `and(user_id_1.eq.${userId},user_id_2.eq.${otherUserId}),and(user_id_1.eq.${otherUserId},user_id_2.eq.${userId})`
+        `and(user_id_1.eq.${userId},user_id_2.eq.${otherUserId}),and(user_id_1.eq.${otherUserId},user_id_2.eq.${userId})`,
       )
       .single();
 
@@ -177,7 +169,7 @@ export const userInteractionsApi = {
           user_name,
           supabase_id
         )
-      `
+      `,
       )
       .or(`user_id_1.eq.${userId},user_id_2.eq.${userId}`)
       .or('user_1_is_blocked.eq.true,user_2_is_blocked.eq.true');
@@ -205,7 +197,7 @@ export const userInteractionsApi = {
           user_name,
           supabase_id
         )
-      `
+      `,
       )
       .or(`user_id_1.eq.${userId},user_id_2.eq.${userId}`)
       .or('user_1_is_muted.eq.true,user_2_is_muted.eq.true');

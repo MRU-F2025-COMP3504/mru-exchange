@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { cartApi } from '../api/cart.api';
-import type { ShoppingCart } from '../types/database.types';
+import type { ShoppingCart } from '../types/database.ts';
 
 /**
  * Hook to manage user's shopping cart
@@ -64,7 +64,9 @@ export const useCart = (userId: string | null) => {
     const result = await cartApi.removeProductFromCart(userId, productId);
 
     if (!result.error) {
-      setCartItems((prev) => prev.filter((item) => item.product_id !== productId));
+      setCartItems((prev) =>
+        prev.filter((item) => item.product_id !== productId),
+      );
     }
 
     return result;
@@ -103,7 +105,10 @@ export const useCart = (userId: string | null) => {
 /**
  * Hook to check if a single product is in cart
  */
-export const useIsInCart = (userId: string | null, productId: number | null) => {
+export const useIsInCart = (
+  userId: string | null,
+  productId: number | null,
+) => {
   const [isInCart, setIsInCart] = useState(false);
   const [loading, setLoading] = useState(true);
 

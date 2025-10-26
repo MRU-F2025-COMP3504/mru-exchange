@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { reviewsApi } from '../api/reviews.api';
-import type { Review } from '../types/database.types';
+import type { Review } from '../types/database.ts';
 
 /**
  * Hook to fetch product reviews
@@ -28,7 +28,8 @@ export const useProductReviews = (productId: number | null) => {
     setLoading(true);
     setError(null);
 
-    const { data, error: fetchError } = await reviewsApi.getProductReviews(productId);
+    const { data, error: fetchError } =
+      await reviewsApi.getProductReviews(productId);
 
     if (fetchError) {
       setError(fetchError.message);
@@ -42,7 +43,8 @@ export const useProductReviews = (productId: number | null) => {
   const fetchAverageRating = async () => {
     if (!productId) return;
 
-    const { average, count } = await reviewsApi.getProductAverageRating(productId);
+    const { average, count } =
+      await reviewsApi.getProductAverageRating(productId);
     setAverageRating(average);
     setReviewCount(count);
   };
@@ -130,7 +132,8 @@ export const useSellerReviews = (userId: string | null) => {
     setLoading(true);
     setError(null);
 
-    const { data, error: fetchError } = await reviewsApi.getReviewsForUser(userId);
+    const { data, error: fetchError } =
+      await reviewsApi.getReviewsForUser(userId);
 
     if (fetchError) {
       setError(fetchError.message);

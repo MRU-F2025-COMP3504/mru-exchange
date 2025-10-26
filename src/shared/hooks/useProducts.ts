@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { productsApi, type ProductFilters } from '../api/products.api';
-import type { ProductInformation } from '../types/database.types';
+import type { ProductInformation } from '../types/database.ts';
 
 /**
  * Hook to fetch and manage products
@@ -110,7 +110,8 @@ export const useUserProducts = (userId: string | null) => {
     setLoading(true);
     setError(null);
 
-    const { data, error: fetchError } = await productsApi.getUserProducts(userId);
+    const { data, error: fetchError } =
+      await productsApi.getUserProducts(userId);
 
     if (fetchError) {
       setError(fetchError.message);

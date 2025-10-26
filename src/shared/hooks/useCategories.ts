@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { categoriesApi } from '../api/categories.api';
-import type { CategoryTag } from '../types/database.types';
+import type { CategoryTag } from '../types/database.ts';
 
 /**
  * Hook to fetch all categories
@@ -60,7 +60,8 @@ export const useCategory = (categoryId: number | null) => {
     setLoading(true);
     setError(null);
 
-    const { data, error: fetchError } = await categoriesApi.getCategory(categoryId);
+    const { data, error: fetchError } =
+      await categoriesApi.getCategory(categoryId);
 
     if (fetchError) {
       setError(fetchError.message);
@@ -104,7 +105,8 @@ export const useCategoryProducts = (categoryId: number | null) => {
     setLoading(true);
     setError(null);
 
-    const { data, error: fetchError } = await categoriesApi.getCategoryProducts(categoryId);
+    const { data, error: fetchError } =
+      await categoriesApi.getCategoryProducts(categoryId);
 
     if (fetchError) {
       setError(fetchError.message);

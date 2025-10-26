@@ -1,5 +1,5 @@
 import { supabase } from '../utils/supabase';
-import type { ProductInformation } from '../types/database.types';
+import type { ProductInformation } from '../types/database.ts';
 
 export interface CreateProductData {
   title: string;
@@ -50,7 +50,7 @@ export const productsApi = {
             description
           )
         )
-      `
+      `,
       )
       .order('created_at', { ascending: false });
 
@@ -74,7 +74,7 @@ export const productsApi = {
 
     if (filters?.searchQuery) {
       query = query.or(
-        `title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`
+        `title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`,
       );
     }
 
@@ -83,8 +83,8 @@ export const productsApi = {
     if (filters?.categoryId && data) {
       const filtered = data.filter((product: any) =>
         product.Catagory_Assigned_Products?.some(
-          (cat: any) => cat.category_id === filters.categoryId
-        )
+          (cat: any) => cat.category_id === filters.categoryId,
+        ),
       );
       return { data: filtered, error };
     }
@@ -124,7 +124,7 @@ export const productsApi = {
             user_name
           )
         )
-      `
+      `,
       )
       .eq('id', id)
       .single();
@@ -164,7 +164,9 @@ export const productsApi = {
         category_id: categoryId,
       }));
 
-      await supabase.from('Catagory_Assigned_Products').insert(categoryAssignments);
+      await supabase
+        .from('Catagory_Assigned_Products')
+        .insert(categoryAssignments);
     }
 
     return { data, error: null };
@@ -182,7 +184,10 @@ export const productsApi = {
   },
 
   deleteProduct: async (productId: number) => {
-    const { error } = await supabase.from('Product_Information').delete().eq('id', productId);
+    const { error } = await supabase
+      .from('Product_Information')
+      .delete()
+      .eq('id', productId);
 
     return { error };
   },
@@ -221,7 +226,10 @@ export const productsApi = {
   },
 
   assignCategories: async (productId: number, categoryIds: number[]) => {
-    await supabase.from('Catagory_Assigned_Products').delete().eq('product_id', productId);
+    await supabase
+      .from('Catagory_Assigned_Products')
+      .delete()
+      .eq('product_id', productId);
 
     const categoryAssignments = categoryIds.map((categoryId) => ({
       product_id: productId,
@@ -247,7 +255,7 @@ export const productsApi = {
           name,
           description
         )
-      `
+      `,
       )
       .eq('product_id', productId);
 

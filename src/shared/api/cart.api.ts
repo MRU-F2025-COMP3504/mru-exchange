@@ -1,5 +1,5 @@
 import { supabase } from '../utils/supabase';
-import type { ShoppingCart } from '../types/database.types';
+import type { ShoppingCart } from '../types/database.ts';
 
 export const cartApi = {
   getUserCart: async (userId: string) => {
@@ -16,7 +16,7 @@ export const cartApi = {
             user_name
           )
         )
-      `
+      `,
       )
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
@@ -49,7 +49,10 @@ export const cartApi = {
   },
 
   removeFromCart: async (cartItemId: number) => {
-    const { error } = await supabase.from('Shopping_Cart').delete().eq('id', cartItemId);
+    const { error } = await supabase
+      .from('Shopping_Cart')
+      .delete()
+      .eq('id', cartItemId);
 
     return { error };
   },
@@ -65,7 +68,10 @@ export const cartApi = {
   },
 
   clearCart: async (userId: string) => {
-    const { error } = await supabase.from('Shopping_Cart').delete().eq('user_id', userId);
+    const { error } = await supabase
+      .from('Shopping_Cart')
+      .delete()
+      .eq('user_id', userId);
 
     return { error };
   },

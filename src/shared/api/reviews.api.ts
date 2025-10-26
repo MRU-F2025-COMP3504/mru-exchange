@@ -1,5 +1,5 @@
 import { supabase } from '../utils/supabase';
-import type { Review } from '../types/database.types';
+import type { Review } from '../types/database.ts';
 
 export const reviewsApi = {
   getProductReviews: async (productId: number) => {
@@ -22,7 +22,7 @@ export const reviewsApi = {
           user_name,
           supabase_id
         )
-      `
+      `,
       )
       .eq('product_id', productId)
       .order('created_at', { ascending: false });
@@ -46,7 +46,7 @@ export const reviewsApi = {
           last_name,
           user_name
         )
-      `
+      `,
       )
       .eq('created_by_id', userId)
       .order('created_at', { ascending: false });
@@ -70,7 +70,7 @@ export const reviewsApi = {
           title,
           image
         )
-      `
+      `,
       )
       .eq('created_on_id', userId)
       .order('created_at', { ascending: false });
@@ -83,10 +83,13 @@ export const reviewsApi = {
     reviewerId: string,
     reviewedUserId: string,
     rating: number,
-    description?: string
+    description?: string,
   ) => {
     if (rating < 0 || rating > 5) {
-      return { data: null, error: { message: 'Rating must be between 0 and 5' } };
+      return {
+        data: null,
+        error: { message: 'Rating must be between 0 and 5' },
+      };
     }
 
     const { data, error } = await supabase
@@ -109,10 +112,16 @@ export const reviewsApi = {
     updates: {
       rating?: number;
       description?: string;
-    }
+    },
   ) => {
-    if (updates.rating !== undefined && (updates.rating < 0 || updates.rating > 5)) {
-      return { data: null, error: { message: 'Rating must be between 0 and 5' } };
+    if (
+      updates.rating !== undefined &&
+      (updates.rating < 0 || updates.rating > 5)
+    ) {
+      return {
+        data: null,
+        error: { message: 'Rating must be between 0 and 5' },
+      };
     }
 
     const { data, error } = await supabase
@@ -126,7 +135,10 @@ export const reviewsApi = {
   },
 
   deleteReview: async (reviewId: number) => {
-    const { error } = await supabase.from('Reviews').delete().eq('id', reviewId);
+    const { error } = await supabase
+      .from('Reviews')
+      .delete()
+      .eq('id', reviewId);
 
     return { error };
   },

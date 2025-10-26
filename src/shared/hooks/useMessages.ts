@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { messagesApi } from '../api/messages.api';
-import type { Chat, Message } from '../types/database.types';
+import type { Chat, Message } from '../types/database.ts';
 
 /**
  * Hook to manage a chat and its messages
@@ -34,7 +34,8 @@ export const useChat = (chatId: number | null) => {
     setLoading(true);
     setError(null);
 
-    const { data, error: fetchError } = await messagesApi.getChatMessages(chatId);
+    const { data, error: fetchError } =
+      await messagesApi.getChatMessages(chatId);
 
     if (fetchError) {
       setError(fetchError.message);
