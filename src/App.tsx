@@ -1,30 +1,32 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import WelcomePage from './pages/WelcomePage';
-import SignInPage from './pages/SignInPage';
-import CreateAccountPage from './pages/CreateAccountPage';
-import VerifyEmailPage from './pages/VerifyEmailPage';
-import HomePage from './pages/HomePage';
+import { AuthProvider } from '@shared/contexts';
+import { ProtectedRoute } from '@shared/components';
+import {
+  WelcomePage,
+  SignInPage,
+  CreateAccountPage,
+  VerifyEmailPage,
+  HomePage,
+} from '@pages/index';
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<WelcomePage />} />
-          <Route path="/signin" element={<SignInPage />} />
-          <Route path="/create-account" element={<CreateAccountPage />} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path='/' element={<WelcomePage />} />
+          <Route path='/signin' element={<SignInPage />} />
+          <Route path='/create-account' element={<CreateAccountPage />} />
+          <Route path='/verify-email' element={<VerifyEmailPage />} />
           <Route
-            path="/home"
+            path='/home'
             element={
               <ProtectedRoute>
                 <HomePage />
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path='*' element={<Navigate to='/' replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
