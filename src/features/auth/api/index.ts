@@ -1,22 +1,48 @@
-import supabase from '@shared/api/supabase';
-import type { UserInformation } from '@shared/types/database.types.ts';
+import { supabase } from '@shared/api';
+import { ok, err } from '@shared/utils';
+import {
+  type AuthChangeEvent,
+  AuthError,
+  type Session,
+  type Subscription,
+  type User as AuthUser,
+} from '@supabase/supabase-js';
+import type { AuthPromiseResult, UserSession } from '@features/auth/types';
+import type { Result } from '@shared/types';
 
-export async function getSession() {
-  const { data, error } = await supabase.auth.getSession();
-  return { data, error };
+export async function getSession(): AuthPromiseResult<Session> {
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (session) {
+    return ok(session);
+  } else if (error) {
+    return err(error);
+  }
+
+  return err(new AuthError('No session found', 401, 'session_not_found'));
 }
 
-export async function getCurrentUser() {
+export async function getCurrentUser(): AuthPromiseResult<AuthUser> {
   const { data, error } = await supabase.auth.getUser();
-  return { data, error };
+
+  return error ? err(error) : ok(data.user);
 }
 
-export async function onSignUp(email: string, password: string, firstName?: string, lastName?: string, username?: string) {
+export async function signUp(
+  email: string,
+  password: string,
+): AuthPromiseResult<UserSession> {
   if (!email.endsWith('@mtroyal.ca')) {
-    return {
-      data: null,
-      error: { message: 'Only @mtroyal.ca email addresses are allowed' },
-    };
+    return err(
+      new AuthError(
+        'Only @mtroyal.ca email addresses are allowed',
+        401,
+        'email_address_invalid',
+      ),
+    );
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -24,108 +50,61 @@ export async function onSignUp(email: string, password: string, firstName?: stri
     password,
   });
 
-  if (error) return { data, null, error };
-
-  return { data, error: null };
+  return error ? err(error) : ok(data);
 }
 
-export async function onSignIn(email: string, password: string) {
+export async function signIn(
+  email: string,
+  password: string,
+): AuthPromiseResult<UserSession> {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
-  return { data, error };
+  return error ? err(error) : ok(data);
 }
 
-export async function onSignOut() {
+export async function signOut(): AuthPromiseResult<{}> {
   const { error } = await supabase.auth.signOut();
-  return { error };
+
+  return error ? err(error) : ok({});
 }
 
-export async function onResetPassword(email: string) {
+export async function resetPassword(email: string): AuthPromiseResult<{}> {
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${window.location.origin}/reset-password`,
   });
 
-  return { data, error };
+  return error ? err(error) : ok(data);
 }
 
-export async function onUpdatePassword(newPassword: string) {
+export async function updatePassword(
+  password: string,
+): AuthPromiseResult<AuthUser> {
   const { data, error } = await supabase.auth.updateUser({
-    password: newPassword,
+    password,
   });
 
-  return { data, error };
+  return error ? err(error) : ok(data.user);
 }
 
-export async function onAuthStateChange(callback: (event: string, session: any) => void) {
-  return supabase.auth.onAuthStateChange(callback);
-}
+export function onAuthStateChange(
+  callback: (
+    event: AuthChangeEvent,
+    session: Result<Session, AuthError>,
+  ) => void,
+): Subscription {
+  const subscriber = supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+      callback(event, ok(session));
+    } else {
+      callback(
+        event,
+        err(new AuthError('No session found', 401, 'session_not_found')),
+      );
+    }
+  });
 
-export async function getUserInfo(supabaseId: string) {
-  const { data, error } = await supabase
-    .from('User_Information')
-    .select('*')
-    .eq('supabase_id', supabaseId)
-    .single();
-
-  return { data, error };
-}
-
-export async function getUserInfoById: async (id: number) {
-  const { data, error } = await supabase
-    .from('User_Information')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  return { data, error };
-}
-
-export async function updateUserInfo(
-  supabaseId: string,
-  updates: {
-    first_name?: string;
-    last_name?: string;
-    user_name?: string;
-    email?: string;
-  }
-) {
-  const { data, error } = await supabase
-    .from('User_Information')
-    .update(updates)
-    .eq('supabase_id', supabaseId)
-    .select()
-    .single();
-
-  return { data, error };
-}
-
-export async function deleteUser(supabaseId: string) {
-  const { data, error } = await supabase
-    .from('User_Information')
-    .update({
-      is_deleted: true,
-      deleted_on: new Date().toISOString(),
-    })
-    .eq('supabase_id', supabaseId)
-    .select()
-    .single();
-
-  return { data, error };
-}
-
-export async function flagUser(supabaseId: string, flagType: string) {
-  const { data, error } = await supabase
-    .from('User_Information')
-    .update({
-      is_flagged: true,
-      flagged_type: flagType,
-    })
-    .eq('supabase_id', supabaseId)
-    .select()
-    .single();
-
-  return { data, error };
+  return subscriber.data.subscription;
 }
