@@ -7,7 +7,7 @@ export type Json =
   | Json[];
 
 export type Database = {
-  mru_dev: {
+  public: {
     Tables: {
       Category_Assigned_Products: {
         Row: {
@@ -482,7 +482,7 @@ export type Database = {
         Returns: boolean;
       };
       is_chat_visible_to_user: {
-        Args: { chat_row: Database['mru_dev']['Tables']['Chats']['Row'] };
+        Args: { chat_row: Database['public']['Tables']['Chats']['Row'] };
         Returns: boolean;
       };
       is_user_interaction_blocked: {
@@ -620,7 +620,7 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  mru_dev: {
+  public: {
     Enums: {},
   },
 } as const;
