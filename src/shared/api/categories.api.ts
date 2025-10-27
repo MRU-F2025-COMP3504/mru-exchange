@@ -1,17 +1,18 @@
 import { supabase } from '@shared/api';
 import { ok, err } from '@shared/utils';
 import type {
+  CategoryAssignedProductTable,
   CategoryTagTable,
   DatabaseQueryResult,
   PickOmit,
 } from '@shared/types';
 
 export async function getAllCategories(
-  select: string,
-): DatabaseQueryResult<CategoryTagTable> {
+  columns: string,
+): DatabaseQueryResult<CategoryTagTable[]> {
   const { data, error } = await supabase
     .from('Category_Tags')
-    .select(select)
+    .select(columns as '*')
     .order('name', { ascending: true });
 
   return error ? err(error) : ok(data);
@@ -19,11 +20,11 @@ export async function getAllCategories(
 
 export async function getCategory(
   id: number,
-  select: string,
+  columns: string,
 ): DatabaseQueryResult<CategoryTagTable> {
   const { data, error } = await supabase
     .from('Category_Tags')
-    .select(select)
+    .select(columns as '*')
     .eq('id', id)
     .single();
 
@@ -32,11 +33,11 @@ export async function getCategory(
 
 export async function getCategoryProducts(
   id: number,
-  select: string,
-): DatabaseQueryResult<CategoryTagTable> {
+  columns: string,
+): DatabaseQueryResult<CategoryAssignedProductTable[]> {
   const { data, error } = await supabase
     .from('Category_Assigned_Products')
-    .select(select)
+    .select(columns as '*')
     .eq('category_id', id);
 
   return error ? err(error) : ok(data);
@@ -44,14 +45,20 @@ export async function getCategoryProducts(
 
 export async function getCategoryProductCount(
   id: number,
-  select: string,
-): DatabaseQueryResult<CategoryTagTable> {
+  columns: string,
+): DatabaseQueryResult<number> {
   const { count, error } = await supabase
     .from('Category_Assigned_Products')
-    .select(select, { count: 'exact', head: true })
+    .select(columns as '*', { count: 'exact', head: true })
     .eq('category_id', id);
 
-  return error ? err(error) : ok(count);
+  if (error) {
+    return err(error);
+  } else if (count) {
+    return ok(count);
+  }
+
+  return ok(0);
 }
 
 export async function createCategory(
