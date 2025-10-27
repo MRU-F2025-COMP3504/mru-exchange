@@ -1,98 +1,108 @@
-import { supabase } from '../utils/supabase';
-import type { ShoppingCart } from '../types/database.ts';
+import { supabase } from '@shared/api';
+import { ok, err } from '@shared/utils';
+import type { DatabaseQueryResult, ShoppingCartTable } from '@shared/types';
 
-export const cartApi = {
-  getUserCart: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('Shopping_Cart')
-      .select(
-        `
-        *,
-        Product_Information:product_id (
-          *,
-          User_Information:user_id (
-            first_name,
-            last_name,
-            user_name
-          )
-        )
-      `,
-      )
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+export async function getUserCart(
+  id: string,
+  columns: string,
+): DatabaseQueryResult<ShoppingCartTable[]> {
+  const { data, error } = await supabase
+    .from('Shopping_Cart')
+    .select(columns as '*')
+    .eq('user_id', id)
+    .order('created_at', { ascending: false });
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  addToCart: async (userId: string, productId: number) => {
-    const { data: existing } = await supabase
-      .from('Shopping_Cart')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('product_id', productId)
-      .single();
+export async function addToCart(
+  userId: string,
+  productId: number,
+  columns: string,
+): DatabaseQueryResult<ShoppingCartTable> {
+  const { data, error } = await supabase
+    .from('Shopping_Cart')
+    .select(columns as '*')
+    .eq('product_id', productId)
+    .eq('user_id', userId)
+    .single();
 
-    if (existing) {
-      return { data: existing, error: { message: 'Item already in cart' } };
-    }
+  if (data) {
+    return err(new Error('Item already in cart'));
+  } else if (error) {
+    return err(error);
+  }
 
-    const { data, error } = await supabase
-      .from('Shopping_Cart')
-      .insert({
-        user_id: userId,
-        product_id: productId,
-      })
-      .select()
-      .single();
+  const result = await supabase
+    .from('Shopping_Cart')
+    .insert({ user_id: userId, product_id: productId })
+    .select()
+    .single();
 
-    return { data, error };
-  },
+  if (result.error) {
+    return err(result.error);
+  }
 
-  removeFromCart: async (cartItemId: number) => {
-    const { error } = await supabase
-      .from('Shopping_Cart')
-      .delete()
-      .eq('id', cartItemId);
+  return ok(result.data);
+}
 
-    return { error };
-  },
+export async function removeFromCart(id: number): DatabaseQueryResult<{}> {
+  const { error } = await supabase.from('Shopping_Cart').delete().eq('id', id);
+  return error ? err(error) : ok({});
+}
 
-  removeProductFromCart: async (userId: string, productId: number) => {
-    const { error } = await supabase
-      .from('Shopping_Cart')
-      .delete()
-      .eq('user_id', userId)
-      .eq('product_id', productId);
+export async function removeProductFromCart(
+  userId: string,
+  productId: number,
+): DatabaseQueryResult<{}> {
+  const { error } = await supabase
+    .from('Shopping_Cart')
+    .delete()
+    .eq('user_id', userId)
+    .eq('product_id', productId);
 
-    return { error };
-  },
+  return error ? err(error) : ok({});
+}
 
-  clearCart: async (userId: string) => {
-    const { error } = await supabase
-      .from('Shopping_Cart')
-      .delete()
-      .eq('user_id', userId);
+export async function clearCart(id: string): DatabaseQueryResult<{}> {
+  const { error } = await supabase
+    .from('Shopping_Cart')
+    .delete()
+    .eq('user_id', id);
 
-    return { error };
-  },
+  return error ? err(error) : ok({});
+}
 
-  isInCart: async (userId: string, productId: number) => {
-    const { data, error } = await supabase
-      .from('Shopping_Cart')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('product_id', productId)
-      .single();
+export async function isInCart(
+  userId: string,
+  productId: number,
+): DatabaseQueryResult<boolean> {
+  const { count, error } = await supabase
+    .from('Shopping_Cart')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('product_id', productId);
 
-    return { isInCart: !!data, error };
-  },
+  if (count) {
+    return ok(count > 0);
+  } else if (error) {
+    return err(error);
+  }
 
-  getCartCount: async (userId: string) => {
-    const { count, error } = await supabase
-      .from('Shopping_Cart')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId);
+  return ok(false);
+}
 
-    return { count, error };
-  },
-};
+export async function getCartCount(userId: string) {
+  const { count, error } = await supabase
+    .from('Shopping_Cart')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId);
+
+  if (count) {
+    return ok(count);
+  } else if (error) {
+    return err(error);
+  }
+
+  return ok(0);
+}
