@@ -1,92 +1,91 @@
-import { supabase } from '../utils/supabase';
-import type { CategoryTag } from '../types/database.ts';
+import { supabase } from '@shared/api';
+import { ok, err } from '@shared/utils';
+import type {
+  CategoryTagTable,
+  DatabaseQueryResult,
+  PickOmit,
+} from '@shared/types';
 
-export const categoriesApi = {
-  getAllCategories: async () => {
-    const { data, error } = await supabase
-      .from('Catagory_Tags')
-      .select('*')
-      .order('name', { ascending: true });
+export async function getAllCategories(
+  select: string,
+): DatabaseQueryResult<CategoryTagTable> {
+  const { data, error } = await supabase
+    .from('Category_Tags')
+    .select(select)
+    .order('name', { ascending: true });
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  getCategory: async (id: number) => {
-    const { data, error } = await supabase
-      .from('Catagory_Tags')
-      .select('*')
-      .eq('id', id)
-      .single();
+export async function getCategory(
+  id: number,
+  select: string,
+): DatabaseQueryResult<CategoryTagTable> {
+  const { data, error } = await supabase
+    .from('Category_Tags')
+    .select(select)
+    .eq('id', id)
+    .single();
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  createCategory: async (name: string, description?: string) => {
-    const { data, error } = await supabase
-      .from('Catagory_Tags')
-      .insert({
-        name,
-        description,
-      })
-      .select()
-      .single();
+export async function getCategoryProducts(
+  id: number,
+  select: string,
+): DatabaseQueryResult<CategoryTagTable> {
+  const { data, error } = await supabase
+    .from('Category_Assigned_Products')
+    .select(select)
+    .eq('category_id', id);
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  updateCategory: async (
-    id: number,
-    updates: {
-      name?: string;
-      description?: string;
-    },
-  ) => {
-    const { data, error } = await supabase
-      .from('Catagory_Tags')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+export async function getCategoryProductCount(
+  id: number,
+  select: string,
+): DatabaseQueryResult<CategoryTagTable> {
+  const { count, error } = await supabase
+    .from('Category_Assigned_Products')
+    .select(select, { count: 'exact', head: true })
+    .eq('category_id', id);
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(count);
+}
 
-  deleteCategory: async (id: number) => {
-    const { error } = await supabase
-      .from('Catagory_Tags')
-      .delete()
-      .eq('id', id);
+export async function createCategory(
+  category: PickOmit<CategoryTagTable, 'name'>,
+): DatabaseQueryResult<CategoryTagTable> {
+  const { data, error } = await supabase
+    .from('Category_Tags')
+    .insert(category)
+    .select()
+    .single();
 
-    return { error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  getCategoryProducts: async (categoryId: number) => {
-    const { data, error } = await supabase
-      .from('Catagory_Assigned_Products')
-      .select(
-        `
-        *,
-        Product_Information:product_id (
-          *,
-          User_Information:user_id (
-            first_name,
-            last_name,
-            user_name
-          )
-        )
-      `,
-      )
-      .eq('category_id', categoryId);
+export async function updateCategory(
+  category: PickOmit<CategoryTagTable, 'id'>,
+): DatabaseQueryResult<CategoryTagTable> {
+  const { data, error } = await supabase
+    .from('Category_Tags')
+    .update(category)
+    .eq('id', category.id)
+    .select()
+    .single();
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  getCategoryProductCount: async (categoryId: number) => {
-    const { count, error } = await supabase
-      .from('Catagory_Assigned_Products')
-      .select('*', { count: 'exact', head: true })
-      .eq('category_id', categoryId);
+export async function deleteCategory(
+  category: Pick<CategoryTagTable, 'id'>,
+): DatabaseQueryResult<{}> {
+  const { error } = await supabase
+    .from('Category_Tags')
+    .delete()
+    .eq('id', category.id);
 
-    return { count, error };
-  },
-};
+  return error ? err(error) : ok({});
+}
