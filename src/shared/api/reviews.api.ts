@@ -1,177 +1,91 @@
-import { supabase } from '../utils/supabase';
-import type { Review } from '../types/database.ts';
+import { supabase } from '@shared/api';
+import { ok, err } from '@shared/utils';
+import { type DatabaseQueryResult, type ReviewTable } from '@shared/types';
 
-export const reviewsApi = {
-  getProductReviews: async (productId: number) => {
-    const { data, error } = await supabase
-      .from('Reviews')
-      .select(
-        `
-        *,
-        reviewer:created_by_id (
-          id,
-          first_name,
-          last_name,
-          user_name,
-          supabase_id
-        ),
-        reviewed_user:created_on_id (
-          id,
-          first_name,
-          last_name,
-          user_name,
-          supabase_id
-        )
-      `,
-      )
-      .eq('product_id', productId)
-      .order('created_at', { ascending: false });
+export async function getProductReviews(
+  id: number,
+  columns: string,
+): DatabaseQueryResult<ReviewTable[]> {
+  const { data, error } = await supabase
+    .from('Reviews')
+    .select(columns as '*')
+    .eq('product_id', id)
+    .order('created_at', { ascending: false });
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  getUserReviews: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('Reviews')
-      .select(
-        `
-        *,
-        Product_Information:product_id (
-          id,
-          title,
-          image
-        ),
-        reviewed_user:created_on_id (
-          first_name,
-          last_name,
-          user_name
-        )
-      `,
-      )
-      .eq('created_by_id', userId)
-      .order('created_at', { ascending: false });
+export async function getUserReviews(
+  id: string,
+  columns: string,
+): DatabaseQueryResult<ReviewTable[]> {
+  const { data, error } = await supabase
+    .from('Reviews')
+    .select(columns as '*')
+    .eq('created_by_id', id)
+    .order('created_at', { ascending: false });
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  getReviewsForUser: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('Reviews')
-      .select(
-        `
-        *,
-        reviewer:created_by_id (
-          first_name,
-          last_name,
-          user_name
-        ),
-        Product_Information:product_id (
-          id,
-          title,
-          image
-        )
-      `,
-      )
-      .eq('created_on_id', userId)
-      .order('created_at', { ascending: false });
+export async function getReviewsForUser(
+  id: string,
+  columns: string,
+): DatabaseQueryResult<ReviewTable[]> {
+  const { data, error } = await supabase
+    .from('Reviews')
+    .select(columns as '*')
+    .eq('created_on_id', id)
+    .order('created_at', { ascending: false });
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  createReview: async (
-    productId: number,
-    reviewerId: string,
-    reviewedUserId: string,
-    rating: number,
-    description?: string,
-  ) => {
-    if (rating < 0 || rating > 5) {
-      return {
-        data: null,
-        error: { message: 'Rating must be between 0 and 5' },
-      };
-    }
+// TODO
+/*export async function createReview() {
 
-    const { data, error } = await supabase
-      .from('Reviews')
-      .insert({
-        product_id: productId,
-        created_by_id: reviewerId,
-        created_on_id: reviewedUserId,
-        rating,
-        description,
-      })
-      .select()
-      .single();
+}*/
 
-    return { data, error };
-  },
+export async function updateReview(
+  id: number,
+  review: Partial<Pick<ReviewTable, 'rating' | 'description'>>,
+): DatabaseQueryResult<ReviewTable> {
+  const { data, error } = await supabase
+    .from('Reviews')
+    .update(review)
+    .eq('id', id)
+    .select()
+    .single();
 
-  updateReview: async (
-    reviewId: number,
-    updates: {
-      rating?: number;
-      description?: string;
-    },
-  ) => {
-    if (
-      updates.rating !== undefined &&
-      (updates.rating < 0 || updates.rating > 5)
-    ) {
-      return {
-        data: null,
-        error: { message: 'Rating must be between 0 and 5' },
-      };
-    }
+  return error ? err(error) : ok(data);
+}
 
-    const { data, error } = await supabase
-      .from('Reviews')
-      .update(updates)
-      .eq('id', reviewId)
-      .select()
-      .single();
+export async function deleteReview(id: number): DatabaseQueryResult<{}> {
+  const { error } = await supabase.from('Reviews').delete().eq('id', id);
 
-    return { data, error };
-  },
+  return error ? err(error) : ok({});
+}
 
-  deleteReview: async (reviewId: number) => {
-    const { error } = await supabase
-      .from('Reviews')
-      .delete()
-      .eq('id', reviewId);
+export async function getProductAverageRating(
+  id: number,
+): DatabaseQueryResult<string> {
+  const { data, error } = await supabase
+    .from('Reviews')
+    .select('rating.ave()')
+    .eq('product_id', id)
+    .single();
 
-    return { error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  getProductAverageRating: async (productId: number) => {
-    const { data, error } = await supabase
-      .from('Reviews')
-      .select('rating')
-      .eq('product_id', productId);
+export async function getUserAverageRating(
+  id: string,
+): DatabaseQueryResult<string> {
+  const { data, error } = await supabase
+    .from('Reviews')
+    .select('rating.ave()')
+    .eq('created_on_id', id)
+    .single();
 
-    if (error || !data || data.length === 0) {
-      return { average: 0, count: 0, error };
-    }
-
-    const sum = data.reduce((acc, review) => acc + (review.rating || 0), 0);
-    const average = sum / data.length;
-
-    return { average, count: data.length, error: null };
-  },
-
-  getUserAverageRating: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('Reviews')
-      .select('rating')
-      .eq('created_on_id', userId);
-
-    if (error || !data || data.length === 0) {
-      return { average: 0, count: 0, error };
-    }
-
-    const sum = data.reduce((acc, review) => acc + (review.rating || 0), 0);
-    const average = sum / data.length;
-
-    return { average, count: data.length, error: null };
-  },
-};
+  return error ? err(error) : ok(data);
+}
