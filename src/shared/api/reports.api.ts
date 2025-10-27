@@ -1,144 +1,105 @@
-import { supabase } from '../utils/supabase';
-import type { Report } from '../types/database.ts';
+import { supabase } from '@shared/api';
+import type { DatabaseQueryResult, PickOmit, ReportTable } from '@shared/types';
+import { ok, err } from '@shared/utils';
 
-export const reportsApi = {
-  createReport: async (
-    reporterId: string,
-    reportedUserId: string,
-    linkedInformation: string,
-  ) => {
-    const { data, error } = await supabase
-      .from('Reports')
-      .insert({
-        created_by_id: reporterId,
-        created_on_id: reportedUserId,
-        linked_information: linkedInformation,
-        is_closed: false,
-      })
-      .select()
-      .single();
+export async function createReport(
+  user: any,
+  report: PickOmit<ReportTable, 'description'>,
+): DatabaseQueryResult<ReportTable> {
+  const { data, error } = await supabase
+    .from('Reports')
+    .insert(report)
+    .select()
+    .single();
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  getAllReports: async (includeClosed: boolean = false) => {
-    let query = supabase
-      .from('Reports')
-      .select(
-        `
-        *,
-        reporter:created_by_id (
-          id,
-          first_name,
-          last_name,
-          user_name,
-          email,
-          supabase_id
-        ),
-        reported_user:created_on_id (
-          id,
-          first_name,
-          last_name,
-          user_name,
-          email,
-          supabase_id
-        )
-      `,
-      )
-      .order('created_at', { ascending: false });
+export async function getAllReports(
+  columns: string,
+): DatabaseQueryResult<ReportTable[]> {
+  const { data, error } = await supabase
+    .from('Reports')
+    .select(columns as '*')
+    .order('created_at', { ascending: false });
 
-    if (!includeClosed) {
-      query = query.eq('is_closed', false);
-    }
+  return error ? err(error) : ok(data);
+}
 
-    const { data, error } = await query;
+export async function getUserReports(
+  id: string,
+  columns: string,
+): DatabaseQueryResult<ReportTable[]> {
+  const { data, error } = await supabase
+    .from('Reports')
+    .select(columns as '*')
+    .eq('created_by_id', id)
+    .order('created_at', { ascending: false });
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  getUserReports: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('Reports')
-      .select(
-        `
-        *,
-        reported_user:created_on_id (
-          first_name,
-          last_name,
-          user_name
-        )
-      `,
-      )
-      .eq('created_by_id', userId)
-      .order('created_at', { ascending: false });
+export async function getReportsAgainstUser(
+  id: string,
+  columns: string,
+): DatabaseQueryResult<ReportTable[]> {
+  const { data, error } = await supabase
+    .from('Reports')
+    .select(columns as '*')
+    .eq('created_by_id', id)
+    .order('created_at', { ascending: false });
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  getReportsAgainstUser: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('Reports')
-      .select(
-        `
-        *,
-        reporter:created_by_id (
-          first_name,
-          last_name,
-          user_name
-        )
-      `,
-      )
-      .eq('created_on_id', userId)
-      .order('created_at', { ascending: false });
+export async function closeReports(
+  id: number,
+): DatabaseQueryResult<ReportTable> {
+  const { data, error } = await supabase
+    .from('Reports')
+    .update({
+      is_closed: true,
+      closed_date: new Date().toISOString().split('T')[0],
+    })
+    .eq('id', id)
+    .select()
+    .single();
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  closeReport: async (reportId: number) => {
-    const { data, error } = await supabase
-      .from('Reports')
-      .update({
-        is_closed: true,
-        closed_date: new Date().toISOString().split('T')[0],
-      })
-      .eq('id', reportId)
-      .select()
-      .single();
+export async function reopenReport(
+  id: number,
+): DatabaseQueryResult<ReportTable> {
+  const { data, error } = await supabase
+    .from('Reports')
+    .update({
+      is_closed: false,
+      closed_date: null,
+    })
+    .eq('id', id)
+    .select()
+    .single();
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  reopenReport: async (reportId: number) => {
-    const { data, error } = await supabase
-      .from('Reports')
-      .update({
-        is_closed: false,
-        closed_date: null,
-      })
-      .eq('id', reportId)
-      .select()
-      .single();
+export async function updateReport(
+  id: number,
+  linkedInformation: string,
+): DatabaseQueryResult<ReportTable> {
+  const { data, error } = await supabase
+    .from('Reports')
+    .update({ linked_information: linkedInformation })
+    .eq('id', id)
+    .select()
+    .single();
 
-    return { data, error };
-  },
+  return error ? err(error) : ok(data);
+}
 
-  updateReport: async (reportId: number, linkedInformation: string) => {
-    const { data, error } = await supabase
-      .from('Reports')
-      .update({ linked_information: linkedInformation })
-      .eq('id', reportId)
-      .select()
-      .single();
+export async function deleteReport(id: number): DatabaseQueryResult<{}> {
+  const { error } = await supabase.from('Reports').delete().eq('id', id);
 
-    return { data, error };
-  },
-
-  deleteReport: async (reportId: number) => {
-    const { error } = await supabase
-      .from('Reports')
-      .delete()
-      .eq('id', reportId);
-
-    return { error };
-  },
-};
+  return error ? err(error) : ok({});
+}
