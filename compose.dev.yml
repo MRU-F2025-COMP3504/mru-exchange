@@ -11,5 +11,3 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-    env_file:
-      - dev.env

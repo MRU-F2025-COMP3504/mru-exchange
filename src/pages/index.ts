@@ -1,0 +1,8 @@
+export { default as CreateAccountPage } from '@pages/CreateAccountPage';
+export { default as HomePage } from '@pages/HomePage';
+export { default as LoginPage } from '@pages/LoginPage';
+export { default as ResetPasswordPage } from '@pages/ResetPasswordPage';
+export { default as SignInPage } from '@pages/SignInPage';
+export { default as SignUpPage } from '@pages/SignUpPage';
+export { default as VerifyEmailPage } from '@pages/VerifyEmailPage';
+export { default as WelcomePage } from '@pages/WelcomePage';

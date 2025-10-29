@@ -1,4 +1,7 @@
-export type Result<T> = { ok: true; data: T } | { ok: false; error: string };
+export * from '@shared/types/database';
+export * from '@shared/types/property';
+export * from '@shared/types/result';
+export * from '@shared/types/table';
 
 export enum SortingOrder {
   NATURAL,
