@@ -1,14 +1,12 @@
-import { SortingOrder } from '@shared/types';
-
-export enum ProductFilterType {
-  CATEGORY,
-  SELLER,
-  PRICE_RANGE,
-  STOCK_RANGE,
-}
+export const ProductFilterType = {
+  CATEGORY: 'CATEGORY',
+  SELLER: 'SELLER',
+  PRICE_RANGE: 'PRICE_RANGE',
+  STOCK_RANGE: 'STOCK_RANGE',
+} as const;
 
 export interface ProductFilter {
-  type: ProductFilterType;
-  order: SortingOrder;
+  type: string;
+  order: number;
   content: string;
 }

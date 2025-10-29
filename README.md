@@ -32,3 +32,33 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - Andrew Krawiec ([@AndrewTries](https://github.com/AndrewTries))
 - Mitchell Johnson ([@Mjohn572](https://github.com/Mjohn572))
 - Sahil Grewal ([@SahilGrewalx](https://github.com/SahilGrewalx))
+
+---
+## 🎯 Features
+### Implemented Backend (Supabase)
+
+- ✅ User authentication (@mtroyal.ca only)
+- ✅ User profiles
+- ✅ Listings CRUD (Create, Read, Update, Delete)
+- ✅ Real-time messaging
+- ✅ Favorites/bookmarks system
+- ✅ Image upload support
+- ✅ Category filtering (Parking, Textbooks, Notes, Tutoring)
+- ✅ Search functionality
+- ✅ Row Level Security (RLS) for data protection
+
+### Categories
+
+- 🅿️ **Parking** - Parking spot rentals/sales
+- 📚 **Textbooks** - Course textbooks
+- 📝 **Notes** - Study notes and materials
+- 👨‍🏫 **Tutoring** - Tutoring services
+
+---
+## 📖 Additional Resources
+
+- [Supabase Documentation](https://supabase.com/docs)
+- [React Documentation](https://react.dev/)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [Vite Documentation](https://vitejs.dev/)
+

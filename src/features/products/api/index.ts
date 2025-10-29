@@ -1,29 +1,92 @@
-import { ProductFilter, ProductFilterType } from '@features/products/types';
-import { Product, Result, Seller, SortingOrder } from '@shared/types';
+import { supabase } from '@shared/api';
+import type {
+  DatabaseQueryResult,
+  PickOmit,
+  ProductTable,
+} from '@shared/types';
 import { ok, err } from '@shared/utils';
-// import {} from '@shared/api'; // database access
+import type { User } from '@supabase/supabase-js';
 
 /**
  * @param id the product identifier
  */
-export function getProduct(id: number): Result<Product> {
-  throw new Error('TODO');
+export async function getProduct(
+  id: number,
+  columns: string,
+): DatabaseQueryResult<ProductTable> {
+  const { data, error } = await supabase
+    .from('Product_Information')
+    .select(columns as '*')
+    .eq('id', id)
+    .single();
+
+  return error ? err(error) : ok(data);
 }
 
 /**
  * @param id the seller identifier
  */
-export function getProductsBySeller(seller: Seller): Result<Product[]> {
-  throw new Error('TODO');
+export async function getProductsBySeller(
+  seller: User,
+  columns: string,
+): DatabaseQueryResult<ProductTable[]> {
+  const { data, error } = await supabase
+    .from('Product_Information')
+    .select(columns as '*')
+    .eq('user_id', seller.id);
+
+  return error ? err(error) : ok(data);
 }
 
-/**
+export async function addProduct(
+  product: Required<ProductTable>,
+): DatabaseQueryResult<ProductTable> {
+  const { data, error } = await supabase
+    .from('Product_Information')
+    .insert(product);
+
+  if (data) {
+    return ok(data);
+  } else if (error) {
+    return err(error);
+  }
+
+  return err(new Error('Failed to add a new product'));
+}
+
+export async function removeProduct(product: Required<ProductTable>) {
+  const { data, error } = await supabase
+    .from('Product_Information')
+    .delete()
+    .eq('id', product.id);
+
+  return error ? err(error) : ok(data);
+}
+
+export async function updateProduct(
+  product: PickOmit<ProductTable, 'id' | 'user_id'>,
+) {
+  const { data, error } = await supabase
+    .from('Product_Information')
+    .update(product);
+
+  return error ? err(error) : ok(data);
+}
+
+/*
+/!**
  * @param keywords the search keywords
  * @param filters the unique filters that narrows results
- */
-export function getProductsByKeywords(
+ *!/
+export async function getProductsByKeywords(
   keywords: string[],
   filters: ProductFilter[],
-): Result<Product[]> {
-  throw new Error('TODO');
+  columns: string,
+): DatabaseQueryResult<ProductTable[]> {
+  const { data, error } = await supabase
+    .from('Product_Information')
+    .select(columns as '*');
+
+  return error ? err(error) : ok(data);
 }
+*/
