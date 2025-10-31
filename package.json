@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b tsconfig.build.json && vite build",
     "d:dev": "docker compose -f compose.dev.yml up",
     "dd:dev": "docker compose -f compose.dev.yml down",
     "dr:dev": "docker compose -f compose.dev.yml up --build",

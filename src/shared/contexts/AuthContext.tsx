@@ -36,14 +36,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
 
       if (_event === 'SIGNED_IN' && session?.user) {
-        const { data: existingUser, error: checkError } = await supabase
+        const { data: existingUser } = await supabase
           .from('User_Information')
           .select('id')
           .eq('supabase_id', session.user.id)
           .single();
 
         if (!existingUser && session.user.email) {
-          const { data: insertData, error: insertError } = await supabase.from('User_Information').insert({
+          await supabase.from('User_Information').insert({
             supabase_id: session.user.id,
             email: session.user.email,
             first_name: session.user.user_metadata?.first_name || '',
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: { message: 'Please use a valid @mtroyal.ca email address' } };
       }
 
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
