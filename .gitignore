@@ -38,3 +38,5 @@ dist-ssr
 # Optional: Keep these files out if they contain sensitive testing data
 # test-data/
 # *.backup.sql
+
+.vercel
