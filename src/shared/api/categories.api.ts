@@ -88,7 +88,7 @@ export async function updateCategory(
 
 export async function deleteCategory(
   category: Pick<CategoryTagTable, 'id'>,
-): DatabaseQueryResult<{}> {
+): DatabaseQueryResult<unknown> {
   const { error } = await supabase
     .from('Category_Tags')
     .delete()

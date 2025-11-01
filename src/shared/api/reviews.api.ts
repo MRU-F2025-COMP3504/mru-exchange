@@ -60,7 +60,7 @@ export async function updateReview(
   return error ? err(error) : ok(data);
 }
 
-export async function deleteReview(id: number): DatabaseQueryResult<{}> {
+export async function deleteReview(id: number): DatabaseQueryResult<unknown> {
   const { error } = await supabase.from('Reviews').delete().eq('id', id);
 
   return error ? err(error) : ok({});

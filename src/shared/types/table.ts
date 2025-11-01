@@ -7,6 +7,7 @@ export type MessageTable = Tables<'Messages'>;
 export type CategoryTagTable = Tables<'Category_Tags'>;
 export type CategoryAssignedProductTable = Tables<'Category_Assigned_Products'>;
 export type ShoppingCartTable = Tables<'Shopping_Cart'>;
+export type ShoppingCartProductsTable = Tables<'Shopping_Cart_Products'>;
 export type ReviewTable = Tables<'Reviews'>;
 export type ReportTable = Tables<'Reports'>;
 export type UserInteractionTable = Tables<'User_Interactions'>;

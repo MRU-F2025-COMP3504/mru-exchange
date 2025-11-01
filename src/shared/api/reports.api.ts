@@ -3,7 +3,6 @@ import type { DatabaseQueryResult, PickOmit, ReportTable } from '@shared/types';
 import { ok, err } from '@shared/utils';
 
 export async function createReport(
-  user: any,
   report: PickOmit<ReportTable, 'description'>,
 ): DatabaseQueryResult<ReportTable> {
   const { data, error } = await supabase
@@ -98,7 +97,7 @@ export async function updateReport(
   return error ? err(error) : ok(data);
 }
 
-export async function deleteReport(id: number): DatabaseQueryResult<{}> {
+export async function deleteReport(id: number): DatabaseQueryResult<unknown> {
   const { error } = await supabase.from('Reports').delete().eq('id', id);
 
   return error ? err(error) : ok({});

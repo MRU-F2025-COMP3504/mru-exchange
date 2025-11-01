@@ -8,4 +8,6 @@ if (!url || !key) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient<Database>(url, key);
+export const supabase = createClient<Database>(url, key, {
+  db: { schema: 'mru_dev' },
+});
