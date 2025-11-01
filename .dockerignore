@@ -22,6 +22,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Documentation and config files not needed in container
 *.md
 .git
 .gitignore
+.github
+.vercel
+.env
+.env.*
+!.env.example
+.dockerignore
+Dockerfile
+dev.Dockerfile
+compose.yml
+compose.dev.yml
