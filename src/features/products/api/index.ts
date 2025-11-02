@@ -1,14 +1,13 @@
 import { supabase } from '@shared/api';
 import type {
   CategoryAssignedProductTable,
-  CategoryTagTable,
   DatabaseQuery,
   PickOmit,
   ProductTable,
   Result,
 } from '@shared/types';
 import { err, ok, query } from '@shared/utils';
-import type { ProductBuilder, ProductFilter } from '@features/products';
+import type { ProductFilter } from '@features/products';
 
 export async function get(
   id: number,
@@ -109,137 +108,6 @@ export function getByFilter(): ProductFilter {
       );
     },
   };
-}
-
-export function builder(): ProductBuilder {
-  const product: Partial<ProductTable> = {};
-  return {
-    seller(id: string): Result<ProductBuilder, Error> {
-      if (!id) {
-        return err(new Error('Product ID is not specified'));
-      } else {
-        product.user_id = id;
-      }
-
-      return ok(this);
-    },
-    title(title: string): Result<ProductBuilder, Error> {
-      if (!title) {
-        return err(new Error('Product title is not specified'));
-      } else {
-        product.title = title;
-      }
-
-      return ok(this);
-    },
-    description(description: string): Result<ProductBuilder, Error> {
-      if (!description) {
-        return err(new Error('Product description is not specified'));
-      } else {
-        product.description = description;
-      }
-
-      return ok(this);
-    },
-    image(url: string): Result<ProductBuilder, Error> {
-      try {
-        product.image = new URL(url).toJSON();
-      } catch (error: unknown) {
-        product.image = null;
-
-        if (error instanceof Error) {
-          return err(error);
-        }
-      }
-
-      return ok(this);
-    },
-    price(price: number): Result<ProductBuilder, Error> {
-      if (price < 0) {
-        return err(
-          new Error('Product price cannot be negative', { cause: price }),
-        );
-      } else {
-        product.price = price;
-      }
-
-      return ok(this);
-    },
-    stock(stock: number): Result<ProductBuilder, Error> {
-      if (stock < 0) {
-        return err(
-          new Error('Product stock cannot be negative', { cause: stock }),
-        );
-      } else {
-        product.stock_count = stock;
-      }
-
-      return ok(this);
-    },
-    async build(): DatabaseQuery<ProductTable> {
-      return query(
-        await supabase
-          .from('Product_Information')
-          .insert(product)
-          .select()
-          .single(),
-      );
-    },
-  };
-}
-
-export async function remove(
-  product: PickOmit<ProductTable, 'id'>,
-): DatabaseQuery<ProductTable> {
-  return query(
-    await supabase
-      .from('Product_Information')
-      .delete()
-      .eq('id', product.id)
-      .select()
-      .single(),
-  );
-}
-
-export async function update(
-  product: Partial<ProductTable>,
-): DatabaseQuery<ProductTable> {
-  return query(
-    await supabase
-      .from('Product_Information')
-      .update(product)
-      .select()
-      .single(),
-  );
-}
-
-export async function categorize(
-  product: PickOmit<ProductTable, 'id'>,
-  ...categories: PickOmit<CategoryTagTable, 'id'>[]
-): DatabaseQuery<CategoryAssignedProductTable[]> {
-  const id = product.id;
-  const existing = query(
-    await supabase
-      .from('Category_Assigned_Products')
-      .delete()
-      .eq('product_id', id),
-  );
-
-  if (!existing.ok) {
-    return existing;
-  }
-
-  return query(
-    await supabase
-      .from('Category_Assigned_Products')
-      .insert(
-        categories.map((category) => ({
-          category_id: category.id,
-          product_id: id,
-        })),
-      )
-      .select(),
-  );
 }
 
 export async function getCategories(
