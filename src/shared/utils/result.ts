@@ -9,6 +9,14 @@ export function err<T, E>(error: E): Result<T, E> {
   return { ok: false, error };
 }
 
+export function present<T>(data: T | null): Result<T, Error> {
+  if (data) {
+    return ok(data);
+  }
+
+  return err(new Error('Specified data is not present'));
+}
+
 export function query<T>(
   response: PostgrestSingleResponse<T>,
 ): DatabaseQueryResult<T> {
