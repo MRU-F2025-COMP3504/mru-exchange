@@ -1,11 +1,11 @@
 import { supabase } from '@shared/api';
 import { ok, err } from '@shared/utils';
-import type { DatabaseQueryResult, ShoppingCartTable } from '@shared/types';
+import type { DatabaseQuery, ShoppingCartTable } from '@shared/types';
 
 export async function getUserCart(
   id: string,
   columns: string,
-): DatabaseQueryResult<ShoppingCartTable[]> {
+): DatabaseQuery<ShoppingCartTable[]> {
   const { data, error } = await supabase
     .from('Shopping_Cart')
     .select(columns as '*')
@@ -19,7 +19,7 @@ export async function addToCart(
   userId: string,
   productId: number,
   columns: string,
-): DatabaseQueryResult<ShoppingCartTable> {
+): DatabaseQuery<ShoppingCartTable> {
   const { data, error } = await supabase
     .from('Shopping_Cart')
     .select(columns as '*')
@@ -46,7 +46,7 @@ export async function addToCart(
   return ok(result.data);
 }
 
-export async function removeFromCart(id: number): DatabaseQueryResult<{}> {
+export async function removeFromCart(id: number): DatabaseQuery<{}> {
   const { error } = await supabase.from('Shopping_Cart').delete().eq('id', id);
   return error ? err(error) : ok({});
 }
@@ -54,7 +54,7 @@ export async function removeFromCart(id: number): DatabaseQueryResult<{}> {
 export async function removeProductFromCart(
   userId: string,
   productId: number,
-): DatabaseQueryResult<{}> {
+): DatabaseQuery<{}> {
   const { error } = await supabase
     .from('Shopping_Cart')
     .delete()
@@ -64,7 +64,7 @@ export async function removeProductFromCart(
   return error ? err(error) : ok({});
 }
 
-export async function clearCart(id: string): DatabaseQueryResult<{}> {
+export async function clearCart(id: string): DatabaseQuery<{}> {
   const { error } = await supabase
     .from('Shopping_Cart')
     .delete()
@@ -76,7 +76,7 @@ export async function clearCart(id: string): DatabaseQueryResult<{}> {
 export async function isInCart(
   userId: string,
   productId: number,
-): DatabaseQueryResult<boolean> {
+): DatabaseQuery<boolean> {
   const { count, error } = await supabase
     .from('Shopping_Cart')
     .select('id', { count: 'exact', head: true })

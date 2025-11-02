@@ -3,13 +3,13 @@ import { ok, err } from '@shared/utils';
 import type {
   CategoryAssignedProductTable,
   CategoryTagTable,
-  DatabaseQueryResult,
+  DatabaseQuery,
   PickOmit,
 } from '@shared/types';
 
 export async function getAllCategories(
   columns: string,
-): DatabaseQueryResult<CategoryTagTable[]> {
+): DatabaseQuery<CategoryTagTable[]> {
   const { data, error } = await supabase
     .from('Category_Tags')
     .select(columns as '*')
@@ -21,7 +21,7 @@ export async function getAllCategories(
 export async function getCategory(
   id: number,
   columns: string,
-): DatabaseQueryResult<CategoryTagTable> {
+): DatabaseQuery<CategoryTagTable> {
   const { data, error } = await supabase
     .from('Category_Tags')
     .select(columns as '*')
@@ -34,7 +34,7 @@ export async function getCategory(
 export async function getCategoryProducts(
   id: number,
   columns: string,
-): DatabaseQueryResult<CategoryAssignedProductTable[]> {
+): DatabaseQuery<CategoryAssignedProductTable[]> {
   const { data, error } = await supabase
     .from('Category_Assigned_Products')
     .select(columns as '*')
@@ -46,7 +46,7 @@ export async function getCategoryProducts(
 export async function getCategoryProductCount(
   id: number,
   columns: string,
-): DatabaseQueryResult<number> {
+): DatabaseQuery<number> {
   const { count, error } = await supabase
     .from('Category_Assigned_Products')
     .select(columns as '*', { count: 'exact', head: true })
@@ -63,7 +63,7 @@ export async function getCategoryProductCount(
 
 export async function createCategory(
   category: PickOmit<CategoryTagTable, 'name'>,
-): DatabaseQueryResult<CategoryTagTable> {
+): DatabaseQuery<CategoryTagTable> {
   const { data, error } = await supabase
     .from('Category_Tags')
     .insert(category)
@@ -75,7 +75,7 @@ export async function createCategory(
 
 export async function updateCategory(
   category: PickOmit<CategoryTagTable, 'id'>,
-): DatabaseQueryResult<CategoryTagTable> {
+): DatabaseQuery<CategoryTagTable> {
   const { data, error } = await supabase
     .from('Category_Tags')
     .update(category)
@@ -88,7 +88,7 @@ export async function updateCategory(
 
 export async function deleteCategory(
   category: Pick<CategoryTagTable, 'id'>,
-): DatabaseQueryResult<unknown> {
+): DatabaseQuery<unknown> {
   const { error } = await supabase
     .from('Category_Tags')
     .delete()
