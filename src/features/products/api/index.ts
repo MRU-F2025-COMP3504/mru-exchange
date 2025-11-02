@@ -95,17 +95,32 @@ export async function getByFilter(
 export function builder(): ProductBuilder {
   const product: Partial<ProductTable> = {};
   return {
-    seller(id: string): ProductBuilder {
-      product.user_id = id;
-      return this;
+    seller(id: string): Result<ProductBuilder, Error> {
+      if (!id) {
+        return err(new Error('Product ID is not specified'));
+      } else {
+        product.user_id = id;
+      }
+
+      return ok(this);
     },
-    title(title: string): ProductBuilder {
-      product.title = title;
-      return this;
+    title(title: string): Result<ProductBuilder, Error> {
+      if (!title) {
+        return err(new Error('Product title is not specified'));
+      } else {
+        product.title = title;
+      }
+
+      return ok(this);
     },
-    description(description: string): ProductBuilder {
-      product.description = description;
-      return this;
+    description(description: string): Result<ProductBuilder, Error> {
+      if (!description) {
+        return err(new Error('Product description is not specified'));
+      } else {
+        product.description = description;
+      }
+
+      return ok(this);
     },
     image(url: string): Result<ProductBuilder, Error> {
       try {
@@ -122,7 +137,7 @@ export function builder(): ProductBuilder {
     },
     price(price: number): Result<ProductBuilder, Error> {
       if (price < 0) {
-        return err(new Error('Price cannot be negative', { cause: price }));
+        return err(new Error('Product price cannot be negative', { cause: price }));
       } else {
         product.price = price;
       }
@@ -131,7 +146,7 @@ export function builder(): ProductBuilder {
     },
     stock(stock: number): Result<ProductBuilder, Error> {
       if (stock < 0) {
-        return err(new Error('Stock cannot be negative', { cause: stock }));
+        return err(new Error('Product stock cannot be negative', { cause: stock }));
       } else {
         product.stock_count = stock;
       }
