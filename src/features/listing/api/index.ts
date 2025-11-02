@@ -1,43 +1,91 @@
-// import { Product } from '@features/products';
-// import {} from '@shared/api'; // database access
-import { Product, Result, Seller } from '@shared/types';
-import { ok, err } from '@shared/utils';
+import { ProductAPI, type ProductBuilder } from '@features/products';
+import { err, ok, present, query } from '@shared/utils';
+import type {
+  DatabaseQuery,
+  PickOmit,
+  Product,
+  ProductTable,
+  Result,
+} from '@shared/types';
+import { supabase } from '@shared/api';
 
-export function create(product: Partial<Product>): Result<Product> {
-  if (!product.seller) {
-    return err('Missing product seller');
+export async function set(product: PickOmit<ProductTable, 'id' | 'user_id'>, isListed: boolean): DatabaseQuery<ProductTable> {
+  const seller = present(product.user_id);
+
+  if (seller.ok) {
+    return query(
+      await supabase
+        .from('Product_Information')
+        .update({
+          isListed,
+        })
+        .eq('id', product.id)
+        .eq('user_id', seller.data)
+        .select()
+        .single(),
+    );
   }
 
-  if (!product.title || product.title.length === 0) {
-    return err('Missing title');
-  }
-
-  // return from database
-  const record = {};
-
-  return ok(record);
+  return seller;
 }
 
-export function remove(product: Product): boolean {
-  // database access
-  return true;
+export async function setAll(seller: string, isListed: boolean): DatabaseQuery<ProductTable[]> {
+  return query(
+    await supabase
+      .from('Product_Information')
+      .update({
+        isListed,
+      })
+      .eq('user_id', seller)
+      .eq('isListed', isListed)
+      .select(),
+  );
 }
 
-export function modify(
-  target: Product,
-  modify: Partial<Product>,
-): Result<Product> {
-  const id = target.id;
-  const seller = target.seller;
+export async function remove(product: PickOmit<ProductTable, 'id' | 'user_id'>): DatabaseQuery<ProductTable> {
+  const seller = present(product.user_id);
 
-  if (modify.title && modify.title.length === 0) {
-    return err('Missing title');
+  if (seller.ok) {
+    return query(
+      await supabase
+        .from('Product_Information')
+        .delete()
+        .eq('id', product.id)
+        .eq('user_id', seller.data)
+        .select()
+        .single(),
+    );
   }
 
-  return ok({
-    ...target,
-    ...modify,
-  });
+  return seller;
+}
+
+export async function removeAll(seller: string): DatabaseQuery<ProductTable[]> {
+  return query(
+    await supabase
+      .from('Product_Information')
+      .delete()
+      .eq('user_id', seller)
+      .select(),
+  );
+}
+
+export async function modify(builder: ProductBuilder): DatabaseQuery<ProductTable> {
+  const seller = present(product.user_id);
+
+  if (seller.ok) {
+    return query(
+      await supabase
+        .from('Product_Information')
+        .update(product)
+        .eq('id', product.id)
+        .eq('user_id', seller.data)
+        .select()
+        .single(),
+    );
+  }
+
+  return seller;
 }
 
 export function stock(target: Product, relative: number): Result<Product> {
