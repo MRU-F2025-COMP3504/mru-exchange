@@ -1,11 +1,10 @@
 import { supabase } from '@shared/api';
-import type { DatabaseQueryResult, PickOmit, ReportTable } from '@shared/types';
+import type { DatabaseQuery, PickOmit, ReportTable } from '@shared/types';
 import { ok, err } from '@shared/utils';
 
 export async function createReport(
-  user: any,
   report: PickOmit<ReportTable, 'description'>,
-): DatabaseQueryResult<ReportTable> {
+): DatabaseQuery<ReportTable> {
   const { data, error } = await supabase
     .from('Reports')
     .insert(report)
@@ -17,7 +16,7 @@ export async function createReport(
 
 export async function getAllReports(
   columns: string,
-): DatabaseQueryResult<ReportTable[]> {
+): DatabaseQuery<ReportTable[]> {
   const { data, error } = await supabase
     .from('Reports')
     .select(columns as '*')
@@ -29,7 +28,7 @@ export async function getAllReports(
 export async function getUserReports(
   id: string,
   columns: string,
-): DatabaseQueryResult<ReportTable[]> {
+): DatabaseQuery<ReportTable[]> {
   const { data, error } = await supabase
     .from('Reports')
     .select(columns as '*')
@@ -42,7 +41,7 @@ export async function getUserReports(
 export async function getReportsAgainstUser(
   id: string,
   columns: string,
-): DatabaseQueryResult<ReportTable[]> {
+): DatabaseQuery<ReportTable[]> {
   const { data, error } = await supabase
     .from('Reports')
     .select(columns as '*')
@@ -54,7 +53,7 @@ export async function getReportsAgainstUser(
 
 export async function closeReports(
   id: number,
-): DatabaseQueryResult<ReportTable> {
+): DatabaseQuery<ReportTable> {
   const { data, error } = await supabase
     .from('Reports')
     .update({
@@ -70,7 +69,7 @@ export async function closeReports(
 
 export async function reopenReport(
   id: number,
-): DatabaseQueryResult<ReportTable> {
+): DatabaseQuery<ReportTable> {
   const { data, error } = await supabase
     .from('Reports')
     .update({
@@ -87,7 +86,7 @@ export async function reopenReport(
 export async function updateReport(
   id: number,
   linkedInformation: string,
-): DatabaseQueryResult<ReportTable> {
+): DatabaseQuery<ReportTable> {
   const { data, error } = await supabase
     .from('Reports')
     .update({ linked_information: linkedInformation })
@@ -98,7 +97,7 @@ export async function updateReport(
   return error ? err(error) : ok(data);
 }
 
-export async function deleteReport(id: number): DatabaseQueryResult<{}> {
+export async function deleteReport(id: number): DatabaseQuery<unknown> {
   const { error } = await supabase.from('Reports').delete().eq('id', id);
 
   return error ? err(error) : ok({});

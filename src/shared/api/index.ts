@@ -4,4 +4,4 @@
  * Central export for all API modules
  */
 
-export { default as supabase } from '@shared/api/supabase';
+export { supabase } from '@shared/api/supabase';
