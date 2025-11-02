@@ -78,9 +78,7 @@ export async function getProductAverageRating(
   return error ? err(error) : ok(data);
 }
 
-export async function getUserAverageRating(
-  id: string,
-): DatabaseQuery<string> {
+export async function getUserAverageRating(id: string): DatabaseQuery<string> {
   const { data, error } = await supabase
     .from('Reviews')
     .select('rating.ave()')
