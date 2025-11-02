@@ -24,35 +24,13 @@ export function register(): ProductBuilder {
       return ok(this);
     },
     title(title: string): Result<ProductBuilder, Error> {
-      if (!title) {
-        return err(new Error('Product title is not specified'));
-      } else {
-        product.title = title;
-      }
-
-      return ok(this);
+      return setTitle(this, product, title);
     },
     description(description: string): Result<ProductBuilder, Error> {
-      if (!description) {
-        return err(new Error('Product description is not specified'));
-      } else {
-        product.description = description;
-      }
-
-      return ok(this);
+      return setDescription(this, product, description);
     },
     image(url: string): Result<ProductBuilder, Error> {
-      try {
-        product.image = new URL(url).toJSON();
-      } catch (error: unknown) {
-        product.image = null;
-
-        if (error instanceof Error) {
-          return err(error);
-        }
-      }
-
-      return ok(this);
+      return setImage(this, product, url);
     },
     price(price: number): Result<ProductBuilder, Error> {
       if (price < 0) {
@@ -140,35 +118,13 @@ export function attribute(product: PickOmit<Product, 'id'>): ProductAttributeMod
 
   return {
     title(title: string): Result<ProductAttributeModifier, Error> {
-      if (!title) {
-        err('Product title is not specified');
-      } else {
-        change.title = title;
-      }
-
-      return ok(this);
+      return setTitle(this, product, title);
     },
     description(description: string): Result<ProductAttributeModifier, Error> {
-      if (!description) {
-        err('Product description is not specified');
-      } else {
-        change.description = description;
-      }
-
-      return ok(this);
+      return setDescription(this, product, description)
     },
     image(url: string): Result<ProductAttributeModifier, Error> {
-      try {
-        change.image = new URL(url).toJSON();
-      } catch (error: unknown) {
-        change.image = null;
-
-        if (error instanceof Error) {
-          return err(error);
-        }
-      }
-
-      return ok(this);
+      return setImage(this, product, url);
     },
     async modify<T extends PickOmit<Product, 'id'>>(): DatabaseQuery<T> {
       return query(
@@ -223,4 +179,38 @@ export async function categorize(
   }
 
   return existing;
+}
+
+function setTitle<T>(controller: T, product: Partial<Product>, title: string): Result<T, Error> {
+  if (!title) {
+    return err(new Error('Product title is not specified'));
+  } else {
+    product.title = title;
+  }
+
+  return ok(controller);
+}
+
+function setDescription<T>(controller: T, product: Partial<Product>, description: string): Result<T, Error> {
+  if (!description) {
+    return err(new Error('Product description is not specified'));
+  } else {
+    product.description = description;
+  }
+
+  return ok(controller);
+}
+
+function setImage<T>(controller: T, product: Partial<Product>, url: string): Result<T, Error> {
+  try {
+    product.image = new URL(url).toJSON();
+  } catch (error: unknown) {
+    product.image = null;
+
+    if (error instanceof Error) {
+      return err(error);
+    }
+  }
+
+  return ok(controller);
 }
