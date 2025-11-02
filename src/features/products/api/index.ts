@@ -3,8 +3,11 @@ import type {
   CategoryAssignedProductTable,
   CategoryTagTable,
   DatabaseQuery,
+  DatabaseQueryResult,
   PickOmit,
+  Product,
   ProductTable,
+  PromiseResult,
   Result,
 } from '@shared/types';
 import { err, ok, query } from '@shared/utils';
@@ -48,48 +51,73 @@ export async function getBySearch(
   );
 }
 
-export async function getByFilter(
-  product: Partial<ProductFilter>,
-): DatabaseQuery<PickOmit<ProductTable, 'id'>[]> {
-  const sql = supabase.from('Product_Information').select('id');
+export function getByFilter(): ProductFilter {
+  const productSql = supabase.from('Product_Information').select('id');
+  let categories: number[];
 
-  if (product.seller) {
-    sql.eq('user_id', product.seller);
-  }
+  return {
+    seller(id: string): Result<ProductFilter, Error> {
+      if (!id) {
+        return err(new Error('Product ID is not specified'));
+      } else {
+        productSql.eq('user_id', id);
+      }
 
-  if (product.price) {
-    sql.gte('price', product.price.min);
-    sql.lte('price', product.price.max);
-  }
+      return ok(this);
+    },
+    price(a: number, b: number): Result<ProductFilter, Error> {
+      if (a < 0 || b < 0) {
+        return err(
+          new Error('Product price range cannot be negative', {
+            cause: { a, b },
+          }),
+        );
+      } else {
+        productSql.gte('price', Math.min(a, b));
+        productSql.lte('price', Math.max(a, b));
+      }
 
-  if (product.stock) {
-    sql.gte('stock_count', product.stock.min);
-    sql.lte('stock_count', product.stock.max);
-  }
+      return ok(this);
+    },
+    stock(a: number, b: number): Result<ProductFilter, Error> {
+      if (a < 0 || b < 0) {
+        return err(
+          new Error('Product stock range cannot be negative', {
+            cause: { a, b },
+          }),
+        );
+      } else {
+        productSql.gte('stock_count', Math.min(a, b));
+        productSql.lte('stock_count', Math.max(a, b));
+      }
 
-  if (product.listed) {
-    sql.eq('isListed', product.listed);
-  }
+      return ok(this);
+    },
+    categories(...values: number[]): Result<ProductFilter, Error> {
+      categories = values;
 
-  const products = query(await sql);
+      return ok(this);
+    },
+    async find(): DatabaseQuery<Product[]> {
+      const products = query(await productSql);
 
-  if (products.ok && product.categories) {
-    const sql = supabase
-      .from('Category_Assigned_Products')
-      .select('id:product_id');
+      if (categories.length === 0 || !products.ok) {
+        return products;
+      }
 
-    for (const category of product.categories) {
-      sql.eq('category_id', category);
+      const categorySql = supabase.from('Category_Assigned_Products').select('id:product_id');
+
+      for (const product of products.data) {
+        categorySql.eq('product_id', product.id);
+      }
+
+      for (const category of categories) {
+        categorySql.eq('category_id', category);
+      }
+
+      return query(await categorySql);
     }
-
-    for (const product of products.data) {
-      sql.eq('product_id', product.id);
-    }
-
-    return query(await sql);
   }
-
-  return products;
 }
 
 export function builder(): ProductBuilder {

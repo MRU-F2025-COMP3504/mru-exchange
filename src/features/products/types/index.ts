@@ -27,15 +27,9 @@ export interface ProductBuilder {
 }
 
 export interface ProductFilter {
-  seller: string;
-  price: {
-    min: number;
-    max: number;
-  };
-  stock: {
-    min: number;
-    max: number;
-  };
-  listed: boolean;
-  categories: number[];
+  seller(id: string): Result<this, Error>;
+  price(min: number, max: number): Result<this, Error>;
+  stock(min: number, max: number): Result<this, Error>;
+  categories(...categories: number[]): Result<this, Error>;
+  find(): DatabaseQuery<Product[]>;
 }
