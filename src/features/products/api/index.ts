@@ -8,13 +8,12 @@ import type {
   Result,
 } from '@shared/types';
 import { err, ok, query } from '@shared/utils';
-import type { User } from '@supabase/supabase-js';
 import type { ProductBuilder, ProductFilter } from '@features/products';
 
 export async function get(
   id: number,
   columns: string,
-): DatabaseQuery<ProductTable> {
+): DatabaseQuery<Partial<ProductTable>> {
   return query(
     await supabase
       .from('Product_Information')
@@ -24,15 +23,11 @@ export async function get(
   );
 }
 
-export async function getBySeller(
-  seller: PickOmit<User, 'id'>,
+export async function getAll(
   columns: string,
-): DatabaseQuery<ProductTable[]> {
+): DatabaseQuery<Partial<ProductTable[]>> {
   return query(
-    await supabase
-      .from('Product_Information')
-      .select(columns as '*')
-      .eq('user_id', seller.id),
+    await supabase.from('Product_Information').select(columns as '*'),
   );
 }
 
@@ -106,8 +101,11 @@ export function getByFilter(): ProductFilter {
         await supabase
           .from('Category_Assigned_Products')
           .select('id:product_id')
-          .in('product_id', products.data.map((product) => product.id))
-          .in('category_id', categories)
+          .in(
+            'product_id',
+            products.data.map((product) => product.id),
+          )
+          .in('category_id', categories),
       );
     },
   };
