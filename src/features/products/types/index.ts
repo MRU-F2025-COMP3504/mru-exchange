@@ -5,12 +5,6 @@ import type {
   Result,
 } from '@shared/types';
 
-export interface ProductSelector {
-  id(id: number): Result<this, Error>;
-  seller(id: string): Result<this, Error>;
-  select(): ProductTable;
-}
-
 export interface ProductBuilder {
   seller(id: string): Result<this, Error>;
   title(title: string): Result<this, Error>;
