@@ -5,10 +5,11 @@ import type {
   DatabaseQuery,
   PickOmit,
   ProductTable,
+  Result,
 } from '@shared/types';
-import { query } from '@shared/utils';
+import { err, ok, query } from '@shared/utils';
 import type { User } from '@supabase/supabase-js';
-import type { ProductFilter } from '@features/products';
+import type { ProductBuilder, ProductFilter } from '@features/products';
 
 export async function get(
   id: number,
@@ -91,16 +92,62 @@ export async function getByFilter(
   return products;
 }
 
-export async function add(
-  product: Required<ProductTable>,
-): DatabaseQuery<ProductTable> {
-  return query(
-    await supabase
-      .from('Product_Information')
-      .insert(product)
-      .select()
-      .single(),
-  );
+export function builder(): ProductBuilder {
+  const product: Partial<ProductTable> = {};
+  return {
+    seller(id: string): ProductBuilder {
+      product.user_id = id;
+      return this;
+    },
+    title(title: string): ProductBuilder {
+      product.title = title;
+      return this;
+    },
+    description(description: string): ProductBuilder {
+      product.description = description;
+      return this;
+    },
+    image(url: string): Result<ProductBuilder, Error> {
+      try {
+        product.image = new URL(url).toJSON();
+      } catch (error: unknown) {
+        product.image = null;
+
+        if (error instanceof Error) {
+          return err(error);
+        }
+      }
+
+      return ok(this);
+    },
+    price(price: number): Result<ProductBuilder, Error> {
+      if (price < 0) {
+        return err(new Error('Price cannot be negative', { cause: price }));
+      } else {
+        product.price = price;
+      }
+
+      return ok(this);
+    },
+    stock(stock: number): Result<ProductBuilder, Error> {
+      if (stock < 0) {
+        return err(new Error('Stock cannot be negative', { cause: stock }));
+      } else {
+        product.stock_count = stock;
+      }
+
+      return ok(this);
+    },
+    async build(): DatabaseQuery<ProductTable> {
+      return query(
+        await supabase
+          .from('Product_Information')
+          .insert(product)
+          .select()
+          .single(),
+      );
+    },
+  };
 }
 
 export async function remove(
