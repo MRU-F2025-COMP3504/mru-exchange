@@ -151,7 +151,7 @@ export function builder(): ProductBuilder {
 }
 
 export async function remove(
-  product: Required<ProductTable>,
+  product: PickOmit<ProductTable, 'id'>,
 ): DatabaseQuery<ProductTable> {
   return query(
     await supabase
