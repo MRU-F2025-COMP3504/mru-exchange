@@ -11,7 +11,10 @@ import {
   type RealtimePostgresInsertPayload,
 } from '@supabase/supabase-js';
 
-export async function getUserChat(id: number, columns: string): DatabaseQuery<ChatTable> {
+export async function getUserChat(
+  id: number,
+  columns: string,
+): DatabaseQuery<ChatTable> {
   const { data, error } = await supabase
     .from('Chats')
     .select(columns as '*')
@@ -21,7 +24,10 @@ export async function getUserChat(id: number, columns: string): DatabaseQuery<Ch
   return error ? err(error) : ok(data);
 }
 
-export async function getUserChats(id: string, columns: string): DatabaseQuery<ChatTable[]> {
+export async function getUserChats(
+  id: string,
+  columns: string,
+): DatabaseQuery<ChatTable[]> {
   const { data, error } = await supabase
     .from('Chats')
     .select(columns as '*')
@@ -31,7 +37,9 @@ export async function getUserChats(id: string, columns: string): DatabaseQuery<C
   return error ? err(error) : ok(data);
 }
 
-export async function createChat(chat: PickOmit<ChatTable, 'user_id_1' | 'user_id_2'>): DatabaseQuery<ChatTable> {
+export async function createChat(
+  chat: PickOmit<ChatTable, 'user_id_1' | 'user_id_2'>,
+): DatabaseQuery<ChatTable> {
   const { data, error } = await supabase
     .from('Chats')
     .insert(chat)
@@ -41,7 +49,10 @@ export async function createChat(chat: PickOmit<ChatTable, 'user_id_1' | 'user_i
   return error ? err(error) : ok(data);
 }
 
-export async function getChatMessages(id: number, columns: string): DatabaseQuery<MessageTable[]> {
+export async function getChatMessages(
+  id: number,
+  columns: string,
+): DatabaseQuery<MessageTable[]> {
   const { data, error } = await supabase
     .from('Messages')
     .select(columns as '*')
@@ -52,7 +63,9 @@ export async function getChatMessages(id: number, columns: string): DatabaseQuer
   return error ? err(error) : ok(data);
 }
 
-export async function sendMessage(message: PickOmit<MessageTable, 'chat_id' | 'sender_id' | 'logged_message'>): DatabaseQuery<MessageTable> {
+export async function sendMessage(
+  message: PickOmit<MessageTable, 'chat_id' | 'sender_id' | 'logged_message'>,
+): DatabaseQuery<MessageTable> {
   const { data, error } = await supabase
     .from('Messages')
     .insert(message)
@@ -74,15 +87,16 @@ export async function hideMessage(id: number): DatabaseQuery<MessageTable> {
 }
 
 export async function deleteMessage(id: number): DatabaseQuery<unknown> {
-  const { error } = await supabase
-    .from('Messages')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.from('Messages').delete().eq('id', id);
 
   return error ? err(error) : ok({});
 }
 
-export async function setChatVisibility(chat: number, user: string, visibility: boolean): DatabaseQuery<ChatTable> {
+export async function setChatVisibility(
+  chat: number,
+  user: string,
+  visibility: boolean,
+): DatabaseQuery<ChatTable> {
   const users = await getUserChat(chat, 'user_id_1,user_id_2');
 
   if (!users.ok) {
@@ -106,7 +120,10 @@ export async function setChatVisibility(chat: number, user: string, visibility: 
   return error ? err(error) : ok(data);
 }
 
-export function subscribeToChat(chat: number, callback: (payload: RealtimePostgresInsertPayload<MessageTable>) => void) {
+export function subscribeToChat(
+  chat: number,
+  callback: (payload: RealtimePostgresInsertPayload<MessageTable>) => void,
+) {
   const id = chat.toString();
   return supabase
     .channel(`chat-${id}`)

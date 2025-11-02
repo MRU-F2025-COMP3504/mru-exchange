@@ -5,14 +5,14 @@ import { AuthProvider, useAuth } from '../AuthContext';
 vi.mock('../../api/supabase', () => ({
   supabase: {
     auth: {
-      getSession: vi.fn(() => 
-        Promise.resolve({ 
-          data: { session: null }, 
-          error: null 
-        })
+      getSession: vi.fn(() =>
+        Promise.resolve({
+          data: { session: null },
+          error: null,
+        }),
       ),
       onAuthStateChange: vi.fn(() => ({
-        data: { subscription: { unsubscribe: vi.fn() } }
+        data: { subscription: { unsubscribe: vi.fn() } },
       })),
       signUp: vi.fn(),
       signInWithPassword: vi.fn(),
@@ -22,12 +22,12 @@ vi.mock('../../api/supabase', () => ({
     from: vi.fn(() => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: null, error: null }))
-        }))
+          single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+        })),
       })),
-      insert: vi.fn(() => Promise.resolve({ data: null, error: null }))
-    }))
-  }
+      insert: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    })),
+  },
 }));
 
 describe('AuthContext', () => {
@@ -102,7 +102,7 @@ describe('AuthContext', () => {
       'test@gmail.com',
       'password123',
       'John',
-      'Doe'
+      'Doe',
     );
 
     expect(error).toBeDefined();
@@ -120,7 +120,10 @@ describe('AuthContext', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    const { error } = await result.current.signIn('test@gmail.com', 'password123');
+    const { error } = await result.current.signIn(
+      'test@gmail.com',
+      'password123',
+    );
 
     expect(error).toBeDefined();
     expect(error.message).toContain('@mtroyal.ca');

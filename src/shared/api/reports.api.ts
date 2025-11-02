@@ -51,9 +51,7 @@ export async function getReportsAgainstUser(
   return error ? err(error) : ok(data);
 }
 
-export async function closeReports(
-  id: number,
-): DatabaseQuery<ReportTable> {
+export async function closeReports(id: number): DatabaseQuery<ReportTable> {
   const { data, error } = await supabase
     .from('Reports')
     .update({
@@ -67,9 +65,7 @@ export async function closeReports(
   return error ? err(error) : ok(data);
 }
 
-export async function reopenReport(
-  id: number,
-): DatabaseQuery<ReportTable> {
+export async function reopenReport(id: number): DatabaseQuery<ReportTable> {
   const { data, error } = await supabase
     .from('Reports')
     .update({

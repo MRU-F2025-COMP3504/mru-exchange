@@ -4,37 +4,43 @@ export default function WelcomePage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      backgroundColor: 'white'
-    }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'white',
+      }}
+    >
       <div style={{ maxWidth: '28rem', width: '100%', padding: '0 1.5rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <img 
-            src="/MruExchangeLogo.png" 
-            alt="MRU Exchange Logo" 
-            style={{ 
-              width: '150px', 
-              height: 'auto', 
+          <img
+            src='/MruExchangeLogo.png'
+            alt='MRU Exchange Logo'
+            style={{
+              width: '150px',
+              height: 'auto',
               marginBottom: '1.5rem',
-              margin: '0 auto'
-            }} 
+              margin: '0 auto',
+            }}
           />
-          <h1 style={{ 
-            fontSize: '1.875rem', 
-            fontWeight: 'bold', 
-            color: '#111827',
-            marginBottom: '0.5rem'
-          }}>
+          <h1
+            style={{
+              fontSize: '1.875rem',
+              fontWeight: 'bold',
+              color: '#111827',
+              marginBottom: '0.5rem',
+            }}
+          >
             MRU Exchange
           </h1>
           <p style={{ fontSize: '1.125rem', color: '#4B5563' }}>Welcome</p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div
+          style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+        >
           <button
             onClick={() => navigate('/signin')}
             style={{
@@ -47,10 +53,14 @@ export default function WelcomePage() {
               fontWeight: '500',
               fontSize: '1rem',
               cursor: 'pointer',
-              transition: 'background-color 0.2s'
+              transition: 'background-color 0.2s',
             }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#EFF6FF'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.backgroundColor = '#EFF6FF')
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.backgroundColor = 'white')
+            }
           >
             Sign In
           </button>
@@ -67,10 +77,14 @@ export default function WelcomePage() {
               fontSize: '1rem',
               border: 'none',
               cursor: 'pointer',
-              transition: 'background-color 0.2s'
+              transition: 'background-color 0.2s',
             }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1D4ED8'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.backgroundColor = '#1D4ED8')
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.backgroundColor = '#2563EB')
+            }
           >
             Create Account
           </button>
