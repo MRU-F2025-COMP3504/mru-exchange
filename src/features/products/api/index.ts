@@ -1,76 +1,89 @@
 import { supabase } from '@shared/api';
 import type {
-  DatabaseQueryResult,
+  CategoryAssignedProductTable,
+  CategoryTagTable,
+  DatabaseQuery,
   PickOmit,
   ProductTable,
 } from '@shared/types';
-import { ok, err } from '@shared/utils';
+import { query } from '@shared/utils';
 import type { User } from '@supabase/supabase-js';
 
-/**
- * @param id the product identifier
- */
-export async function getProduct(
+export async function get(
   id: number,
   columns: string,
-): DatabaseQueryResult<ProductTable> {
-  const { data, error } = await supabase
+): DatabaseQuery<ProductTable> {
+  return query(await supabase
     .from('Product_Information')
     .select(columns as '*')
     .eq('id', id)
-    .single();
-
-  return error ? err(error) : ok(data);
+    .single());
 }
 
-/**
- * @param id the seller identifier
- */
-export async function getProductsBySeller(
-  seller: User,
+export async function getBySeller(
+  seller: PickOmit<User, 'id'>,
   columns: string,
-): DatabaseQueryResult<ProductTable[]> {
-  const { data, error } = await supabase
+): DatabaseQuery<ProductTable[]> {
+  return query(await supabase
     .from('Product_Information')
     .select(columns as '*')
-    .eq('user_id', seller.id);
-
-  return error ? err(error) : ok(data);
+    .eq('user_id', seller.id));
 }
 
-export async function addProduct(
+export async function add(
   product: Required<ProductTable>,
-): DatabaseQueryResult<ProductTable> {
-  const { data, error } = await supabase
+): DatabaseQuery<ProductTable> {
+  return query(await supabase
     .from('Product_Information')
-    .insert(product);
-
-  if (data) {
-    return ok(data);
-  } else if (error) {
-    return err(error);
-  }
-
-  return err(new Error('Failed to add a new product'));
+    .insert(product)
+    .select()
+    .single());
 }
 
-export async function removeProduct(product: Required<ProductTable>) {
-  const { data, error } = await supabase
+export async function remove(product: Required<ProductTable>): DatabaseQuery<ProductTable> {
+  return query(await supabase
     .from('Product_Information')
     .delete()
-    .eq('id', product.id);
-
-  return error ? err(error) : ok(data);
+    .eq('id', product.id)
+    .select()
+    .single());
 }
 
-export async function updateProduct(
-  product: PickOmit<ProductTable, 'id' | 'user_id'>,
-) {
-  const { data, error } = await supabase
+export async function update(
+  product: Partial<ProductTable>,
+): DatabaseQuery<ProductTable> {
+  return query(await supabase
     .from('Product_Information')
-    .update(product);
+    .update(product)
+    .select()
+    .single());
+}
 
-  return error ? err(error) : ok(data);
+export async function categorize(product: PickOmit<ProductTable, 'id'>, ...categories: PickOmit<CategoryTagTable, 'id'>[]): DatabaseQuery<CategoryAssignedProductTable[]> {
+  const id = product.id;
+  const existing = query(await supabase
+    .from('Category_Assigned_Products')
+    .delete()
+    .eq('product_id', id));
+
+  if (!existing.ok) {
+    return existing;
+  }
+
+  return query(await supabase
+    .from('Category_Assigned_Products')
+    .insert(categories.map((category) => ({
+      category_id: category.id,
+      product_id: id,
+    })))
+    .select());
+}
+
+export async function getCategories(product: PickOmit<ProductTable, 'id'>): DatabaseQuery<CategoryAssignedProductTable[]> {
+  return query(await supabase
+    .from('Category_Assigned_Products')
+    .select('*')
+    .eq('product_id', product.id));
 }
 
 /*
