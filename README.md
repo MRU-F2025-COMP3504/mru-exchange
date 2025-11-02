@@ -21,6 +21,7 @@ We use [Discord](https://discord.gg/nRq2tNgDhp) to discuss our project.
 ## Shared Google Folder
 
 Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCEl7aFqRQXRUGOCotDveUUP4-?usp=drive_link)) contains the following artifacts for each:
+
 - Project milestones
 - Weekly status reports
 - Weekly team and project meeetings
@@ -34,7 +35,9 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - Sahil Grewal ([@SahilGrewalx](https://github.com/SahilGrewalx))
 
 ---
+
 ## 🎯 Features
+
 ### Implemented Backend (Supabase)
 
 - ✅ User authentication (@mtroyal.ca only)
@@ -55,10 +58,10 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - 👨‍🏫 **Tutoring** - Tutoring services
 
 ---
+
 ## 📖 Additional Resources
 
 - [Supabase Documentation](https://supabase.com/docs)
 - [React Documentation](https://react.dev/)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Vite Documentation](https://vitejs.dev/)
-
