@@ -167,21 +167,3 @@ export async function getCategories(
       .eq('product_id', product.id),
   );
 }
-
-/*
-/!**
- * @param keywords the search keywords
- * @param filters the unique filters that narrows results
- *!/
-export async function getProductsByKeywords(
-  keywords: string[],
-  filters: ProductFilter[],
-  columns: string,
-): DatabaseQueryResult<ProductTable[]> {
-  const { data, error } = await supabase
-    .from('Product_Information')
-    .select(columns as '*');
-
-  return error ? err(error) : ok(data);
-}
-*/
