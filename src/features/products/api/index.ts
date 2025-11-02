@@ -35,6 +35,18 @@ export async function getBySeller(
   );
 }
 
+export async function getBySearch(
+  text: string,
+): DatabaseQuery<PickOmit<ProductTable, 'id'>[]> {
+  const search = text.replace(/[%_\\]/g, '\\$&');
+  return query(
+    await supabase
+      .from('Product_Information')
+      .select('id')
+      .or(`title.ilike.%${search}%,content.ilike.%${search}%`),
+  );
+}
+
 export async function getByFilter(
   product: Partial<ProductFilter>,
 ): DatabaseQuery<PickOmit<ProductTable, 'id'>[]> {
