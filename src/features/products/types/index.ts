@@ -1,15 +1,5 @@
 import type { DatabaseQuery, ProductTable, Result } from '@shared/types';
 
-export interface Product {
-  id: number;
-  seller: number;
-  title: string;
-  description: string;
-  image: URL;
-  price: number;
-  stock: number;
-}
-
 export interface ProductSelector {
   id(id: number): Result<this, Error>;
   seller(id: string): Result<this, Error>;
