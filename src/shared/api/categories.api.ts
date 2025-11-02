@@ -1,15 +1,15 @@
 import { supabase } from '@shared/api';
 import { ok, err } from '@shared/utils';
 import type {
-  CategoryAssignedProductTable,
-  CategoryTagTable,
+  CategorizedProduct,
+  Category,
   DatabaseQuery,
   PickOmit,
 } from '@shared/types';
 
 export async function getAllCategories(
   columns: string,
-): DatabaseQuery<CategoryTagTable[]> {
+): DatabaseQuery<Category[]> {
   const { data, error } = await supabase
     .from('Category_Tags')
     .select(columns as '*')
@@ -21,7 +21,7 @@ export async function getAllCategories(
 export async function getCategory(
   id: number,
   columns: string,
-): DatabaseQuery<CategoryTagTable> {
+): DatabaseQuery<Category> {
   const { data, error } = await supabase
     .from('Category_Tags')
     .select(columns as '*')
@@ -34,7 +34,7 @@ export async function getCategory(
 export async function getCategoryProducts(
   id: number,
   columns: string,
-): DatabaseQuery<CategoryAssignedProductTable[]> {
+): DatabaseQuery<CategorizedProduct[]> {
   const { data, error } = await supabase
     .from('Category_Assigned_Products')
     .select(columns as '*')
@@ -62,8 +62,8 @@ export async function getCategoryProductCount(
 }
 
 export async function createCategory(
-  category: PickOmit<CategoryTagTable, 'name'>,
-): DatabaseQuery<CategoryTagTable> {
+  category: PickOmit<Category, 'name'>,
+): DatabaseQuery<Category> {
   const { data, error } = await supabase
     .from('Category_Tags')
     .insert(category)
@@ -74,8 +74,8 @@ export async function createCategory(
 }
 
 export async function updateCategory(
-  category: PickOmit<CategoryTagTable, 'id'>,
-): DatabaseQuery<CategoryTagTable> {
+  category: PickOmit<Category, 'id'>,
+): DatabaseQuery<Category> {
   const { data, error } = await supabase
     .from('Category_Tags')
     .update(category)
@@ -87,7 +87,7 @@ export async function updateCategory(
 }
 
 export async function deleteCategory(
-  category: Pick<CategoryTagTable, 'id'>,
+  category: Pick<Category, 'id'>,
 ): DatabaseQuery<unknown> {
   const { error } = await supabase
     .from('Category_Tags')

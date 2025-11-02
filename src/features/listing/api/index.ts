@@ -1,10 +1,10 @@
 import { err, ok, query } from '@shared/utils';
 import type {
-  CategoryAssignedProductTable,
-  CategoryTagTable,
+  CategorizedProduct,
+  Category,
   DatabaseQuery,
   PickOmit,
-  ProductTable,
+  Product,
   Result,
 } from '@shared/types';
 import { supabase } from '@shared/api';
@@ -12,7 +12,7 @@ import type { ProductAttributeModifier } from '@features/listing';
 import type { ProductBuilder } from '@features/catalogue';
 
 export function register(): ProductBuilder {
-  const product: Partial<ProductTable> = {};
+  const product: Partial<Product> = {};
   return {
     seller(id: string): Result<ProductBuilder, Error> {
       if (!id) {
@@ -76,7 +76,7 @@ export function register(): ProductBuilder {
 
       return ok(this);
     },
-    async build<T extends PickOmit<ProductTable, 'id'>>(): DatabaseQuery<T> {
+    async build<T extends PickOmit<Product, 'id'>>(): DatabaseQuery<T> {
       return query(
         await supabase
           .from('Product_Information')
@@ -88,7 +88,7 @@ export function register(): ProductBuilder {
   };
 }
 
-export async function set<T extends PickOmit<ProductTable, 'id'>>(product: T, isListed: boolean): DatabaseQuery<T> {
+export async function set<T extends PickOmit<Product, 'id'>>(product: T, isListed: boolean): DatabaseQuery<T> {
   return query(
     await supabase
       .from('Product_Information')
@@ -101,7 +101,7 @@ export async function set<T extends PickOmit<ProductTable, 'id'>>(product: T, is
   );
 }
 
-export async function setAll<T extends PickOmit<ProductTable, 'id'>>(seller: string, isListed: boolean): DatabaseQuery<T[]> {
+export async function setAll<T extends PickOmit<Product, 'id'>>(seller: string, isListed: boolean): DatabaseQuery<T[]> {
   return query(
     await supabase
       .from('Product_Information')
@@ -114,7 +114,7 @@ export async function setAll<T extends PickOmit<ProductTable, 'id'>>(seller: str
   );
 }
 
-export async function remove<T extends PickOmit<ProductTable, 'id'>>(product: T): DatabaseQuery<T> {
+export async function remove<T extends PickOmit<Product, 'id'>>(product: T): DatabaseQuery<T> {
   return query(
     await supabase
       .from('Product_Information')
@@ -125,7 +125,7 @@ export async function remove<T extends PickOmit<ProductTable, 'id'>>(product: T)
   );
 }
 
-export async function removeAll<T extends PickOmit<ProductTable, 'id'>>(seller: string): DatabaseQuery<T[]> {
+export async function removeAll<T extends PickOmit<Product, 'id'>>(seller: string): DatabaseQuery<T[]> {
   return query(
     await supabase
       .from('Product_Information')
@@ -135,8 +135,8 @@ export async function removeAll<T extends PickOmit<ProductTable, 'id'>>(seller: 
   );
 }
 
-export function attribute(product: PickOmit<ProductTable, 'id'>): ProductAttributeModifier {
-  const change: Partial<ProductTable> = {};
+export function attribute(product: PickOmit<Product, 'id'>): ProductAttributeModifier {
+  const change: Partial<Product> = {};
 
   return {
     title(title: string): Result<ProductAttributeModifier, Error> {
@@ -170,7 +170,7 @@ export function attribute(product: PickOmit<ProductTable, 'id'>): ProductAttribu
 
       return ok(this);
     },
-    async modify<T extends PickOmit<ProductTable, 'id'>>(): DatabaseQuery<T> {
+    async modify<T extends PickOmit<Product, 'id'>>(): DatabaseQuery<T> {
       return query(
         await supabase
           .from('Product_Information')
@@ -183,7 +183,7 @@ export function attribute(product: PickOmit<ProductTable, 'id'>): ProductAttribu
   }
 }
 
-export async function stock<T extends PickOmit<ProductTable, 'id'>>(product: T, stock: number): DatabaseQuery<T> {
+export async function stock<T extends PickOmit<Product, 'id'>>(product: T, stock: number): DatabaseQuery<T> {
   return query(
     await supabase
       .from('Product_Information')
@@ -197,9 +197,9 @@ export async function stock<T extends PickOmit<ProductTable, 'id'>>(product: T, 
 }
 
 export async function categorize(
-  product: PickOmit<ProductTable, 'id'>,
-  ...categories: PickOmit<CategoryTagTable, 'id'>[]
-): DatabaseQuery<CategoryAssignedProductTable[]> {
+  product: PickOmit<Product, 'id'>,
+  ...categories: PickOmit<Category, 'id'>[]
+): DatabaseQuery<CategorizedProduct[]> {
   const id = product.id;
   const existing = query(
     await supabase

@@ -1,7 +1,7 @@
 import type {
   DatabaseQuery,
   PickOmit,
-  ProductTable,
+  Product,
   Result,
 } from '@shared/types';
 
@@ -12,7 +12,7 @@ export interface ProductBuilder {
   image(url: string): Result<this, Error>;
   price(price: number): Result<this, Error>;
   stock(stock: number): Result<this, Error>;
-  build(): DatabaseQuery<ProductTable>;
+  build(): DatabaseQuery<Product>;
 }
 
 export interface ProductFilter {
@@ -20,5 +20,5 @@ export interface ProductFilter {
   price(min: number, max: number): Result<this, Error>;
   stock(min: number, max: number): Result<this, Error>;
   categories(...categories: number[]): Result<this, Error>;
-  find(): DatabaseQuery<PickOmit<ProductTable, 'id'>[]>;
+  find(): DatabaseQuery<PickOmit<Product, 'id'>[]>;
 }

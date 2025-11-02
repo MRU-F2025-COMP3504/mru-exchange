@@ -1,11 +1,11 @@
 import { supabase } from '@shared/api';
 import { ok, err } from '@shared/utils';
-import type { DatabaseQuery, ShoppingCartTable } from '@shared/types';
+import type { DatabaseQuery, ShoppingCart } from '@shared/types';
 
 export async function getUserCart(
   id: string,
   columns: string,
-): DatabaseQuery<ShoppingCartTable[]> {
+): DatabaseQuery<ShoppingCart[]> {
   const { data, error } = await supabase
     .from('Shopping_Cart')
     .select(columns as '*')
@@ -19,7 +19,7 @@ export async function addToCart(
   userId: string,
   productId: number,
   columns: string,
-): DatabaseQuery<ShoppingCartTable> {
+): DatabaseQuery<ShoppingCart> {
   const { data, error } = await supabase
     .from('Shopping_Cart')
     .select(columns as '*')

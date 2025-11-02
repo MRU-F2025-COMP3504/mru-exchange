@@ -1,11 +1,11 @@
 import { supabase } from '@shared/api';
 import { ok, err } from '@shared/utils';
-import { type DatabaseQuery, type ReviewTable } from '@shared/types';
+import { type DatabaseQuery, type Review } from '@shared/types';
 
 export async function getProductReviews(
   id: number,
   columns: string,
-): DatabaseQuery<ReviewTable[]> {
+): DatabaseQuery<Review[]> {
   const { data, error } = await supabase
     .from('Reviews')
     .select(columns as '*')
@@ -18,7 +18,7 @@ export async function getProductReviews(
 export async function getUserReviews(
   id: string,
   columns: string,
-): DatabaseQuery<ReviewTable[]> {
+): DatabaseQuery<Review[]> {
   const { data, error } = await supabase
     .from('Reviews')
     .select(columns as '*')
@@ -31,7 +31,7 @@ export async function getUserReviews(
 export async function getReviewsForUser(
   id: string,
   columns: string,
-): DatabaseQuery<ReviewTable[]> {
+): DatabaseQuery<Review[]> {
   const { data, error } = await supabase
     .from('Reviews')
     .select(columns as '*')
@@ -48,8 +48,8 @@ export async function getReviewsForUser(
 
 export async function updateReview(
   id: number,
-  review: Partial<Pick<ReviewTable, 'rating' | 'description'>>,
-): DatabaseQuery<ReviewTable> {
+  review: Partial<Pick<Review, 'rating' | 'description'>>,
+): DatabaseQuery<Review> {
   const { data, error } = await supabase
     .from('Reviews')
     .update(review)

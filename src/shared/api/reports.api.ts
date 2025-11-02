@@ -1,10 +1,10 @@
 import { supabase } from '@shared/api';
-import type { DatabaseQuery, PickOmit, ReportTable } from '@shared/types';
+import type { DatabaseQuery, PickOmit, Report } from '@shared/types';
 import { ok, err } from '@shared/utils';
 
 export async function createReport(
-  report: PickOmit<ReportTable, 'description'>,
-): DatabaseQuery<ReportTable> {
+  report: PickOmit<Report, 'description'>,
+): DatabaseQuery<Report> {
   const { data, error } = await supabase
     .from('Reports')
     .insert(report)
@@ -16,7 +16,7 @@ export async function createReport(
 
 export async function getAllReports(
   columns: string,
-): DatabaseQuery<ReportTable[]> {
+): DatabaseQuery<Report[]> {
   const { data, error } = await supabase
     .from('Reports')
     .select(columns as '*')
@@ -28,7 +28,7 @@ export async function getAllReports(
 export async function getUserReports(
   id: string,
   columns: string,
-): DatabaseQuery<ReportTable[]> {
+): DatabaseQuery<Report[]> {
   const { data, error } = await supabase
     .from('Reports')
     .select(columns as '*')
@@ -41,7 +41,7 @@ export async function getUserReports(
 export async function getReportsAgainstUser(
   id: string,
   columns: string,
-): DatabaseQuery<ReportTable[]> {
+): DatabaseQuery<Report[]> {
   const { data, error } = await supabase
     .from('Reports')
     .select(columns as '*')
@@ -51,7 +51,7 @@ export async function getReportsAgainstUser(
   return error ? err(error) : ok(data);
 }
 
-export async function closeReports(id: number): DatabaseQuery<ReportTable> {
+export async function closeReports(id: number): DatabaseQuery<Report> {
   const { data, error } = await supabase
     .from('Reports')
     .update({
@@ -65,7 +65,7 @@ export async function closeReports(id: number): DatabaseQuery<ReportTable> {
   return error ? err(error) : ok(data);
 }
 
-export async function reopenReport(id: number): DatabaseQuery<ReportTable> {
+export async function reopenReport(id: number): DatabaseQuery<Report> {
   const { data, error } = await supabase
     .from('Reports')
     .update({
@@ -82,7 +82,7 @@ export async function reopenReport(id: number): DatabaseQuery<ReportTable> {
 export async function updateReport(
   id: number,
   linkedInformation: string,
-): DatabaseQuery<ReportTable> {
+): DatabaseQuery<Report> {
   const { data, error } = await supabase
     .from('Reports')
     .update({ linked_information: linkedInformation })

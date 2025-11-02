@@ -1,9 +1,9 @@
 import { supabase } from '@shared/api';
 import { err, ok } from '@shared/utils';
 import type {
-  ChatTable,
+  Chat,
   DatabaseQuery,
-  MessageTable,
+  Message,
   PickOmit,
 } from '@shared/types';
 import {
@@ -14,7 +14,7 @@ import {
 export async function getUserChat(
   id: number,
   columns: string,
-): DatabaseQuery<ChatTable> {
+): DatabaseQuery<Chat> {
   const { data, error } = await supabase
     .from('Chats')
     .select(columns as '*')
@@ -27,7 +27,7 @@ export async function getUserChat(
 export async function getUserChats(
   id: string,
   columns: string,
-): DatabaseQuery<ChatTable[]> {
+): DatabaseQuery<Chat[]> {
   const { data, error } = await supabase
     .from('Chats')
     .select(columns as '*')
@@ -38,8 +38,8 @@ export async function getUserChats(
 }
 
 export async function createChat(
-  chat: PickOmit<ChatTable, 'user_id_1' | 'user_id_2'>,
-): DatabaseQuery<ChatTable> {
+  chat: PickOmit<Chat, 'user_id_1' | 'user_id_2'>,
+): DatabaseQuery<Chat> {
   const { data, error } = await supabase
     .from('Chats')
     .insert(chat)
@@ -52,7 +52,7 @@ export async function createChat(
 export async function getChatMessages(
   id: number,
   columns: string,
-): DatabaseQuery<MessageTable[]> {
+): DatabaseQuery<Message[]> {
   const { data, error } = await supabase
     .from('Messages')
     .select(columns as '*')
@@ -64,8 +64,8 @@ export async function getChatMessages(
 }
 
 export async function sendMessage(
-  message: PickOmit<MessageTable, 'chat_id' | 'sender_id' | 'logged_message'>,
-): DatabaseQuery<MessageTable> {
+  message: PickOmit<Message, 'chat_id' | 'sender_id' | 'logged_message'>,
+): DatabaseQuery<Message> {
   const { data, error } = await supabase
     .from('Messages')
     .insert(message)
@@ -75,7 +75,7 @@ export async function sendMessage(
   return error ? err(error) : ok(data);
 }
 
-export async function hideMessage(id: number): DatabaseQuery<MessageTable> {
+export async function hideMessage(id: number): DatabaseQuery<Message> {
   const { data, error } = await supabase
     .from('Messages')
     .update({ visible: false })
@@ -96,7 +96,7 @@ export async function setChatVisibility(
   chat: number,
   user: string,
   visibility: boolean,
-): DatabaseQuery<ChatTable> {
+): DatabaseQuery<Chat> {
   const users = await getUserChat(chat, 'user_id_1,user_id_2');
 
   if (!users.ok) {
@@ -122,7 +122,7 @@ export async function setChatVisibility(
 
 export function subscribeToChat(
   chat: number,
-  callback: (payload: RealtimePostgresInsertPayload<MessageTable>) => void,
+  callback: (payload: RealtimePostgresInsertPayload<Message>) => void,
 ) {
   const id = chat.toString();
   return supabase
