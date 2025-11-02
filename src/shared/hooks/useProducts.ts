@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { productsApi, type ProductFilters } from '../api/products.api';
+import { productsApi, type ProductFilters } from '../api/catalogue.api';
 import type { ProductInformation } from '../types/database.ts';
 
 /**
- * Hook to fetch and manage products
+ * Hook to fetch and manage catalogue
  */
 export const useProducts = (filters?: ProductFilters) => {
   const [products, setProducts] = useState<ProductInformation[]>([]);
@@ -88,7 +88,7 @@ export const useProduct = (productId: number | null) => {
 };
 
 /**
- * Hook to fetch user's products
+ * Hook to fetch user's catalogue
  */
 export const useUserProducts = (userId: string | null) => {
   const [products, setProducts] = useState<ProductInformation[]>([]);

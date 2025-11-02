@@ -7,7 +7,7 @@ import type {
   Result,
 } from '@shared/types';
 import { err, ok, query } from '@shared/utils';
-import type { ProductFilter } from '@features/products';
+import type { ProductFilter } from '@features/catalogue';
 
 export async function get(
   id: number,

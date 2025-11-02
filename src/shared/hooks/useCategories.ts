@@ -81,7 +81,7 @@ export const useCategory = (categoryId: number | null) => {
 };
 
 /**
- * Hook to fetch products in a category
+ * Hook to fetch catalogue in a category
  */
 export const useCategoryProducts = (categoryId: number | null) => {
   const [products, setProducts] = useState<any[]>([]);
