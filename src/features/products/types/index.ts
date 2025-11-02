@@ -1,4 +1,9 @@
-import type { DatabaseQuery, ProductTable, Result } from '@shared/types';
+import type {
+  DatabaseQuery,
+  PickOmit,
+  ProductTable,
+  Result,
+} from '@shared/types';
 
 export interface ProductSelector {
   id(id: number): Result<this, Error>;
@@ -21,5 +26,5 @@ export interface ProductFilter {
   price(min: number, max: number): Result<this, Error>;
   stock(min: number, max: number): Result<this, Error>;
   categories(...categories: number[]): Result<this, Error>;
-  find(): DatabaseQuery<Product[]>;
+  find(): DatabaseQuery<PickOmit<ProductTable, 'id'>[]>;
 }

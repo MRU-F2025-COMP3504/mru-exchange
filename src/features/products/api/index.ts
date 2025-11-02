@@ -3,11 +3,8 @@ import type {
   CategoryAssignedProductTable,
   CategoryTagTable,
   DatabaseQuery,
-  DatabaseQueryResult,
   PickOmit,
-  Product,
   ProductTable,
-  PromiseResult,
   Result,
 } from '@shared/types';
 import { err, ok, query } from '@shared/utils';
@@ -52,7 +49,7 @@ export async function getBySearch(
 }
 
 export function getByFilter(): ProductFilter {
-  const productSql = supabase.from('Product_Information').select('id');
+  const sql = supabase.from('Product_Information').select('id');
   let categories: number[];
 
   return {
@@ -60,7 +57,7 @@ export function getByFilter(): ProductFilter {
       if (!id) {
         return err(new Error('Product ID is not specified'));
       } else {
-        productSql.eq('user_id', id);
+        sql.eq('user_id', id);
       }
 
       return ok(this);
@@ -73,8 +70,8 @@ export function getByFilter(): ProductFilter {
           }),
         );
       } else {
-        productSql.gte('price', Math.min(a, b));
-        productSql.lte('price', Math.max(a, b));
+        sql.gte('price', Math.min(a, b));
+        sql.lte('price', Math.max(a, b));
       }
 
       return ok(this);
@@ -87,8 +84,8 @@ export function getByFilter(): ProductFilter {
           }),
         );
       } else {
-        productSql.gte('stock_count', Math.min(a, b));
-        productSql.lte('stock_count', Math.max(a, b));
+        sql.gte('stock_count', Math.min(a, b));
+        sql.lte('stock_count', Math.max(a, b));
       }
 
       return ok(this);
@@ -98,26 +95,22 @@ export function getByFilter(): ProductFilter {
 
       return ok(this);
     },
-    async find(): DatabaseQuery<Product[]> {
-      const products = query(await productSql);
+    async find(): DatabaseQuery<PickOmit<ProductTable, 'id'>[]> {
+      const products = query(await sql);
 
       if (categories.length === 0 || !products.ok) {
         return products;
       }
 
-      const categorySql = supabase.from('Category_Assigned_Products').select('id:product_id');
-
-      for (const product of products.data) {
-        categorySql.eq('product_id', product.id);
-      }
-
-      for (const category of categories) {
-        categorySql.eq('category_id', category);
-      }
-
-      return query(await categorySql);
-    }
-  }
+      return query(
+        await supabase
+          .from('Category_Assigned_Products')
+          .select('id:product_id')
+          .in('product_id', products.data.map((product) => product.id))
+          .in('category_id', categories)
+      );
+    },
+  };
 }
 
 export function builder(): ProductBuilder {
@@ -165,7 +158,9 @@ export function builder(): ProductBuilder {
     },
     price(price: number): Result<ProductBuilder, Error> {
       if (price < 0) {
-        return err(new Error('Product price cannot be negative', { cause: price }));
+        return err(
+          new Error('Product price cannot be negative', { cause: price }),
+        );
       } else {
         product.price = price;
       }
@@ -174,7 +169,9 @@ export function builder(): ProductBuilder {
     },
     stock(stock: number): Result<ProductBuilder, Error> {
       if (stock < 0) {
-        return err(new Error('Product stock cannot be negative', { cause: stock }));
+        return err(
+          new Error('Product stock cannot be negative', { cause: stock }),
+        );
       } else {
         product.stock_count = stock;
       }
