@@ -1,5 +1,13 @@
 export interface ProductFilter {
-  type: string;
-  order: number;
-  content: string;
+  seller: string;
+  price: {
+    min: number;
+    max: number;
+  };
+  stock: {
+    min: number;
+    max: number;
+  };
+  listed: boolean;
+  categories: number[];
 }
