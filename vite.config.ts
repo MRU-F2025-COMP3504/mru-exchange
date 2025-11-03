@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite';
+/// <reference types="vitest/config" />
+import { defineConfig, type UserConfigExport } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
@@ -12,6 +13,12 @@ export default defineConfig({
       usePolling: true, // Update on file changes
     },
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    css: true,
+  },
   resolve: {
     alias: {
       '@features': path.resolve(__dirname, './src/features'),
@@ -20,4 +27,4 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, './src/shared'),
     },
   },
-});
+} as UserConfigExport);
