@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { resetPassword } from '@features/auth';
+import { AuthAPI } from '@features/auth';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -22,7 +22,7 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    const result = await resetPassword(email);
+    const result = await AuthAPI.resetPassword(email);
 
     if (result.ok) {
       setSuccessMessage(
@@ -58,7 +58,7 @@ export default function ResetPasswordPage() {
             password.
           </p>
 
-          <form onSubmit={handleSubmit} className='space-y-6'>
+          <form onSubmit={void handleSubmit} className='space-y-6'>
             {/* Email Input */}
             <div>
               <label
@@ -71,7 +71,7 @@ export default function ResetPasswordPage() {
                 id='email'
                 type='email'
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); }}
                 placeholder='student@mtroyal.ca'
                 required
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
