@@ -51,31 +51,35 @@ export async function register(
 
 export async function store(
   cart: RequiredColumns<ShoppingCart, 'id'>,
-  product: RequiredColumns<Product, 'id'>,
-): DatabaseView<ShoppingCartProduct> {
+  ...products: RequiredColumns<Product, 'id'>[]
+): DatabaseView<ShoppingCartProduct[]> {
+  const id = cart.id;
   return query(
     await supabase
       .from('Shopping_Cart_Products')
-      .insert({
-        shopping_cart_id: cart.id,
-        product_id: product.id,
-      })
-      .select()
-      .single(),
+      .insert(
+        products.map((product) => ({
+          shopping_cart_id: id,
+          product_id: product.id,
+        })),
+      )
+      .select(),
   );
 }
 
 export async function remove(
   cart: RequiredColumns<ShoppingCart, 'id'>,
-  product: RequiredColumns<Product, 'id'>,
-): DatabaseView<ShoppingCartProduct> {
+  ...products: RequiredColumns<Product, 'id'>[]
+): DatabaseView<ShoppingCartProduct[]> {
   return query(
     await supabase
       .from('Shopping_Cart_Products')
       .delete()
       .eq('shopping_cart_id', cart.id)
-      .eq('product_id', product.id)
-      .select()
+      .in(
+        'id',
+        products.map((product) => product.id),
+      )
       .single(),
   );
 }
