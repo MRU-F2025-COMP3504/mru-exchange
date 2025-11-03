@@ -10,7 +10,7 @@ import { supabase } from '@shared/api';
 import type { MessageSender } from '@features/messaging/types';
 import { query, view } from '@shared/utils';
 
-export async function getAll(
+export async function getByChat(
   chat: RequiredColumns<Chat, 'id'>,
 ): DatabaseView<UserMessage[]> {
   return view(
@@ -41,51 +41,37 @@ export async function send(
 }
 
 export async function hide(
-  message: RequiredColumns<UserMessage, 'id'>,
-): DatabaseQuery<UserMessage, 'id'> {
-  return query(
-    await supabase
-      .from('Messages')
-      .update({ visible: false })
-      .eq('id', message.id)
-      .select('id')
-      .single(),
-  );
-}
-
-export async function hideAll(
   sender: MessageSender,
+  ...messages: RequiredColumns<UserMessage, 'id'>[]
 ): DatabaseQueryArray<UserMessage, 'id'> {
   return query(
     await supabase
       .from('Messages')
       .update({ visible: false })
+      .eq('chat_id', sender.chat)
       .eq('sender_id', sender.user)
+      .in(
+        'id',
+        messages.map((message) => message.id),
+      )
       .select('id'),
   );
 }
 
 export async function remove(
-  message: RequiredColumns<UserMessage, 'id'>,
-): DatabaseQuery<UserMessage, 'id'> {
-  return query(
-    await supabase
-      .from('Messages')
-      .delete()
-      .eq('id', message.id)
-      .select('id')
-      .single(),
-  );
-}
-
-export async function removeAll(
   sender: MessageSender,
+  ...messages: RequiredColumns<UserMessage, 'id'>[]
 ): DatabaseQueryArray<UserMessage, 'id'> {
   return query(
     await supabase
       .from('Messages')
       .delete()
+      .eq('chat_id', sender.chat)
       .eq('sender_id', sender.user)
+      .in(
+        'id',
+        messages.map((message) => message.id),
+      )
       .select('id'),
   );
 }
