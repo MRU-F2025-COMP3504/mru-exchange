@@ -9,5 +9,5 @@ export type CategorizedProduct = Tables<'Category_Assigned_Products'>;
 export type ShoppingCart = Tables<'Shopping_Cart'>;
 export type ShoppingCartProducts = Tables<'Shopping_Cart_Products'>;
 export type Review = Tables<'Reviews'>;
-export type Report = Tables<'Reports'>;
+export type UserReport = Tables<'Reports'>;
 export type UserInteraction = Tables<'User_Interactions'>;
