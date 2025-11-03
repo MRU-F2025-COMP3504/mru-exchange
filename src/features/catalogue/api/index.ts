@@ -1,19 +1,15 @@
 import { supabase } from '@shared/api';
 import type {
-  CategorizedProduct,
   DatabaseQueryArray,
   DatabaseView,
-  PickOmit,
   Product,
   Result,
 } from '@shared/types';
 import { err, ok } from '@shared/utils';
 import type { ProductFilter } from '@features/catalogue';
-import { query, view } from '@shared/api/database.ts';
+import { query } from '@shared/api/database.ts';
 
-export async function get(
-  id: number,
-): DatabaseView<Product> {
+export async function get(id: number): DatabaseView<Product> {
   return query(
     await supabase
       .from('Product_Information')
@@ -23,9 +19,7 @@ export async function get(
   );
 }
 
-export async function getAll(
-  columns: string,
-): DatabaseView<Product[]> {
+export async function getAll(columns: string): DatabaseView<Product[]> {
   return query(
     await supabase.from('Product_Information').select(columns as '*'),
   );
@@ -109,15 +103,4 @@ export function getByFilter(): ProductFilter {
       );
     },
   };
-}
-
-export async function getCategories(
-  product: PickOmit<Product, 'id'>,
-): DatabaseView<CategorizedProduct[]> {
-  return view(
-    await supabase
-      .from('Category_Assigned_Products')
-      .select('*')
-      .eq('product_id', product.id),
-  );
 }

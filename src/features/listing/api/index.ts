@@ -1,7 +1,5 @@
 import { err, ok } from '@shared/utils';
 import type {
-  CategorizedProduct,
-  Category,
   DatabaseQuery,
   DatabaseQueryArray,
   PickOmit,
@@ -68,7 +66,10 @@ export function register(): ProductBuilder {
   };
 }
 
-export async function set(product: PickOmit<Product, 'id'>, isListed: boolean): DatabaseQuery<Product, 'id'> {
+export async function set(
+  product: PickOmit<Product, 'id'>,
+  isListed: boolean,
+): DatabaseQuery<Product, 'id'> {
   return query(
     await supabase
       .from('Product_Information')
@@ -81,7 +82,10 @@ export async function set(product: PickOmit<Product, 'id'>, isListed: boolean): 
   );
 }
 
-export async function setAll(seller: string, isListed: boolean): DatabaseQueryArray<Product, 'id'> {
+export async function setAll(
+  seller: string,
+  isListed: boolean,
+): DatabaseQueryArray<Product, 'id'> {
   return query(
     await supabase
       .from('Product_Information')
@@ -94,7 +98,9 @@ export async function setAll(seller: string, isListed: boolean): DatabaseQueryAr
   );
 }
 
-export async function remove(product: PickOmit<Product, 'id'>): DatabaseQuery<Product, 'id'> {
+export async function remove(
+  product: PickOmit<Product, 'id'>,
+): DatabaseQuery<Product, 'id'> {
   return query(
     await supabase
       .from('Product_Information')
@@ -105,7 +111,9 @@ export async function remove(product: PickOmit<Product, 'id'>): DatabaseQuery<Pr
   );
 }
 
-export async function removeAll(seller: string): DatabaseQueryArray<Product, 'id'> {
+export async function removeAll(
+  seller: string,
+): DatabaseQueryArray<Product, 'id'> {
   return query(
     await supabase
       .from('Product_Information')
@@ -115,7 +123,9 @@ export async function removeAll(seller: string): DatabaseQueryArray<Product, 'id
   );
 }
 
-export function attribute(product: PickOmit<Product, 'id'>): ProductAttributeModifier {
+export function attribute(
+  product: PickOmit<Product, 'id'>,
+): ProductAttributeModifier {
   const change: Partial<Product> = {};
 
   return {
@@ -123,7 +133,7 @@ export function attribute(product: PickOmit<Product, 'id'>): ProductAttributeMod
       return setTitle(this, product, title);
     },
     description(description: string): Result<ProductAttributeModifier, Error> {
-      return setDescription(this, product, description)
+      return setDescription(this, product, description);
     },
     image(url: string): Result<ProductAttributeModifier, Error> {
       return setImage(this, product, url);
@@ -138,10 +148,13 @@ export function attribute(product: PickOmit<Product, 'id'>): ProductAttributeMod
           .single(),
       );
     },
-  }
+  };
 }
 
-export async function stock(product: PickOmit<Product, 'id'>, stock: number): DatabaseQuery<Product, 'id'> {
+export async function stock(
+  product: PickOmit<Product, 'id'>,
+  stock: number,
+): DatabaseQuery<Product, 'id'> {
   return query(
     await supabase
       .from('Product_Information')
@@ -154,36 +167,11 @@ export async function stock(product: PickOmit<Product, 'id'>, stock: number): Da
   );
 }
 
-export async function categorize(
-  product: PickOmit<Product, 'id'>,
-  ...categories: PickOmit<Category, 'id'>[]
-): DatabaseQueryArray<CategorizedProduct, 'category_id'> {
-  const id = product.id;
-  const existing = query(
-    await supabase
-      .from('Category_Assigned_Products')
-      .delete()
-      .eq('product_id', id),
-  );
-
-  if (existing.ok) {
-    return query(
-      await supabase
-        .from('Category_Assigned_Products')
-        .insert(
-          categories.map((category) => ({
-            category_id: category.id,
-            product_id: id,
-          })),
-        )
-        .select('category_id'),
-    );
-  }
-
-  return existing;
-}
-
-function setTitle<T>(controller: T, product: Partial<Product>, title: string): Result<T, Error> {
+function setTitle<T>(
+  controller: T,
+  product: Partial<Product>,
+  title: string,
+): Result<T, Error> {
   if (!title) {
     return err(new Error('Product title is not specified'));
   } else {
@@ -193,7 +181,11 @@ function setTitle<T>(controller: T, product: Partial<Product>, title: string): R
   return ok(controller);
 }
 
-function setDescription<T>(controller: T, product: Partial<Product>, description: string): Result<T, Error> {
+function setDescription<T>(
+  controller: T,
+  product: Partial<Product>,
+  description: string,
+): Result<T, Error> {
   if (!description) {
     return err(new Error('Product description is not specified'));
   } else {
@@ -203,7 +195,11 @@ function setDescription<T>(controller: T, product: Partial<Product>, description
   return ok(controller);
 }
 
-function setImage<T>(controller: T, product: Partial<Product>, url: string): Result<T, Error> {
+function setImage<T>(
+  controller: T,
+  product: Partial<Product>,
+  url: string,
+): Result<T, Error> {
   try {
     product.image = new URL(url).toJSON();
   } catch (error: unknown) {
