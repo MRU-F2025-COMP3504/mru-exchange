@@ -9,7 +9,7 @@ import type {
 import { supabase } from '@shared/api';
 import type { ProductAttributeModifier } from '@features/listing';
 import type { ProductBuilder } from '@features/listing/types';
-import { query } from '@shared/api/database.ts';
+import { query } from '@shared/utils/database.ts';
 
 export function register(): ProductBuilder {
   const product: Partial<Product> = {};

@@ -7,7 +7,7 @@ import type {
 } from '@shared/types';
 import { err, ok } from '@shared/utils';
 import type { ProductFilter } from '@features/catalogue';
-import { query } from '@shared/api/database.ts';
+import { query } from '@shared/utils/database.ts';
 
 export async function get(id: number): DatabaseView<Product> {
   return query(

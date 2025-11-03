@@ -6,7 +6,7 @@ import type {
   PickOmit,
   Product,
 } from '@shared/types';
-import { query } from '@shared/api/database.ts';
+import { query } from '@shared/utils/database.ts';
 import { supabase } from '@shared/api';
 
 export async function register(

@@ -6,7 +6,7 @@ import type {
   Product,
 } from '@shared/types';
 import { supabase } from '@shared/api';
-import { view } from '@shared/api/database.ts';
+import { view } from '@shared/utils/database.ts';
 
 export async function getTags(): DatabaseView<Category[]> {
   return view(
