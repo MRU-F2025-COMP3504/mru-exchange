@@ -3,14 +3,16 @@ import type {
   DatabaseQuery,
   DatabaseQueryArray,
   DatabaseView,
-  PickOmit,
+  RequiredColumns,
   UserMessage,
 } from '@shared/types';
-import { query, view } from '@shared/api/database.ts';
 import { supabase } from '@shared/api';
 import type { MessageSender } from '@features/messaging/types';
+import { query, view } from '@shared/utils';
 
-export async function getAll(chat: PickOmit<Chat, 'id'>): DatabaseView<UserMessage[]> {
+export async function getAll(
+  chat: RequiredColumns<Chat, 'id'>,
+): DatabaseView<UserMessage[]> {
   return view(
     await supabase
       .from('Messages')
@@ -38,7 +40,9 @@ export async function send(
   );
 }
 
-export async function hide(message: PickOmit<UserMessage, 'id'>): DatabaseQuery<UserMessage, 'id'> {
+export async function hide(
+  message: RequiredColumns<UserMessage, 'id'>,
+): DatabaseQuery<UserMessage, 'id'> {
   return query(
     await supabase
       .from('Messages')
@@ -61,9 +65,16 @@ export async function hideAll(
   );
 }
 
-export async function remove(message: PickOmit<UserMessage, 'id'>): DatabaseQuery<UserMessage, 'id'> {
+export async function remove(
+  message: RequiredColumns<UserMessage, 'id'>,
+): DatabaseQuery<UserMessage, 'id'> {
   return query(
-    await supabase.from('Messages').delete().eq('id', message.id).select('id').single(),
+    await supabase
+      .from('Messages')
+      .delete()
+      .eq('id', message.id)
+      .select('id')
+      .single(),
   );
 }
 
