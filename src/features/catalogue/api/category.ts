@@ -1,13 +1,12 @@
 import type {
   CategorizedProduct,
   Category,
-  DatabaseQuery,
   DatabaseView,
   PickOmit,
   Product,
 } from '@shared/types';
 import { supabase } from '@shared/api';
-import { query, view } from '@shared/api/database.ts';
+import { view } from '@shared/api/database.ts';
 
 export async function getTags(): DatabaseView<Category[]> {
   return view(
@@ -47,5 +46,3 @@ export async function getAssignedTagsByProduct(
       .eq('product_id', product.id),
   );
 }
-
-export async function create();
