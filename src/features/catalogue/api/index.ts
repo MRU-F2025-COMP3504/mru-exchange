@@ -1,22 +1,23 @@
 import { supabase } from '@shared/api';
 import type {
   CategorizedProduct,
-  DatabaseQuery,
+  DatabaseQueryArray,
+  DatabaseView,
   PickOmit,
   Product,
   Result,
 } from '@shared/types';
-import { err, ok, query } from '@shared/utils';
+import { err, ok } from '@shared/utils';
 import type { ProductFilter } from '@features/catalogue';
+import { query, view } from '@shared/api/database.ts';
 
 export async function get(
   id: number,
-  columns: string,
-): DatabaseQuery<Partial<Product>> {
+): DatabaseView<Product> {
   return query(
     await supabase
       .from('Product_Information')
-      .select(columns as '*')
+      .select('*')
       .eq('id', id)
       .single(),
   );
@@ -24,7 +25,7 @@ export async function get(
 
 export async function getAll(
   columns: string,
-): DatabaseQuery<Partial<Product[]>> {
+): DatabaseView<Product[]> {
   return query(
     await supabase.from('Product_Information').select(columns as '*'),
   );
@@ -32,7 +33,7 @@ export async function getAll(
 
 export async function getBySearch(
   text: string,
-): DatabaseQuery<PickOmit<Product, 'id'>[]> {
+): DatabaseQueryArray<Product, 'id'> {
   const search = text.replace(/[%_\\]/g, '\\$&');
   return query(
     await supabase
@@ -89,7 +90,7 @@ export function getByFilter(): ProductFilter {
 
       return ok(this);
     },
-    async find(): DatabaseQuery<PickOmit<Product, 'id'>[]> {
+    async find(): DatabaseQueryArray<Product, 'id'> {
       const products = query(await sql);
 
       if (categories.length === 0 || !products.ok) {
@@ -112,8 +113,8 @@ export function getByFilter(): ProductFilter {
 
 export async function getCategories(
   product: PickOmit<Product, 'id'>,
-): DatabaseQuery<CategorizedProduct[]> {
-  return query(
+): DatabaseView<CategorizedProduct[]> {
+  return view(
     await supabase
       .from('Category_Assigned_Products')
       .select('*')

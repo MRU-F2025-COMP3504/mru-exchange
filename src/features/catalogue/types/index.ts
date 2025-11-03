@@ -1,6 +1,5 @@
 import type {
-  DatabaseQuery,
-  PickOmit,
+  DatabaseQueryArray,
   Product,
   Result,
 } from '@shared/types';
@@ -10,5 +9,5 @@ export interface ProductFilter {
   price(min: number, max: number): Result<this, Error>;
   stock(min: number, max: number): Result<this, Error>;
   categories(...categories: number[]): Result<this, Error>;
-  find<T extends PickOmit<Product, 'id'>>(): DatabaseQuery<T[]>;
+  find(): DatabaseQueryArray<Product, 'id'>;
 }

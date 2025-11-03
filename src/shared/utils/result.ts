@@ -1,5 +1,4 @@
-import type { DatabaseQueryResult, Result } from '@shared/types';
-import type { PostgrestSingleResponse } from '@supabase/supabase-js';
+import type { Result } from '@shared/types';
 
 export function ok<T, E>(data: T): Result<T, E> {
   return { ok: true, data };
@@ -15,18 +14,4 @@ export function present<T>(data: T | null | undefined): Result<T, Error> {
   }
 
   return err(new Error('Specified data is not present'));
-}
-
-export function query<T>(
-  response: PostgrestSingleResponse<T>,
-): DatabaseQueryResult<T> {
-  const { data, error } = response;
-
-  if (data) {
-    return ok(data);
-  } else if (error) {
-    return err(error);
-  }
-
-  return err(new Error('Undetermined query result'));
 }

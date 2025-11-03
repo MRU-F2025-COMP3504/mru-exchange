@@ -1,8 +1,9 @@
-import { err, ok, query } from '@shared/utils';
+import { err, ok } from '@shared/utils';
 import type {
   CategorizedProduct,
   Category,
   DatabaseQuery,
+  DatabaseQueryArray,
   PickOmit,
   Product,
   Result,
@@ -10,6 +11,7 @@ import type {
 import { supabase } from '@shared/api';
 import type { ProductAttributeModifier } from '@features/listing';
 import type { ProductBuilder } from '@features/listing/types';
+import { query } from '@shared/api/database.ts';
 
 export function register(): ProductBuilder {
   const product: Partial<Product> = {};
@@ -54,19 +56,19 @@ export function register(): ProductBuilder {
 
       return ok(this);
     },
-    async build<T extends PickOmit<Product, 'id'>>(): DatabaseQuery<T> {
+    async build(): DatabaseQuery<Product, 'id'> {
       return query(
         await supabase
           .from('Product_Information')
           .insert(product)
-          .select()
+          .select('id')
           .single(),
       );
     },
   };
 }
 
-export async function set<T extends PickOmit<Product, 'id'>>(product: T, isListed: boolean): DatabaseQuery<T> {
+export async function set(product: PickOmit<Product, 'id'>, isListed: boolean): DatabaseQuery<Product, 'id'> {
   return query(
     await supabase
       .from('Product_Information')
@@ -74,12 +76,12 @@ export async function set<T extends PickOmit<Product, 'id'>>(product: T, isListe
         isListed,
       })
       .eq('id', product.id)
-      .select()
+      .select('id')
       .single(),
   );
 }
 
-export async function setAll<T extends PickOmit<Product, 'id'>>(seller: string, isListed: boolean): DatabaseQuery<T[]> {
+export async function setAll(seller: string, isListed: boolean): DatabaseQueryArray<Product, 'id'> {
   return query(
     await supabase
       .from('Product_Information')
@@ -88,28 +90,28 @@ export async function setAll<T extends PickOmit<Product, 'id'>>(seller: string, 
       })
       .eq('user_id', seller)
       .eq('isListed', !isListed)
-      .select(),
+      .select('id'),
   );
 }
 
-export async function remove<T extends PickOmit<Product, 'id'>>(product: T): DatabaseQuery<T> {
+export async function remove(product: PickOmit<Product, 'id'>): DatabaseQuery<Product, 'id'> {
   return query(
     await supabase
       .from('Product_Information')
       .delete()
       .eq('id', product.id)
-      .select()
+      .select('id')
       .single(),
   );
 }
 
-export async function removeAll<T extends PickOmit<Product, 'id'>>(seller: string): DatabaseQuery<T[]> {
+export async function removeAll(seller: string): DatabaseQueryArray<Product, 'id'> {
   return query(
     await supabase
       .from('Product_Information')
       .delete()
       .eq('user_id', seller)
-      .select(),
+      .select('id'),
   );
 }
 
@@ -126,20 +128,20 @@ export function attribute(product: PickOmit<Product, 'id'>): ProductAttributeMod
     image(url: string): Result<ProductAttributeModifier, Error> {
       return setImage(this, product, url);
     },
-    async modify<T extends PickOmit<Product, 'id'>>(): DatabaseQuery<T> {
+    async modify(): DatabaseQuery<Product, 'id'> {
       return query(
         await supabase
           .from('Product_Information')
           .update(change)
           .eq('id', product.id)
-          .select()
+          .select('id')
           .single(),
       );
     },
   }
 }
 
-export async function stock<T extends PickOmit<Product, 'id'>>(product: T, stock: number): DatabaseQuery<T> {
+export async function stock(product: PickOmit<Product, 'id'>, stock: number): DatabaseQuery<Product, 'id'> {
   return query(
     await supabase
       .from('Product_Information')
@@ -155,7 +157,7 @@ export async function stock<T extends PickOmit<Product, 'id'>>(product: T, stock
 export async function categorize(
   product: PickOmit<Product, 'id'>,
   ...categories: PickOmit<Category, 'id'>[]
-): DatabaseQuery<CategorizedProduct[]> {
+): DatabaseQueryArray<CategorizedProduct, 'category_id'> {
   const id = product.id;
   const existing = query(
     await supabase
@@ -174,7 +176,7 @@ export async function categorize(
             product_id: id,
           })),
         )
-        .select(),
+        .select('category_id'),
     );
   }
 

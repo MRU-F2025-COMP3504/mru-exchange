@@ -1,4 +1,8 @@
-import type { DatabaseQuery, PickOmit, Product, Result } from '@shared/types';
+import type {
+  DatabaseQuery,
+  Product,
+  Result,
+} from '@shared/types';
 
 export interface ProductBuilder {
   seller(id: string): Result<this, Error>;
@@ -7,12 +11,12 @@ export interface ProductBuilder {
   image(url: string): Result<this, Error>;
   price(price: number): Result<this, Error>;
   stock(stock: number): Result<this, Error>;
-  build(): DatabaseQuery<Product>;
+  build(): DatabaseQuery<Product, 'id'>;
 }
 
 export interface ProductAttributeModifier {
   title(title: string): Result<this, Error>;
   description(description: string): Result<this, Error>;
   image(url: string): Result<this, Error>;
-  modify<T extends PickOmit<Product, 'id'>>(): DatabaseQuery<T>
+  modify(): DatabaseQuery<Product, 'id'>
 }
