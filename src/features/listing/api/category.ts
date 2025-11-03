@@ -3,14 +3,14 @@ import type {
   Category,
   DatabaseQuery,
   DatabaseView,
-  PickOmit,
+  RequiredColumns,
   Product,
 } from '@shared/types';
 import { query } from '@shared/utils/database.ts';
 import { supabase } from '@shared/api';
 
 export async function register(
-  category: PickOmit<Category, 'name' | 'description'>,
+  category: RequiredColumns<Category, 'name' | 'description'>,
 ): DatabaseView<Category> {
   return query(
     await supabase.from('Category_Tags').insert(category).select().single(),
@@ -18,7 +18,7 @@ export async function register(
 }
 
 export async function remove(
-  category: PickOmit<Category, 'id'>,
+  category: RequiredColumns<Category, 'id'>,
 ): DatabaseQuery<Category, 'id'> {
   return query(
     await supabase
@@ -31,7 +31,7 @@ export async function remove(
 }
 
 export async function set(
-  old: PickOmit<Category, 'id'>,
+  old: RequiredColumns<Category, 'id'>,
   change: Pick<Partial<Category>, 'name' | 'description'>,
 ): DatabaseView<Category> {
   return query(
@@ -45,8 +45,8 @@ export async function set(
 }
 
 export async function tag(
-  product: PickOmit<Product, 'id'>,
-  ...categories: PickOmit<Category, 'id'>[]
+  product: RequiredColumns<Product, 'id'>,
+  ...categories: RequiredColumns<Category, 'id'>[]
 ): DatabaseView<CategorizedProduct[]> {
   return query(
     await supabase

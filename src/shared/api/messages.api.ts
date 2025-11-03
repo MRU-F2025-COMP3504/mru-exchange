@@ -4,7 +4,7 @@ import type {
   Chat,
   DatabaseQuery,
   Message,
-  PickOmit,
+  RequiredColumns,
 } from '@shared/types';
 import {
   REALTIME_LISTEN_TYPES,
@@ -38,7 +38,7 @@ export async function getUserChats(
 }
 
 export async function createChat(
-  chat: PickOmit<Chat, 'user_id_1' | 'user_id_2'>,
+  chat: RequiredColumns<Chat, 'user_id_1' | 'user_id_2'>,
 ): DatabaseQuery<Chat> {
   const { data, error } = await supabase
     .from('Chats')
@@ -64,7 +64,7 @@ export async function getChatMessages(
 }
 
 export async function sendMessage(
-  message: PickOmit<Message, 'chat_id' | 'sender_id' | 'logged_message'>,
+  message: RequiredColumns<Message, 'chat_id' | 'sender_id' | 'logged_message'>,
 ): DatabaseQuery<Message> {
   const { data, error } = await supabase
     .from('Messages')

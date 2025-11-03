@@ -1,9 +1,9 @@
 import { supabase } from '@shared/api';
-import type { DatabaseQuery, PickOmit, Report } from '@shared/types';
+import type { DatabaseQuery, RequiredColumns, Report } from '@shared/types';
 import { ok, err } from '@shared/utils';
 
 export async function createReport(
-  report: PickOmit<Report, 'description'>,
+  report: RequiredColumns<Report, 'description'>,
 ): DatabaseQuery<Report> {
   const { data, error } = await supabase
     .from('Reports')
@@ -14,9 +14,7 @@ export async function createReport(
   return error ? err(error) : ok(data);
 }
 
-export async function getAllReports(
-  columns: string,
-): DatabaseQuery<Report[]> {
+export async function getAllReports(columns: string): DatabaseQuery<Report[]> {
   const { data, error } = await supabase
     .from('Reports')
     .select(columns as '*')

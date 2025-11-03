@@ -2,7 +2,7 @@ import { err, ok } from '@shared/utils';
 import type {
   DatabaseQuery,
   DatabaseQueryArray,
-  PickOmit,
+  RequiredColumns,
   Product,
   Result,
 } from '@shared/types';
@@ -67,7 +67,7 @@ export function register(): ProductBuilder {
 }
 
 export async function set(
-  product: PickOmit<Product, 'id'>,
+  product: RequiredColumns<Product, 'id'>,
   isListed: boolean,
 ): DatabaseQuery<Product, 'id'> {
   return query(
@@ -99,7 +99,7 @@ export async function setAll(
 }
 
 export async function remove(
-  product: PickOmit<Product, 'id'>,
+  product: RequiredColumns<Product, 'id'>,
 ): DatabaseQuery<Product, 'id'> {
   return query(
     await supabase
@@ -124,7 +124,7 @@ export async function removeAll(
 }
 
 export function attribute(
-  product: PickOmit<Product, 'id'>,
+  product: RequiredColumns<Product, 'id'>,
 ): ProductAttributeModifier {
   const change: Partial<Product> = {};
 
@@ -152,7 +152,7 @@ export function attribute(
 }
 
 export async function stock(
-  product: PickOmit<Product, 'id'>,
+  product: RequiredColumns<Product, 'id'>,
   stock: number,
 ): DatabaseQuery<Product, 'id'> {
   return query(

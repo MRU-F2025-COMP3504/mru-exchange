@@ -2,7 +2,7 @@ import type {
   CategorizedProduct,
   Category,
   DatabaseView,
-  PickOmit,
+  RequiredColumns,
   Product,
 } from '@shared/types';
 import { supabase } from '@shared/api';
@@ -18,7 +18,7 @@ export async function getTags(): DatabaseView<Category[]> {
 }
 
 export async function getTag(
-  tag: PickOmit<Category, 'id'>,
+  tag: RequiredColumns<Category, 'id'>,
 ): DatabaseView<Category> {
   return view(
     await supabase.from('Category_Tags').select('*').eq('id', tag.id).single(),
@@ -26,7 +26,7 @@ export async function getTag(
 }
 
 export async function getProductsByAssignedTag(
-  tag: PickOmit<Category, 'id'>,
+  tag: RequiredColumns<Category, 'id'>,
 ): DatabaseView<CategorizedProduct[]> {
   return view(
     await supabase
@@ -37,7 +37,7 @@ export async function getProductsByAssignedTag(
 }
 
 export async function getAssignedTagsByProduct(
-  product: PickOmit<Product, 'id'>,
+  product: RequiredColumns<Product, 'id'>,
 ): DatabaseView<CategorizedProduct[]> {
   return view(
     await supabase
