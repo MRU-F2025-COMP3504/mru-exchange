@@ -1,80 +1,93 @@
 import type {
   DatabaseQuery,
   DatabaseView,
-  PickOmit,
   Product,
+  RequiredColumns,
   Result,
   Review,
 } from '@shared/types';
-import { query, view } from '@shared/api/database.ts';
 import { supabase } from '@shared/api';
 import type { User } from '@supabase/supabase-js';
 import type { ReviewPublisher } from '@features/review/types';
-import { err, ok } from '@shared/utils';
+import { err, ok, query, view } from '@shared/utils';
 
-export async function getProductReviews(product: PickOmit<Product, 'id'>): DatabaseView<Review[]> {
+export async function getProductReviews(
+  product: RequiredColumns<Product, 'id'>,
+): DatabaseView<Review[]> {
   return view(
     await supabase
       .from('Reviews')
       .select('*')
       .eq('product_id', product.id)
-      .order('created_at', { ascending: false })
-  )
+      .order('created_at', { ascending: false }),
+  );
 }
 
-export async function getProductReviewsByUser(reviewer: PickOmit<User, 'id'>, product: PickOmit<Product, 'id'>): DatabaseView<Review[]> {
+export async function getProductReviewsByUser(
+  reviewer: RequiredColumns<User, 'id'>,
+  product: RequiredColumns<Product, 'id'>,
+): DatabaseView<Review[]> {
   return view(
     await supabase
       .from('Reviews')
       .select('*')
       .eq('product_id', product.id)
       .eq('created_by_id', reviewer.id)
-      .order('created_at', { ascending: false })
-  )
+      .order('created_at', { ascending: false }),
+  );
 }
 
-export async function getSellerReviews(seller: PickOmit<User, 'id'>): DatabaseView<Review[]> {
+export async function getSellerReviews(
+  seller: RequiredColumns<User, 'id'>,
+): DatabaseView<Review[]> {
   return view(
     await supabase
       .from('Reviews')
       .select('*')
       .eq('created_on_id', seller.id)
-      .order('created_at', { ascending: false })
-  )
+      .order('created_at', { ascending: false }),
+  );
 }
 
-export async function getSellerReviewsByUser(reviewer: PickOmit<User, 'id'>, seller: PickOmit<User, 'id'>): DatabaseView<Review[]> {
+export async function getSellerReviewsByUser(
+  reviewer: RequiredColumns<User, 'id'>,
+  seller: RequiredColumns<User, 'id'>,
+): DatabaseView<Review[]> {
   return view(
     await supabase
       .from('Reviews')
       .select('*')
       .eq('created_by_id', reviewer.id)
       .eq('created_on_id', seller.id)
-      .order('created_at', { ascending: false })
-  )
+      .order('created_at', { ascending: false }),
+  );
 }
 
-export async function getAverageProductRating(product: PickOmit<Product, 'id'>): DatabaseQuery<Review, 'product_id' | 'rating'> {
+export async function getAverageProductRating(
+  product: RequiredColumns<Product, 'id'>,
+): DatabaseQuery<Review, 'product_id' | 'rating'> {
   return query(
     await supabase
       .from('Reviews')
       .select('product_id,rating:rating.ave()')
       .eq('product_id', product.id)
-      .single()
-  )
+      .single(),
+  );
 }
 
-export async function getAverageSellerRating(seller: PickOmit<User, 'id'>): DatabaseQuery<Review, 'created_on_id' | 'rating'> {
+export async function getAverageSellerRating(
+  seller: RequiredColumns<User, 'id'>,
+): DatabaseQuery<Review, 'created_on_id' | 'rating'> {
   return query(
     await supabase
       .from('Reviews')
       .select('created_on_id,rating:rating.ave()')
       .eq('created_on_id', seller.id)
-      .single()
-  )
+      .single(),
+  );
 }
 
-export function create(reviewer: PickOmit<User, 'id'>): ReviewPublisher {
+export function create(reviewer: RequiredColumns<User, 'id'>): ReviewPublisher {
   const review: Partial<Review> = {};
   return {
     description(description: string): Result<ReviewPublisher, Error> {
@@ -106,30 +119,34 @@ export function create(reviewer: PickOmit<User, 'id'>): ReviewPublisher {
             created_by_id: reviewer.id,
           })
           .select()
-          .single()
-      )
-    }
+          .single(),
+      );
+    },
   };
 }
 
-export async function remove(review: PickOmit<Review, 'id'>): DatabaseQuery<Review, 'id'> {
+export async function remove(
+  review: RequiredColumns<Review, 'id'>,
+): DatabaseQuery<Review, 'id'> {
   return query(
     await supabase
       .from('Reviews')
       .delete()
       .eq('id', review.id)
       .select()
-      .single()
-  )
+      .single(),
+  );
 }
 
-export async function update(review: PickOmit<Review, 'id' | 'rating' | 'description'>): DatabaseQuery<Review, 'id'> {
+export async function update(
+  review: RequiredColumns<Review, 'id' | 'rating' | 'description'>,
+): DatabaseQuery<Review, 'id'> {
   return query(
     await supabase
       .from('Reviews')
       .update(review)
       .eq('id', review.id)
       .select('id')
-      .single()
-  )
+      .single(),
+  );
 }
