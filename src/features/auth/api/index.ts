@@ -3,9 +3,10 @@ import { ok, err } from '@shared/utils';
 import {
   type AuthChangeEvent,
   AuthError,
+  type AuthResponse,
   type Session,
   type Subscription,
-  type User as AuthUser,
+  type User,
 } from '@supabase/supabase-js';
 import type { AuthPromiseResult, UserSession } from '@features/auth/types';
 import type { Result } from '@shared/types';
@@ -25,13 +26,17 @@ export async function getSession(): AuthPromiseResult<Session> {
   return err(new AuthError('No session found', 401, 'session_not_found'));
 }
 
-export async function getCurrentUser(): AuthPromiseResult<AuthUser> {
+export async function getCurrentUser(): AuthPromiseResult<User> {
   const { data, error } = await supabase.auth.getUser();
 
-  return error ? err(error) : ok(data.user);
+  if (error) {
+    return err(error);
+  }
+
+  return ok(data.user);
 }
 
-export async function signUp(
+export async function register(
   email: string,
   password: string,
 ): AuthPromiseResult<UserSession> {
@@ -45,48 +50,60 @@ export async function signUp(
     );
   }
 
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-
-  return error ? err(error) : ok(data);
+  return authenticate(
+    await supabase.auth.signUp({
+      email,
+      password,
+    }),
+  );
 }
 
 export async function signIn(
   email: string,
   password: string,
 ): AuthPromiseResult<UserSession> {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  return error ? err(error) : ok(data);
+  return authenticate(
+    await supabase.auth.signInWithPassword({
+      email,
+      password,
+    }),
+  );
 }
 
-export async function signOut(): AuthPromiseResult<{}> {
+export async function signOut(): AuthPromiseResult<null> {
   const { error } = await supabase.auth.signOut();
 
-  return error ? err(error) : ok({});
+  if (error) {
+    return err(error);
+  }
+
+  return ok(null);
 }
 
-export async function resetPassword(email: string): AuthPromiseResult<{}> {
-  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+export async function resetPassword(email: string): AuthPromiseResult<null> {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${window.location.origin}/reset-password`,
   });
 
-  return error ? err(error) : ok(data);
+  if (error) {
+    return err(error);
+  }
+
+  return ok(null);
 }
 
 export async function updatePassword(
   password: string,
-): AuthPromiseResult<AuthUser> {
+): AuthPromiseResult<User> {
   const { data, error } = await supabase.auth.updateUser({
     password,
   });
 
-  return error ? err(error) : ok(data.user);
+  if (error) {
+    return err(error);
+  }
+
+  return ok(data.user);
 }
 
 export function onAuthStateChange(
@@ -107,4 +124,14 @@ export function onAuthStateChange(
   });
 
   return subscriber.data.subscription;
+}
+
+function authenticate(response: AuthResponse): Result<UserSession, AuthError> {
+  const { data, error } = response;
+
+  if (error) {
+    return err(error);
+  }
+
+  return ok(data);
 }

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuthUser } from '@features/auth';
+import { useAuth } from '@features/auth';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -12,8 +12,7 @@ export default function SignUpPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-
-  const { signUp } = useAuthUser();
+  const auth = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -43,7 +42,7 @@ export default function SignUpPage() {
       return;
     }
 
-    const result = await signUp(email, password);
+    const result = await auth.signUp(email, password);
 
     if (result.ok) {
       setSuccessMessage(
@@ -51,7 +50,7 @@ export default function SignUpPage() {
       );
 
       // Optionally redirect after a delay
-      setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => { navigate('/login'); }, 3000);
     }
 
     setIsLoading(false);
@@ -74,7 +73,7 @@ export default function SignUpPage() {
             Create Account
           </h2>
 
-          <form onSubmit={handleSubmit} className='space-y-4'>
+          <form onSubmit={void handleSubmit} className='space-y-4'>
             {/* First Name */}
             <div>
               <label
@@ -87,7 +86,7 @@ export default function SignUpPage() {
                 id='firstName'
                 type='text'
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                onChange={(e) => { setFirstName(e.target.value); }}
                 placeholder='John'
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
                 disabled={isLoading}
@@ -106,7 +105,7 @@ export default function SignUpPage() {
                 id='lastName'
                 type='text'
                 value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                onChange={(e) => { setLastName(e.target.value); }}
                 placeholder='Doe'
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
                 disabled={isLoading}
@@ -125,7 +124,7 @@ export default function SignUpPage() {
                 id='userName'
                 type='text'
                 value={userName}
-                onChange={(e) => setUserName(e.target.value)}
+                onChange={(e) => { setUserName(e.target.value); }}
                 placeholder='johndoe'
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
                 disabled={isLoading}
@@ -144,7 +143,7 @@ export default function SignUpPage() {
                 id='email'
                 type='email'
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); }}
                 placeholder='student@mtroyal.ca'
                 required
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
@@ -167,7 +166,7 @@ export default function SignUpPage() {
                 id='password'
                 type='password'
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); }}
                 placeholder='Enter your password'
                 required
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
@@ -188,7 +187,7 @@ export default function SignUpPage() {
                 id='confirmPassword'
                 type='password'
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => { setConfirmPassword(e.target.value); }}
                 placeholder='Confirm your password'
                 required
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'

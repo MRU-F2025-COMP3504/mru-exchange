@@ -1,14 +1,13 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuthUser } from '@features/auth';
+import { useAuth } from '@features/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const { signIn } = useAuthUser();
+  const auth = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -24,7 +23,7 @@ export default function LoginPage() {
       return;
     }
 
-    const result = await signIn(email, password);
+    const result = await auth.signIn(email, password);
 
     if (result.ok) {
       // Redirect to home page on successful login
@@ -51,7 +50,7 @@ export default function LoginPage() {
         <div className='bg-white rounded-lg shadow-xl p-8'>
           <h2 className='text-2xl font-semibold text-gray-800 mb-6'>Sign In</h2>
 
-          <form onSubmit={handleSubmit} className='space-y-6'>
+          <form onSubmit={void handleSubmit} className='space-y-6'>
             {/* Email Input */}
             <div>
               <label
@@ -64,7 +63,7 @@ export default function LoginPage() {
                 id='email'
                 type='email'
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); }}
                 placeholder='student@mtroyal.ca'
                 required
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
@@ -87,7 +86,7 @@ export default function LoginPage() {
                 id='password'
                 type='password'
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); }}
                 placeholder='Enter your password'
                 required
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'

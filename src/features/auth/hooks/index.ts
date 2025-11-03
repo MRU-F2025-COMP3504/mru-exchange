@@ -1,1 +1,1 @@
-export { default as useAuthUser } from '@features/auth/hooks/useAuthUser';
+export { default as useAuth } from '@features/auth/hooks/useAuth';
