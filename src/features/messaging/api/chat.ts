@@ -2,16 +2,16 @@ import type {
   Chat,
   DatabaseQuery,
   DatabaseView,
-  PickOmit,
+  RequiredColumns,
   UserMessage,
 } from '@shared/types';
-import { query, view } from '@shared/api/database.ts';
 import { supabase } from '@shared/api';
 import {
   REALTIME_LISTEN_TYPES,
   type RealtimeChannel,
   type RealtimePostgresInsertPayload,
 } from '@supabase/supabase-js';
+import { query, view } from '@shared/utils';
 
 export async function get(id: number): DatabaseView<Chat> {
   return view(await supabase.from('Chats').select('*').eq('id', id).single());
@@ -28,7 +28,7 @@ export async function getByUser(id: string): DatabaseView<Chat[]> {
 }
 
 export async function setVisible(
-  chat: PickOmit<Chat, 'id'>,
+  chat: RequiredColumns<Chat, 'id'>,
   visible: boolean,
 ): DatabaseQuery<Chat, 'id'> {
   return query(
@@ -42,7 +42,7 @@ export async function setVisible(
 }
 
 export function subscribe(
-  chat: PickOmit<Chat, 'id'>,
+  chat: RequiredColumns<Chat, 'id'>,
   callback: (payload: RealtimePostgresInsertPayload<UserMessage>) => void,
 ): RealtimeChannel {
   const id = chat.id.toString();
