@@ -36,7 +36,7 @@ export async function getCurrentUser(): AuthPromiseResult<User> {
   return ok(data.user);
 }
 
-export async function register(
+export async function signUp(
   email: string,
   password: string,
 ): AuthPromiseResult<UserSession> {

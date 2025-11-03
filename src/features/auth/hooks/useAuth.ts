@@ -5,7 +5,7 @@ import {
   onAuthStateChange,
   signIn,
   signOut,
-  register,
+  signUp,
 } from '@features/auth/api';
 import type { UseUserReturn } from '@features/auth/types';
 
@@ -35,7 +35,7 @@ export default function useAuth(): UseUserReturn {
 
   return {
     user,
-    signUp: register,
+    signUp,
     signIn,
     signOut,
   };
