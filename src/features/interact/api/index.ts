@@ -2,16 +2,16 @@ import type {
   DatabaseQuery,
   DatabaseQueryArray,
   DatabaseView,
-  PickOmit,
+  RequiredColumns,
   UserInteraction,
 } from '@shared/types';
 import type { User } from '@supabase/supabase-js';
-import { query, view } from '@shared/api/database.ts';
 import { supabase } from '@shared/api';
+import { query, view } from '@shared/utils';
 
 export async function get(
-  a: PickOmit<User, 'id'>,
-  b: PickOmit<User, 'id'>,
+  a: RequiredColumns<User, 'id'>,
+  b: RequiredColumns<User, 'id'>,
 ): DatabaseView<UserInteraction> {
   return view(
     await supabase
@@ -25,7 +25,7 @@ export async function get(
 }
 
 export async function getBlockedOnUser(
-  user: PickOmit<User, 'id'>,
+  user: RequiredColumns<User, 'id'>,
 ): DatabaseQueryArray<UserInteraction, 'id'> {
   return query(
     await supabase
@@ -37,7 +37,7 @@ export async function getBlockedOnUser(
 }
 
 export async function getMutedOnUser(
-  user: PickOmit<User, 'id'>,
+  user: RequiredColumns<User, 'id'>,
 ): DatabaseQueryArray<UserInteraction, 'id'> {
   return query(
     await supabase
@@ -49,8 +49,8 @@ export async function getMutedOnUser(
 }
 
 export async function create(
-  a: PickOmit<User, 'id'>,
-  b: PickOmit<User, 'id'>,
+  a: RequiredColumns<User, 'id'>,
+  b: RequiredColumns<User, 'id'>,
 ): DatabaseQuery<UserInteraction, 'id'> {
   return query(
     await supabase
@@ -65,8 +65,8 @@ export async function create(
 }
 
 export async function block(
-  blocker: PickOmit<User, 'id'>,
-  target: PickOmit<User, 'id'>,
+  blocker: RequiredColumns<User, 'id'>,
+  target: RequiredColumns<User, 'id'>,
   flag = true,
 ): DatabaseQuery<UserInteraction, 'id'> {
   const interaction = await get(blocker, target);
@@ -82,8 +82,8 @@ export async function block(
 }
 
 export async function mute(
-  blocker: PickOmit<User, 'id'>,
-  target: PickOmit<User, 'id'>,
+  blocker: RequiredColumns<User, 'id'>,
+  target: RequiredColumns<User, 'id'>,
   flag = true,
 ): DatabaseQuery<UserInteraction, 'id'> {
   const interaction = await get(blocker, target);
@@ -99,7 +99,7 @@ export async function mute(
 }
 
 async function set(
-  interaction: PickOmit<UserInteraction, 'id'>,
+  interaction: RequiredColumns<UserInteraction, 'id'>,
   field: string,
   flag: boolean,
 ): DatabaseQuery<UserInteraction, 'id'> {
