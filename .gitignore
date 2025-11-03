@@ -24,13 +24,10 @@ dist-ssr
 *.sw?
 
 # Environment variables
-.env
+# Note: .env is committed for team sharing in this project
+# In production, you should NOT commit the following env files
 .env.local
 .env.production
-*.env
-
-# Note: dev.env is committed for team sharing in this project
-# In production, you should NOT commit env files
 
 # Supabase
 .supabase
