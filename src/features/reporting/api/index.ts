@@ -2,18 +2,17 @@ import type {
   DatabaseQuery,
   DatabaseQueryArray,
   DatabaseView,
-  PickOmit,
+  RequiredColumns,
   Result,
   UserReport,
 } from '@shared/types';
-import { ok, err } from '@shared/utils';
+import { ok, err, view, query } from '@shared/utils';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@shared/api';
-import { query, view } from '@shared/api/database.ts';
 import type { UserReporter } from '@features/reporting/types';
 
 export async function getByReporter(
-  reporter: PickOmit<User, 'id'>,
+  reporter: RequiredColumns<User, 'id'>,
 ): DatabaseView<UserReport[]> {
   return view(
     await supabase
@@ -25,7 +24,7 @@ export async function getByReporter(
 }
 
 export async function getByReported(
-  reported: PickOmit<User, 'id'>,
+  reported: RequiredColumns<User, 'id'>,
 ): DatabaseView<UserReport[]> {
   return view(
     await supabase
@@ -55,7 +54,7 @@ export function create(): UserReporter {
       return ok(this);
     },
     async report(
-      target: PickOmit<User, 'id'>,
+      target: RequiredColumns<User, 'id'>,
     ): DatabaseQuery<UserReport, 'id'> {
       return query(
         await supabase
@@ -72,7 +71,7 @@ export function create(): UserReporter {
 }
 
 export async function remove(
-  ...reports: PickOmit<UserReport, 'id'>[]
+  ...reports: RequiredColumns<UserReport, 'id'>[]
 ): DatabaseQueryArray<UserReport, 'id'> {
   return query(
     await supabase
@@ -87,7 +86,7 @@ export async function remove(
 }
 
 export async function close(
-  ...reports: PickOmit<UserReport, 'id'>[]
+  ...reports: RequiredColumns<UserReport, 'id'>[]
 ): DatabaseQueryArray<UserReport, 'id'> {
   return query(
     await supabase
@@ -105,7 +104,7 @@ export async function close(
 }
 
 export async function open(
-  ...reports: PickOmit<UserReport, 'id'>[]
+  ...reports: RequiredColumns<UserReport, 'id'>[]
 ): DatabaseQueryArray<UserReport, 'id'> {
   return query(
     await supabase
@@ -123,7 +122,7 @@ export async function open(
 }
 
 export async function setDescription(
-  report: PickOmit<UserReport, 'id' | 'description'>,
+  report: RequiredColumns<UserReport, 'id' | 'description'>,
 ): DatabaseQuery<UserReport, 'id'> {
   return query(
     await supabase
