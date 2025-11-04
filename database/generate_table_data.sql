@@ -260,3 +260,21 @@ INSERT INTO mru_dev."Product_Information" (title, description, price, stock_coun
 ('Coffee Maker', 'Works fine, no carafe.', 7.00, 1, 'Miscellaneous'),
 ('Extension Cord (10ft)', 'Works.', 5.00, 1, 'Miscellaneous'),
 ('Reusable Grocery Bags', '4-pack, clean.', 2.00, 1, 'Miscellaneous');
+
+
+INSERT INTO mru_dev."Category_Assigned_Products" (category_id, product_id)
+SELECT 
+    CASE 
+        WHEN cat = 'Books' THEN 0
+        WHEN cat = 'Electronics' THEN 1
+        WHEN cat = 'Supplies' THEN 2
+        WHEN cat = 'Furniture' THEN 3
+        WHEN cat = 'Apparel' THEN 4
+        WHEN cat = 'Health' THEN 5
+        WHEN cat = 'Pets & Animals' THEN 6
+        WHEN cat = 'Automotive' THEN 7
+        WHEN cat = 'Games' THEN 8
+        ELSE 9
+    END as category_id,
+    id AS product_id
+FROM mru_dev."Product_Information";
