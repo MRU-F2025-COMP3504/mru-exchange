@@ -101,21 +101,21 @@ def generateShoppingCartData():
         cart = [
         i,
         uuidList[random.randint(num_users_low, num_users_high)],
-        random.randint(num_users_low, num_users_high),
+        productList[random.randint(num_users_low, num_users_high)],
         now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         ]
         Shopping_Carts.append(cart)
  
 def generateChatData():
-    Chats.append(['id', 'user_id_1', 'user_id_2', 'created_at'])
+    Chats.append(['user_id_1', 'user_id_2'])
+    seen = set()
     for i in range(rowsToGenerate):
         uuid1, uuid2 = generate_distinct_uuid()
-        chat = [
-        i,
-        uuid1,
-        uuid2,
-        now.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
-        ]
+        chat = tuple(sorted([uuid1, uuid2]))
+        while(chat in seen):
+            uuid1, uuid2 = generate_distinct_uuid()
+            chat = tuple(sorted([uuid1, uuid2]))
+        seen.add(chat)
         Chats.append(chat)
         
 def generateMessagesData():
@@ -123,25 +123,25 @@ def generateMessagesData():
     for i in range(rowsToGenerate):
         message = [
         i,
-        random.randint(num_users_low, num_users_high),
+        chatList[random.randint(num_users_low, num_users_high)],
         uuidList[random.randint(num_users_low, num_users_high)],
         "This is not a real message",
         now.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
         ]
         Messages.append(message)
 
-def generateCatagoryAssignedProductsData():
-    Catagory_Assigned_Products.append(['category_id', 'product_id', 'created_at'])
+def generateCategoryAssignedProductsData():
+    Category_Assigned_Products.append(['category_id', 'product_id', 'created_at'])
     for i in range(rowsToGenerate):
         catAP = [
-        random.randint(num_users_low, num_users_high),
-        random.randint(num_users_low, num_users_high),
+        categoryList[random.randint(num_users_low, num_users_high)],
+        productList[random.randint(num_users_low, num_users_high)],
         now.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
         ]
-        Catagory_Assigned_Products.append(catAP)
+        Category_Assigned_Products.append(catAP)
         
-def generateCatagoryTagsData():
-    Catagory_Tags.append(['id', 'name', 'description', 'created_at'])
+def generateCategoryTagsData():
+    Category_Tags.append(['id', 'name', 'description', 'created_at'])
     for i in range(rowsToGenerate):
         catTag = [
         i,
@@ -149,7 +149,7 @@ def generateCatagoryTagsData():
         "This category has no description",
         now.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
         ]
-        Catagory_Tags.append(catTag)
+        Category_Tags.append(catTag)
         
 def generateReportsData():
     Reports.append(['id', 'created_by_id', 'created_on_id', 'linked_information', 'closed_date', 'is_closed', 'created_at'])
@@ -186,10 +186,11 @@ generateProductData()
 generateShoppingCartData()
 generateChatData()
 generateMessagesData()
-generateCatagoryAssignedProductsData()
-generateCatagoryTagsData()
+generateCategoryAssignedProductsData()
+generateCategoryTagsData()
 generateReportsData()
 generateReviewsData()
+generateUserInteractionsData()
 
 for name, arr in Tables.items():
     print(f"\n{name}: {arr}")
