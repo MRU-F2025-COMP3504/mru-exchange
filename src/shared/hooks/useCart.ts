@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { cartApi } from '../api/cart.api';
-import type { ShoppingCart } from '../types/database.ts';
+import type { ShoppingCart } from '../types/database/schema.ts';
 
 /**
  * Hook to manage user's shopping cart

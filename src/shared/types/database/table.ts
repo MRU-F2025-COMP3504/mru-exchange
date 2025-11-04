@@ -1,4 +1,4 @@
-import type { Tables } from '@shared/types/database';
+import type { Tables } from '@shared/types/database/schema.ts';
 
 export type UserProfile = Tables<'User_Information'>;
 export type Product = Tables<'Product_Information'>;

@@ -4,7 +4,7 @@ import type {
   DatabaseViewResult,
   Result,
 } from '@shared/types';
-import { err, ok } from '@shared/utils/index.ts';
+import { err, ok } from '@shared/utils';
 
 export function query<T, P extends keyof T>(
   response: PostgrestSingleResponse<T>,

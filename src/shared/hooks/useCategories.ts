@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { categoriesApi } from '../api/categories.api';
-import type { CategoryTag } from '../types/database.ts';
+import type { CategoryTag } from '../types/database/schema.ts';
 
 /**
  * Hook to fetch all categories

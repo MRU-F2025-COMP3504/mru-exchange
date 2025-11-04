@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { messagesApi } from '../api/messages.api';
-import type { Chat, Message } from '../types/database.ts';
+import type { Chat, Message } from '../types/database/schema.ts';
 
 /**
  * Hook to manage a chat and its messages
