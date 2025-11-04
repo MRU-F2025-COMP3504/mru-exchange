@@ -1,24 +1,13 @@
 import type { PostgrestSingleResponse } from '@supabase/supabase-js';
 import type {
-  DatabaseQueryResult,
-  DatabaseViewResult,
+  RequiredColumns,
   Result,
 } from '@shared/types';
 import { err, ok } from '@shared/utils';
 
 export function query<T, P extends keyof T>(
-  response: PostgrestSingleResponse<T>,
-): DatabaseQueryResult<T, P> {
-  return process(response);
-}
-
-export function view<T>(
-  response: PostgrestSingleResponse<T>,
-): DatabaseViewResult<T> {
-  return process(response);
-}
-
-function process<T>(response: PostgrestSingleResponse<T>): Result<T, Error> {
+  response: PostgrestSingleResponse<T>
+): Result<T, Error> | Result<RequiredColumns<T, P>, Error> {
   const { data, error } = response;
 
   if (data) {
