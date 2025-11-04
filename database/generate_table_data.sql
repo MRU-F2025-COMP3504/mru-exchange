@@ -278,3 +278,28 @@ SELECT
     END as category_id,
     id AS product_id
 FROM mru_dev."Product_Information";
+
+
+
+DO $$
+DECLARE
+    cart_id int8;
+    prod_id int8;
+    prod_count int;
+    i int;
+    product_ids int8[];
+BEGIN
+    product_ids := ARRAY(SELECT id FROM mru_dev."Product_Information");
+    FOR cart_id IN SELECT id FROM mru_dev."Shopping_Cart" LOOP
+        IF random() < 0.55 THEN
+            CONTINUE;
+        END IF;
+        prod_count := floor(POWER(random(),3) * (10-1) + 1)::int;
+        FOR i IN 1..prod_count LOOP
+            prod_id := product_ids[floor(random() * array_length(product_ids, 1) + 1)::int];
+            INSERT INTO mru_dev."Shopping_Cart_Products"(shopping_cart_id, product_id)
+            VALUES (cart_id, prod_id)
+            ON CONFLICT DO NOTHING;
+        END LOOP;
+    END LOOP;
+END $$;
