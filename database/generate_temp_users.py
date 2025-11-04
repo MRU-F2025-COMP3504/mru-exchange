@@ -193,17 +193,58 @@ def generateReportsData():
         Reports.append(report)
 
 def generateReviewsData():
-    Reviews.append(['id', 'created_by_id', 'created_on_id', 'product_id', 'rating', 'description', 'created_at'])
+    Reviews.append(['created_by_id', 'created_on_id','rating', 'description'])
+    negative_review = [
+        "This guy smells like feet",
+        "This person scammed me! Don't buy!",
+        "They doesn't respond to messages...",
+        "I know this guy in person, avoid at all cost",
+        "Package arrived broken and seller refused refund",
+        "Terrible communication, would not recommend",
+        "Product was completely different from the description",
+        "Slow shipping and poor customer service",
+        "Received the wrong item twice, very frustrating",
+        "Seller tried to overcharge me, dishonest behavior"
+    ]
+
+    positive_review = [
+        "Quick delivery, secure packaging, and excellent quality matching the website description",
+        "Very nice to talk to. Delivered package on time.",
+        "I just think their eyes are dreamy",
+        "Good",
+        "Item exactly as described, highly recommend",
+        "Friendly seller and smooth transaction",
+        "Exceeded my expectations, excellent quality",
+        "Super fast shipping, very reliable",
+        "Amazing experience, would buy again",
+        "Responsive and helpful, highly satisfied"
+    ]
+
+    medium_review = [
+        "Package arrived later than expected, but product is fine",
+        "Item quality is okay, nothing special",
+        "Communication was average, took a while to reply",
+        "Not bad, but could be better",
+        "The product works, but not as described in detail",
+        "Shipping took longer than usual",
+        "Packaging was adequate, not impressive",
+        "In person hand off was fine, product is acceptable",
+        "Average experience, neither good nor bad",
+        "Got the textbook I wanted, but setting up a pickup time was difficult"
+    ]
+
     for i in range(rowsToGenerate):
         uuid1, uuid2 = generate_distinct_uuid()
+        rating = random.randint(1, 10)/2
+        if(rating > 3.5): desc = random.choice(positive_review)
+        elif (rating <= 3.5 and rating >= 1.5): desc = random.choice(medium_review)
+        else: desc = random.choice(negative_review)
         review = [
-        i,
-        uuid1,
-        uuid2,
-        random.randint(num_users_low, num_users_high),
-        random.randint(1, 5),
-        "This review has no description",
-        now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            uuid1,
+            uuid2,
+            # productList[random.randint(num_users_low, num_users_high)],
+            rating,
+            desc
         ]
         Reviews.append(review)
     
