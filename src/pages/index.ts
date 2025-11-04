@@ -6,3 +6,6 @@ export { default as SignInPage } from '@pages/SignInPage';
 export { default as SignUpPage } from '@pages/SignUpPage';
 export { default as VerifyEmailPage } from '@pages/VerifyEmailPage';
 export { default as WelcomePage } from '@pages/WelcomePage';
+export { default as Header } from '@pages/Header';
+export { default as Footer } from '@pages/Footer';
+export { default as ContactUsPage } from '@pages/ContactUsPage';
