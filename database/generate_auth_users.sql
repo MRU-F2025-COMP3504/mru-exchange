@@ -86,3 +86,9 @@ BEGIN
     return new;
 END;
 $$;
+
+
+
+create or replace trigger on_auth_user_created
+after insert on auth.users for each row
+execute function mru_dev.handle_mru_user();
