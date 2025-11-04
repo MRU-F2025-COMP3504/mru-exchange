@@ -152,18 +152,44 @@ def generateCategoryTagsData():
         Category_Tags.append(catTag)
         
 def generateReportsData():
-    Reports.append(['id', 'created_by_id', 'created_on_id', 'linked_information', 'closed_date', 'is_closed', 'created_at'])
+    Reports.append(['created_by_id', 'created_on_id', 'description'])
+    seen = set()
+    report_desc = [
+        "They killed my dog",
+        "This person scammed me, please ban them",
+        "They wrote obscenities towards me in the chat",
+        "Reporting this person for spamming the chat",
+        "This person is mean and keeps bothering me, please ban them",
+        "They are being racist",
+        "I think this person is a bot account, please investigate",
+        "They keep posting links to crypto sites",
+        "They sent me unsolicited images",
+        "This user is harassing me repeatedly",
+        "They are impersonating someone else",
+        "Sharing inappropriate content in the forum",
+        "They are threatening other users",
+        "Posting personal information without consent",
+        "Spamming repeated messages in the chat",
+        "Attempting to trick me into a scam",
+        "They are making offensive jokes and comments",
+        "Using the platform to solicit money fraudulently",
+        "Sending abusive language via private messages",
+        "This account seems fake, suspicious behavior",
+        "Repeatedly violating the community guidelines",
+        "They are trolling and disrupting conversations",
+        "Posting misleading product reviews",
+        "This person is trying to phish other users",
+        "Using multiple accounts to harass people",
+        "Encouraging illegal activity or dangerous behavior"
+    ]
     for i in range(rowsToGenerate):
         uuid1, uuid2 = generate_distinct_uuid()
-        report = [
-        i,
-        uuid1,
-        uuid2,
-        None,
-        None,
-        False,
-        now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        ]
+        pair = tuple(sorted([uuid1, uuid2]))
+        while(pair in seen):
+            uuid1, uuid2 = generate_distinct_uuid()
+            pair = tuple(sorted([uuid1, uuid2]))
+        report = (pair[0], pair[1], random.choice(report_desc))
+        seen.add(report)
         Reports.append(report)
 
 def generateReviewsData():
