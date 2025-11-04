@@ -19,3 +19,5 @@ CREATE INDEX shopping_cart_user_id_index ON mru_dev."Shopping_Cart" USING btree 
 CREATE INDEX shopping_cart_product_id_index ON mru_dev."Shopping_Cart" USING btree (product_id);
 
 CREATE INDEX user_interactions_user_id_2_index ON mru_dev."User_Interactions" USING btree (user_id_2);
+
+CREATE INDEX shopping_cart_products_product_id_index ON "mru_dev"."Shopping_Cart_Products" USING btree (product_id);
