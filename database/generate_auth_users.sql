@@ -39,3 +39,29 @@ INSERT INTO auth.identities (id, user_id, provider_id, identity_data, provider, 
 RETURN user_id;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION mru_test.generate_users(start int8, num_users int8)
+RETURNS void AS $$
+DECLARE 
+    i int8;
+BEGIN
+    num_users := num_users + start;
+    FOR i IN start..num_users LOOP
+        PERFORM mru_test.generate_false_user(format('testuser%s@mtroyal.ca', i), mru_test.generatepassword());
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION mru_test.generate_users(start int8, num_users int8)
+RETURNS void AS $$
+DECLARE 
+    i int8;
+BEGIN
+    num_users := num_users + start;
+    FOR i IN start..num_users LOOP
+        PERFORM mru_test.generate_false_user(format('testuser%s@mtroyal.ca', i), mru_test.generatepassword());
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT mru_test.generate_users(11, 89);
