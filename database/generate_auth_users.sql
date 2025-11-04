@@ -65,3 +65,24 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT mru_test.generate_users(11, 89);
+
+
+
+CREATE OR REPLACE FUNCTION mru_dev.handle_mru_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = mru_dev, auth
+AS $$
+BEGIN
+  insert into mru_dev."User_Information"(supabase_id, email, first_name, last_name)
+  values(
+    new.id,
+    new.email, 
+    new.raw_user_meta_data->>'first_name', 
+    new.raw_user_meta_data->>'last_name')
+    on conflict (email)
+    do update set supabase_id = new.id;
+    return new;
+END;
+$$;
