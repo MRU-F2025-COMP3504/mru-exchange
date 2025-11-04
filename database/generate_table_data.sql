@@ -282,6 +282,16 @@ FROM mru_dev."Product_Information";
 
 
 DO $$
+DECLARE 
+    supabase_ids uuid[] := ARRAY(SELECT supabase_id FROM mru_dev."User_Information");
+BEGIN
+    UPDATE mru_dev."Product_Information"
+    SET user_id = (supabase_ids[floor(random() * array_length(supabase_ids, 1))::int + 1]);
+END $$ LANGUAGE plpgsql;
+
+
+
+DO $$
 DECLARE
     cart_id int8;
     prod_id int8;
