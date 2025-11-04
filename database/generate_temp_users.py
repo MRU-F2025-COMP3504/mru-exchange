@@ -248,6 +248,24 @@ def generateReviewsData():
         ]
         Reviews.append(review)
     
+def genRand():
+    return random.random() < 0.25
+               
+def generateUserInteractionsData():
+    User_Interactions.append(['user_id_1', 'user_id_2', 'user_1_is_blocked', 'user_2_is_blocked', 'user_1_is_muted', 'user_2_is_muted'])
+    seen = set()
+    for i in range(rowsToGenerate):
+        uuid1, uuid2 = generate_distinct_uuid()
+        pair = tuple(sorted([uuid1, uuid2]))
+        while(pair in seen):
+            uuid1, uuid2 = generate_distinct_uuid()
+            pair = tuple(sorted([uuid1, uuid2]))
+        ui = (pair[0], pair[1], genRand(), genRand(), genRand(), genRand())
+        while(ui[2] == False and ui[3] == False and ui[4] == False and ui[5] == False):
+            ui = (pair[0], pair[1], genRand(), genRand(), genRand(), genRand())
+        seen.add(pair)
+        User_Interactions.append(ui)
+        
 generateUserData()
 generateProductData()
 generateShoppingCartData()
