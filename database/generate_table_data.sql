@@ -49,3 +49,35 @@ BEGIN
       WHERE id = i + 19;
   END LOOP;
 END $$ LANGUAGE plpgsql;
+
+
+
+DO $$
+DECLARE 
+    i int8;
+    category_names text[] := 
+        ARRAY[
+            'Books', 'Electronics', 'Supplies', 'Furniture', 'Apparel', 'Health', 'Pets & Animals', 'Automotive', 'Games', 'Miscellaneous'
+        ];
+
+    category_descriptions text[] := ARRAY[
+    'Printed and digital books, magazines, and educational materials.',
+    'Gadgets, devices, and accessories including phones, computers, and audio equipment.',
+    'Office, school, and creative supplies for work, study, and personal projects.',
+    'Home and office furniture including décor, lighting, and storage solutions.',
+    'Clothing, shoes, and accessories.',
+    'Products for wellness, fitness, and personal care.',
+    'Food, toys, and accessories for pets and other animals.',
+    'Vehicle parts, maintenance tools, and automotive accessories.',
+    'Board games, video games, and recreational entertainment items.',
+    'Items that don’t fit into other categories or are one-of-a-kind.'
+    ];
+BEGIN
+  FOR i IN 1..10 LOOP
+      UPDATE mru_dev."Category_Tags"
+      SET 
+          name = category_names[i],
+          description = category_descriptions[i]
+      WHERE id = i-1;
+  END LOOP;
+END $$ LANGUAGE plpgsql;
