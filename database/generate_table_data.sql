@@ -81,3 +81,9 @@ BEGIN
       WHERE id = i-1;
   END LOOP;
 END $$ LANGUAGE plpgsql;
+
+
+
+INSERT INTO mru_dev."Shopping_Cart"(user_id)
+SELECT supabase_id as user_id
+FROM mru_dev."User_Information";
