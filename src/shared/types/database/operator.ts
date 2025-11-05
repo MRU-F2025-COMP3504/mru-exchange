@@ -1,13 +1,33 @@
 import type { Result } from '@shared/types';
 
-export type RequiredColumns<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
-export type DatabaseQueryResult<T, P> =
-  T extends (infer R)[]
-    ? P extends keyof R
-      ? Result<RequiredColumns<R, P>[]>
-      : Result<R[]>
-    : P extends keyof T
-      ? Result<RequiredColumns<T, P>>
-      : Result<T>;
-export type DatabaseQuery<T, P> = Promise<DatabaseQueryResult<T, P>>;
-export type DatabaseQueryResponse<T, P extends keyof T> = Result<T> | Result<RequiredColumns<T, P>>;
+export type RequiredColumns<Table, Columns extends keyof Table> = Pick<
+  Table,
+  Columns
+> &
+  Partial<Omit<Table, Columns>>;
+export type ExtractTable<TableArray> = TableArray extends (infer Table)[]
+  ? Table
+  : TableArray;
+
+export type DatabaseQueryResult<
+  Table,
+  Columns extends '*' | keyof ExtractTable<Table>,
+> = Result<
+  Table extends never
+    ? Table
+    : Table extends (infer TableExtract)[]
+      ? RequiredColumns<
+          TableExtract,
+          Columns extends '*'
+            ? keyof TableExtract
+            : Columns & keyof TableExtract
+        >[]
+      : RequiredColumns<
+          Table,
+          Columns extends '*' ? keyof Table : Columns & keyof Table
+        >
+>;
+export type DatabaseQuery<
+  Table,
+  Columns extends '*' | keyof ExtractTable<Table>,
+> = Promise<DatabaseQueryResult<Table, Columns>>;

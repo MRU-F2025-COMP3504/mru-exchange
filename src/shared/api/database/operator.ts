@@ -1,20 +1,20 @@
 import type { PostgrestSingleResponse } from '@supabase/supabase-js';
-import type {
-  RequiredColumns,
-  Result,
-} from '@shared/types';
+import type { DatabaseQueryResult, ExtractTable, Result } from '@shared/types';
 import { err, ok } from '@shared/utils';
 
-export function query<T, P extends keyof T>(
-  response: PostgrestSingleResponse<T>
-): Result<T, Error> | Result<RequiredColumns<T, P>, Error> {
+export function query<Table, Columns extends '*' | keyof ExtractTable<Table>>(
+  response: PostgrestSingleResponse<Table>,
+): DatabaseQueryResult<Table, Columns> {
   const { data, error } = response;
+  let result: Result<Table>;
 
   if (data) {
-    return ok(data);
+    result = ok(data);
   } else if (error) {
-    return err(error);
+    result = err(error);
+  } else {
+    result = err(new Error('Undetermined query result'));
   }
 
-  return err(new Error('Undetermined query result'));
+  return result as DatabaseQueryResult<Table, Columns>;
 }
