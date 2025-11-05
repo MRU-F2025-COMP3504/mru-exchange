@@ -2,38 +2,35 @@ import type {
   CategorizedProduct,
   Category,
   DatabaseQuery,
-  DatabaseView,
   RequiredColumns,
   Product,
 } from '@shared/types';
-import { query } from '@shared/utils/database.ts';
-import { supabase } from '@shared/api';
+import { query, supabase } from '@shared/api';
 
 export async function register(
   category: RequiredColumns<Category, 'name' | 'description'>,
-): DatabaseView<Category> {
+): DatabaseQuery<Category, '*'> {
   return query(
-    await supabase.from('Category_Tags').insert(category).select().single(),
+    await supabase.from('Category_Tags').insert(category).select('*').single(),
   );
 }
 
 export async function remove(
-  category: RequiredColumns<Category, 'id'>,
-): DatabaseQuery<Category, 'id'> {
+  ...categories: RequiredColumns<Category, 'id'>[]
+): DatabaseQuery<Category[], 'id'> {
   return query(
     await supabase
       .from('Category_Tags')
       .delete()
-      .eq('id', category.id)
+      .in('id', categories.map((category) => category.id))
       .select('id')
-      .single(),
   );
 }
 
 export async function set(
   old: RequiredColumns<Category, 'id'>,
   change: Pick<Partial<Category>, 'name' | 'description'>,
-): DatabaseView<Category> {
+): DatabaseQuery<Category, '*'> {
   return query(
     await supabase
       .from('Category_Tags')
@@ -47,7 +44,7 @@ export async function set(
 export async function tag(
   product: RequiredColumns<Product, 'id'>,
   ...categories: RequiredColumns<Category, 'id'>[]
-): DatabaseView<CategorizedProduct[]> {
+): DatabaseQuery<CategorizedProduct[], '*'> {
   return query(
     await supabase
       .from('Category_Assigned_Products')

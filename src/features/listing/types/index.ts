@@ -1,22 +1,22 @@
 import type {
   DatabaseQuery,
-  Product,
-  Result,
+  Product, RequiredColumns,
+  Result, UserProfile,
 } from '@shared/types';
 
 export interface ProductBuilder {
-  seller(id: string): Result<this, Error>;
-  title(title: string): Result<this, Error>;
-  description(description: string): Result<this, Error>;
-  image(url: string): Result<this, Error>;
-  price(price: number): Result<this, Error>;
-  stock(stock: number): Result<this, Error>;
+  seller(id: RequiredColumns<UserProfile, 'supabase_id'>): Result<this>;
+  title(title: string): Result<this>;
+  description(description: string): Result<this>;
+  image(url: string): Result<this>;
+  price(price: number): Result<this>;
+  stock(stock: number): Result<this>;
   build(): DatabaseQuery<Product, 'id'>;
 }
 
 export interface ProductAttributeModifier {
-  title(title: string): Result<this, Error>;
-  description(description: string): Result<this, Error>;
-  image(url: string): Result<this, Error>;
+  title(title: string): Result<this>;
+  description(description: string): Result<this>;
+  image(url: string): Result<this>;
   modify(): DatabaseQuery<Product, 'id'>
 }

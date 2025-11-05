@@ -1,20 +1,17 @@
 import type {
   DatabaseQuery,
-  DatabaseQueryArray,
-  DatabaseView,
   Product,
   RequiredColumns,
   ShoppingCart,
   ShoppingCartProduct,
 } from '@shared/types';
 import type { User } from '@supabase/supabase-js';
-import { supabase } from '@shared/api';
-import { query, view } from '@shared/utils';
+import { query, supabase } from '@shared/api';
 
 export async function get(
   user: RequiredColumns<User, 'id'>,
-): DatabaseView<ShoppingCart> {
-  return view(
+): DatabaseQuery<ShoppingCart, '*'> {
+  return query(
     await supabase
       .from('Shopping_Cart')
       .select('*')
@@ -25,8 +22,8 @@ export async function get(
 
 export async function getProducts(
   cart: RequiredColumns<Product, 'id'>,
-): DatabaseView<ShoppingCartProduct[]> {
-  return view(
+): DatabaseQuery<ShoppingCartProduct[], '*'> {
+  return query(
     await supabase
       .from('Shopping_Cart_Products')
       .select('*')
@@ -52,7 +49,7 @@ export async function register(
 export async function store(
   cart: RequiredColumns<ShoppingCart, 'id'>,
   ...products: RequiredColumns<Product, 'id'>[]
-): DatabaseView<ShoppingCartProduct[]> {
+): DatabaseQuery<ShoppingCartProduct[], '*'> {
   const id = cart.id;
   return query(
     await supabase
@@ -63,14 +60,14 @@ export async function store(
           product_id: product.id,
         })),
       )
-      .select(),
+      .select('*'),
   );
 }
 
 export async function remove(
   cart: RequiredColumns<ShoppingCart, 'id'>,
   ...products: RequiredColumns<Product, 'id'>[]
-): DatabaseView<ShoppingCartProduct[]> {
+): DatabaseQuery<ShoppingCartProduct[], '*'> {
   return query(
     await supabase
       .from('Shopping_Cart_Products')
@@ -80,18 +77,18 @@ export async function remove(
         'id',
         products.map((product) => product.id),
       )
-      .single(),
+      .select('*'),
   );
 }
 
 export async function clear(
   cart: RequiredColumns<ShoppingCart, 'id'>,
-): DatabaseQueryArray<ShoppingCartProduct, 'product_id'> {
+): DatabaseQuery<ShoppingCartProduct[], 'product_id'> {
   return query(
     await supabase
       .from('Shopping_Cart_Products')
       .delete()
       .eq('shopping_cart_id', cart.id)
-      .select(),
+      .select('product_id'),
   );
 }

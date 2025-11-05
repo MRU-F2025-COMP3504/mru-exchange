@@ -1,13 +1,9 @@
-import type {
-  DatabaseQueryArray,
-  Product,
-  Result,
-} from '@shared/types';
+import type { DatabaseQuery, Product, RequiredColumns, Result, UserProfile } from '@shared/types';
 
 export interface ProductFilter {
-  seller(id: string): Result<this, Error>;
-  price(min: number, max: number): Result<this, Error>;
-  stock(min: number, max: number): Result<this, Error>;
-  categories(...categories: number[]): Result<this, Error>;
-  find(): DatabaseQueryArray<Product, 'id'>;
+  seller(seller: RequiredColumns<UserProfile, 'supabase_id'>): Result<this>;
+  price(min: number, max: number): Result<this>;
+  stock(min: number, max: number): Result<this>;
+  categories(...categories: number[]): Result<this>;
+  find(): DatabaseQuery<Product[], 'id'>;
 }

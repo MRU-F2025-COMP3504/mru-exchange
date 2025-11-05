@@ -1,38 +1,41 @@
 import { err, ok } from '@shared/utils';
 import type {
   DatabaseQuery,
-  DatabaseQueryArray,
   RequiredColumns,
   Product,
   Result,
+  UserProfile,
 } from '@shared/types';
-import { supabase } from '@shared/api';
-import type { ProductAttributeModifier } from '@features/listing';
-import type { ProductBuilder } from '@features/listing/types';
-import { query } from '@shared/utils/database.ts';
+import { query, supabase } from '@shared/api';
+import type {
+  ProductAttributeModifier,
+  ProductBuilder,
+} from '@features/listing';
 
 export function register(): ProductBuilder {
   const product: Partial<Product> = {};
   return {
-    seller(id: string): Result<ProductBuilder, Error> {
-      if (!id) {
+    seller(
+      seller: RequiredColumns<UserProfile, 'supabase_id'>,
+    ): Result<ProductBuilder> {
+      if (!seller.supabase_id) {
         return err(new Error('Product ID is not specified'));
       } else {
-        product.user_id = id;
+        product.user_id = seller.supabase_id;
       }
 
       return ok(this);
     },
-    title(title: string): Result<ProductBuilder, Error> {
+    title(title: string): Result<ProductBuilder> {
       return setTitle(this, product, title);
     },
-    description(description: string): Result<ProductBuilder, Error> {
+    description(description: string): Result<ProductBuilder> {
       return setDescription(this, product, description);
     },
-    image(url: string): Result<ProductBuilder, Error> {
+    image(url: string): Result<ProductBuilder> {
       return setImage(this, product, url);
     },
-    price(price: number): Result<ProductBuilder, Error> {
+    price(price: number): Result<ProductBuilder> {
       if (price < 0) {
         return err(
           new Error('Product price cannot be negative', { cause: price }),
@@ -43,7 +46,7 @@ export function register(): ProductBuilder {
 
       return ok(this);
     },
-    stock(stock: number): Result<ProductBuilder, Error> {
+    stock(stock: number): Result<ProductBuilder> {
       if (stock < 0) {
         return err(
           new Error('Product stock cannot be negative', { cause: stock }),
@@ -67,58 +70,34 @@ export function register(): ProductBuilder {
 }
 
 export async function set(
-  product: RequiredColumns<Product, 'id'>,
   isListed: boolean,
-): DatabaseQuery<Product, 'id'> {
+  ...products: RequiredColumns<Product, 'id'>[]
+): DatabaseQuery<Product[], 'id'> {
   return query(
     await supabase
       .from('Product_Information')
       .update({
         isListed,
       })
-      .eq('id', product.id)
-      .select('id')
-      .single(),
-  );
-}
-
-export async function setAll(
-  seller: string,
-  isListed: boolean,
-): DatabaseQueryArray<Product, 'id'> {
-  return query(
-    await supabase
-      .from('Product_Information')
-      .update({
-        isListed,
-      })
-      .eq('user_id', seller)
-      .eq('isListed', !isListed)
+      .in(
+        'id',
+        products.map((product) => product.id),
+      )
       .select('id'),
   );
 }
 
 export async function remove(
-  product: RequiredColumns<Product, 'id'>,
-): DatabaseQuery<Product, 'id'> {
+  ...products: RequiredColumns<Product, 'id'>[]
+): DatabaseQuery<Product[], 'id'> {
   return query(
     await supabase
       .from('Product_Information')
       .delete()
-      .eq('id', product.id)
-      .select('id')
-      .single(),
-  );
-}
-
-export async function removeAll(
-  seller: string,
-): DatabaseQueryArray<Product, 'id'> {
-  return query(
-    await supabase
-      .from('Product_Information')
-      .delete()
-      .eq('user_id', seller)
+      .in(
+        'id',
+        products.map((product) => product.id),
+      )
       .select('id'),
   );
 }
@@ -129,13 +108,13 @@ export function attribute(
   const change: Partial<Product> = {};
 
   return {
-    title(title: string): Result<ProductAttributeModifier, Error> {
+    title(title: string): Result<ProductAttributeModifier> {
       return setTitle(this, product, title);
     },
-    description(description: string): Result<ProductAttributeModifier, Error> {
+    description(description: string): Result<ProductAttributeModifier> {
       return setDescription(this, product, description);
     },
-    image(url: string): Result<ProductAttributeModifier, Error> {
+    image(url: string): Result<ProductAttributeModifier> {
       return setImage(this, product, url);
     },
     async modify(): DatabaseQuery<Product, 'id'> {
@@ -171,7 +150,7 @@ function setTitle<T>(
   controller: T,
   product: Partial<Product>,
   title: string,
-): Result<T, Error> {
+): Result<T> {
   if (!title) {
     return err(new Error('Product title is not specified'));
   } else {
@@ -185,7 +164,7 @@ function setDescription<T>(
   controller: T,
   product: Partial<Product>,
   description: string,
-): Result<T, Error> {
+): Result<T> {
   if (!description) {
     return err(new Error('Product description is not specified'));
   } else {
@@ -199,7 +178,7 @@ function setImage<T>(
   controller: T,
   product: Partial<Product>,
   url: string,
-): Result<T, Error> {
+): Result<T> {
   try {
     product.image = new URL(url).toJSON();
   } catch (error: unknown) {

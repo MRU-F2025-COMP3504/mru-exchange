@@ -1,19 +1,16 @@
 import type {
   Chat,
   DatabaseQuery,
-  DatabaseQueryArray,
-  DatabaseView,
   RequiredColumns,
   UserMessage,
 } from '@shared/types';
-import { supabase } from '@shared/api';
+import { query, supabase } from '@shared/api';
 import type { MessageSender } from '@features/messaging/types';
-import { query, view } from '@shared/utils';
 
 export async function getByChat(
   chat: RequiredColumns<Chat, 'id'>,
-): DatabaseView<UserMessage[]> {
-  return view(
+): DatabaseQuery<UserMessage[], '*'> {
+  return query(
     await supabase
       .from('Messages')
       .select('*')
@@ -43,7 +40,7 @@ export async function send(
 export async function hide(
   sender: MessageSender,
   ...messages: RequiredColumns<UserMessage, 'id'>[]
-): DatabaseQueryArray<UserMessage, 'id'> {
+): DatabaseQuery<UserMessage[], 'id'> {
   return query(
     await supabase
       .from('Messages')
@@ -61,7 +58,7 @@ export async function hide(
 export async function remove(
   sender: MessageSender,
   ...messages: RequiredColumns<UserMessage, 'id'>[]
-): DatabaseQueryArray<UserMessage, 'id'> {
+): DatabaseQuery<UserMessage[], 'id'> {
   return query(
     await supabase
       .from('Messages')

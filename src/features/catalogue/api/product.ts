@@ -1,38 +1,40 @@
-import { supabase } from '@shared/api';
+import { query, supabase } from '@shared/api';
 import type {
-  DatabaseQueryArray,
-  DatabaseView,
+  DatabaseQuery,
   Product,
+  RequiredColumns,
   Result,
+  UserProfile,
 } from '@shared/types';
 import { err, ok } from '@shared/utils';
 import type { ProductFilter } from '@features/catalogue';
-import { query } from '@shared/utils/database.ts';
 
-export async function get(id: number): DatabaseView<Product> {
+export async function get(...products: RequiredColumns<Product, 'id'>[]): DatabaseQuery<Product[], '*'> {
   return query(
     await supabase
       .from('Product_Information')
       .select('*')
-      .eq('id', id)
-      .single(),
-  );
+      .in('id', products.map((product) => product.id))
+  )
 }
 
-export async function getAll(columns: string): DatabaseView<Product[]> {
+export async function getBySeller(seller: RequiredColumns<UserProfile, 'supabase_id'>): DatabaseQuery<Product[], '*'> {
   return query(
-    await supabase.from('Product_Information').select(columns as '*'),
+    await supabase
+      .from('Product_Information')
+      .select('*')
+      .eq('user_id', seller.supabase_id)
   );
 }
 
 export async function getBySearch(
   text: string,
-): DatabaseQueryArray<Product, 'id'> {
+): DatabaseQuery<Product[], '*'> {
   const search = text.replace(/[%_\\]/g, '\\$&');
   return query(
     await supabase
       .from('Product_Information')
-      .select('id')
+      .select('*')
       .or(`title.ilike.%${search}%,content.ilike.%${search}%`),
   );
 }
@@ -42,16 +44,16 @@ export function getByFilter(): ProductFilter {
   let categories: number[];
 
   return {
-    seller(id: string): Result<ProductFilter, Error> {
-      if (!id) {
-        return err(new Error('Product ID is not specified'));
+    seller(seller: RequiredColumns<UserProfile, 'supabase_id'>): Result<ProductFilter> {
+      if (!seller.supabase_id) {
+        return err(new Error('Seller ID is not specified'));
       } else {
-        sql.eq('user_id', id);
+        void sql.eq('user_id', seller.supabase_id);
       }
 
       return ok(this);
     },
-    price(a: number, b: number): Result<ProductFilter, Error> {
+    price(a: number, b: number): Result<ProductFilter> {
       if (a < 0 || b < 0) {
         return err(
           new Error('Product price range cannot be negative', {
@@ -59,13 +61,13 @@ export function getByFilter(): ProductFilter {
           }),
         );
       } else {
-        sql.gte('price', Math.min(a, b));
-        sql.lte('price', Math.max(a, b));
+        void sql.gte('price', Math.min(a, b));
+        void sql.lte('price', Math.max(a, b));
       }
 
       return ok(this);
     },
-    stock(a: number, b: number): Result<ProductFilter, Error> {
+    stock(a: number, b: number): Result<ProductFilter> {
       if (a < 0 || b < 0) {
         return err(
           new Error('Product stock range cannot be negative', {
@@ -73,18 +75,18 @@ export function getByFilter(): ProductFilter {
           }),
         );
       } else {
-        sql.gte('stock_count', Math.min(a, b));
-        sql.lte('stock_count', Math.max(a, b));
+        void sql.gte('stock_count', Math.min(a, b));
+        void sql.lte('stock_count', Math.max(a, b));
       }
 
       return ok(this);
     },
-    categories(...values: number[]): Result<ProductFilter, Error> {
+    categories(...values: number[]): Result<ProductFilter> {
       categories = values;
 
       return ok(this);
     },
-    async find(): DatabaseQueryArray<Product, 'id'> {
+    async find(): DatabaseQuery<Product[], 'id'> {
       const products = query(await sql);
 
       if (categories.length === 0 || !products.ok) {
@@ -99,7 +101,7 @@ export function getByFilter(): ProductFilter {
             'product_id',
             products.data.map((product) => product.id),
           )
-          .in('category_id', categories),
+          .in('category_id', categories)
       );
     },
   };

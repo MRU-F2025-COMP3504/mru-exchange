@@ -1,63 +1,60 @@
 import type {
   DatabaseQuery,
-  DatabaseQueryArray,
-  DatabaseView,
   RequiredColumns,
   UserInteraction,
+  UserProfile,
 } from '@shared/types';
-import type { User } from '@supabase/supabase-js';
-import { supabase } from '@shared/api';
-import { query, view } from '@shared/utils';
+import { query, supabase } from '@shared/api';
 
 export async function get(
-  a: RequiredColumns<User, 'id'>,
-  b: RequiredColumns<User, 'id'>,
-): DatabaseView<UserInteraction> {
-  return view(
+  a: RequiredColumns<UserProfile, 'supabase_id'>,
+  b: RequiredColumns<UserProfile, 'supabase_id'>,
+): DatabaseQuery<UserInteraction, '*'> {
+  return query(
     await supabase
       .from('User_Interactions')
       .select('*')
       .or(
-        `and(user_id_1.eq.${a.id},user_id_2.eq.${b.id}),and(user_id_1.eq.${b.id},user_id_2.eq.${a.id})`,
+        `and(user_id_1.eq.${a.supabase_id},user_id_2.eq.${b.supabase_id}),and(user_id_1.eq.${b.supabase_id},user_id_2.eq.${a.supabase_id})`,
       )
       .single(),
   );
 }
 
 export async function getBlockedOnUser(
-  user: RequiredColumns<User, 'id'>,
-): DatabaseQueryArray<UserInteraction, 'id'> {
+  user: RequiredColumns<UserProfile, 'supabase_id'>,
+): DatabaseQuery<UserInteraction[], 'id'> {
   return query(
     await supabase
       .from('User_Interactions')
       .select('id')
-      .or(`user_id_1.eq.${user.id},user_id_2.eq.${user.id}`)
+      .or(`user_id_1.eq.${user.supabase_id},user_id_2.eq.${user.supabase_id}`)
       .or('user_1_is_blocked.eq.true,user_2_is_blocked.eq.true'),
   );
 }
 
 export async function getMutedOnUser(
-  user: RequiredColumns<User, 'id'>,
-): DatabaseQueryArray<UserInteraction, 'id'> {
+  user: RequiredColumns<UserProfile, 'supabase_id'>,
+): DatabaseQuery<UserInteraction[], 'id'> {
   return query(
     await supabase
       .from('User_Interactions')
       .select('id')
-      .or(`user_id_1.eq.${user.id},user_id_2.eq.${user.id}`)
+      .or(`user_id_1.eq.${user.supabase_id},user_id_2.eq.${user.supabase_id}`)
       .or('user_1_is_muted.eq.true,user_2_is_muted.eq.true'),
   );
 }
 
 export async function create(
-  a: RequiredColumns<User, 'id'>,
-  b: RequiredColumns<User, 'id'>,
+  a: RequiredColumns<UserProfile, 'supabase_id'>,
+  b: RequiredColumns<UserProfile, 'supabase_id'>,
 ): DatabaseQuery<UserInteraction, 'id'> {
   return query(
     await supabase
       .from('User_Interactions')
       .insert({
-        user_id_1: a.id,
-        user_id_2: b.id,
+        user_id_1: a.supabase_id,
+        user_id_2: b.supabase_id,
       })
       .select('id')
       .single(),
@@ -65,8 +62,8 @@ export async function create(
 }
 
 export async function block(
-  blocker: RequiredColumns<User, 'id'>,
-  target: RequiredColumns<User, 'id'>,
+  blocker: RequiredColumns<UserProfile, 'supabase_id'>,
+  target: RequiredColumns<UserProfile, 'supabase_id'>,
   flag = true,
 ): DatabaseQuery<UserInteraction, 'id'> {
   const interaction = await get(blocker, target);
@@ -76,14 +73,16 @@ export async function block(
 
   const data = interaction.data;
   const update =
-    data.user_id_1 === target.id ? 'user_1_is_blocked' : 'user_2_is_blocked';
+    data.user_id_1 === target.supabase_id
+      ? 'user_1_is_blocked'
+      : 'user_2_is_blocked';
 
   return set(data, update, flag);
 }
 
 export async function mute(
-  blocker: RequiredColumns<User, 'id'>,
-  target: RequiredColumns<User, 'id'>,
+  blocker: RequiredColumns<UserProfile, 'supabase_id'>,
+  target: RequiredColumns<UserProfile, 'supabase_id'>,
   flag = true,
 ): DatabaseQuery<UserInteraction, 'id'> {
   const interaction = await get(blocker, target);
@@ -93,7 +92,9 @@ export async function mute(
 
   const data = interaction.data;
   const update =
-    data.user_id_1 === target.id ? 'user_1_is_muted' : 'user_2_is_muted';
+    data.user_id_1 === target.supabase_id
+      ? 'user_1_is_muted'
+      : 'user_2_is_muted';
 
   return set(data, update, flag);
 }

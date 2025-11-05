@@ -1,15 +1,14 @@
 import type {
   CategorizedProduct,
   Category,
-  DatabaseView,
   RequiredColumns,
   Product,
+  DatabaseQuery,
 } from '@shared/types';
-import { supabase } from '@shared/api';
-import { view } from '@shared/utils/database.ts';
+import { query, supabase } from '@shared/api';
 
-export async function getTags(): DatabaseView<Category[]> {
-  return view(
+export async function getTags(): DatabaseQuery<Category[], '*'> {
+  return query(
     await supabase
       .from('Category_Tags')
       .select('*')
@@ -19,16 +18,16 @@ export async function getTags(): DatabaseView<Category[]> {
 
 export async function getTag(
   tag: RequiredColumns<Category, 'id'>,
-): DatabaseView<Category> {
-  return view(
+): DatabaseQuery<Category, '*'> {
+  return query(
     await supabase.from('Category_Tags').select('*').eq('id', tag.id).single(),
   );
 }
 
 export async function getProductsByAssignedTag(
   tag: RequiredColumns<Category, 'id'>,
-): DatabaseView<CategorizedProduct[]> {
-  return view(
+): DatabaseQuery<CategorizedProduct[], '*'> {
+  return query(
     await supabase
       .from('Category_Assigned_Products')
       .select('*')
@@ -38,8 +37,8 @@ export async function getProductsByAssignedTag(
 
 export async function getAssignedTagsByProduct(
   product: RequiredColumns<Product, 'id'>,
-): DatabaseView<CategorizedProduct[]> {
-  return view(
+): DatabaseQuery<CategorizedProduct[], '*'> {
+  return query(
     await supabase
       .from('Category_Assigned_Products')
       .select('*')

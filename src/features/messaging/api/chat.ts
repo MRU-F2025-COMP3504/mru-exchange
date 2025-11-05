@@ -1,32 +1,30 @@
 import type {
   Chat,
   DatabaseQuery,
-  DatabaseView,
   RequiredColumns,
   UserMessage,
+  UserProfile,
 } from '@shared/types';
-import { supabase } from '@shared/api';
+import { query, supabase } from '@shared/api';
 import {
   REALTIME_LISTEN_TYPES,
   type RealtimeChannel,
   type RealtimePostgresInsertPayload,
-  type User,
 } from '@supabase/supabase-js';
-import { query, view } from '@shared/utils';
 
 export async function get(
   chat: RequiredColumns<Chat, 'id'>,
-): DatabaseView<Chat> {
-  return view(
+): DatabaseQuery<Chat, '*'> {
+  return query(
     await supabase.from('Chats').select('*').eq('id', chat.id).single(),
   );
 }
 
 export async function getByUser(
-  user: RequiredColumns<User, 'id'>,
-): DatabaseView<Chat[]> {
-  const id = user.id;
-  return view(
+  user: RequiredColumns<UserProfile, 'supabase_id'>,
+): DatabaseQuery<Chat[], '*'> {
+  const id = user.supabase_id;
+  return query(
     await supabase
       .from('Chats')
       .select('*')
@@ -70,15 +68,15 @@ export function subscribe(
 }
 
 export async function create(
-  a: RequiredColumns<User, 'id'>,
-  b: RequiredColumns<User, 'id'>,
+  a: RequiredColumns<UserProfile, 'supabase_id'>,
+  b: RequiredColumns<UserProfile, 'supabase_id'>,
 ): DatabaseQuery<Chat, 'id'> {
   return query(
     await supabase
       .from('Chats')
       .insert({
-        user_id_1: a.id,
-        user_id_2: b.id,
+        user_id_1: a.supabase_id,
+        user_id_2: b.supabase_id,
       })
       .select()
       .single(),

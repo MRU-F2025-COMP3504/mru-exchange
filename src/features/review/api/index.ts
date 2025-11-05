@@ -1,20 +1,19 @@
 import type {
   DatabaseQuery,
-  DatabaseView,
   Product,
   RequiredColumns,
   Result,
   Review,
+  UserProfile,
 } from '@shared/types';
-import { supabase } from '@shared/api';
-import type { User } from '@supabase/supabase-js';
-import type { ReviewPublisher } from '@features/review/types';
-import { err, ok, query, view } from '@shared/utils';
+import { query, supabase } from '@shared/api';
+import type { ReviewPublisher } from '@features/review';
+import { err, ok } from '@shared/utils';
 
 export async function getProductReviews(
   product: RequiredColumns<Product, 'id'>,
-): DatabaseView<Review[]> {
-  return view(
+): DatabaseQuery<Review[], '*'> {
+  return query(
     await supabase
       .from('Reviews')
       .select('*')
@@ -23,49 +22,49 @@ export async function getProductReviews(
   );
 }
 
-export async function getProductReviewsByUser(
-  reviewer: RequiredColumns<User, 'id'>,
+export async function getProductReviewsByUserProfile(
+  reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
   product: RequiredColumns<Product, 'id'>,
-): DatabaseView<Review[]> {
-  return view(
+): DatabaseQuery<Review[], '*'> {
+  return query(
     await supabase
       .from('Reviews')
       .select('*')
       .eq('product_id', product.id)
-      .eq('created_by_id', reviewer.id)
+      .eq('created_by_id', reviewer.supabase_id)
       .order('created_at', { ascending: false }),
   );
 }
 
 export async function getSellerReviews(
-  seller: RequiredColumns<User, 'id'>,
-): DatabaseView<Review[]> {
-  return view(
+  seller: RequiredColumns<UserProfile, 'supabase_id'>,
+): DatabaseQuery<Review[], '*'> {
+  return query(
     await supabase
       .from('Reviews')
       .select('*')
-      .eq('created_on_id', seller.id)
+      .eq('created_on_id', seller.supabase_id)
       .order('created_at', { ascending: false }),
   );
 }
 
-export async function getSellerReviewsByUser(
-  reviewer: RequiredColumns<User, 'id'>,
-  seller: RequiredColumns<User, 'id'>,
-): DatabaseView<Review[]> {
-  return view(
+export async function getSellerReviewsByUserProfile(
+  reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
+  seller: RequiredColumns<UserProfile, 'supabase_id'>,
+): DatabaseQuery<Review[], '*'> {
+  return query(
     await supabase
       .from('Reviews')
       .select('*')
-      .eq('created_by_id', reviewer.id)
-      .eq('created_on_id', seller.id)
+      .eq('created_by_id', reviewer.supabase_id)
+      .eq('created_on_id', seller.supabase_id)
       .order('created_at', { ascending: false }),
   );
 }
 
 export async function getAverageProductRating(
   product: RequiredColumns<Product, 'id'>,
-): DatabaseQuery<Review, 'product_id' | 'rating'> {
+): DatabaseQuery<Review[], 'id' | 'rating'> {
   return query(
     await supabase
       .from('Reviews')
@@ -76,21 +75,23 @@ export async function getAverageProductRating(
 }
 
 export async function getAverageSellerRating(
-  seller: RequiredColumns<User, 'id'>,
+  seller: RequiredColumns<UserProfile, 'supabase_id'>,
 ): DatabaseQuery<Review, 'created_on_id' | 'rating'> {
   return query(
     await supabase
       .from('Reviews')
       .select('created_on_id,rating:rating.ave()')
-      .eq('created_on_id', seller.id)
+      .eq('created_on_id', seller.supabase_id)
       .single(),
   );
 }
 
-export function create(reviewer: RequiredColumns<User, 'id'>): ReviewPublisher {
+export function create(
+  reviewer: RequiredColumns<UserProfile, 'id'>,
+): ReviewPublisher {
   const review: Partial<Review> = {};
   return {
-    description(description: string): Result<ReviewPublisher, Error> {
+    description(description: string): Result<ReviewPublisher> {
       if (!description) {
         return err(new Error('Review description is not specified'));
       } else {
@@ -99,7 +100,7 @@ export function create(reviewer: RequiredColumns<User, 'id'>): ReviewPublisher {
 
       return ok(this);
     },
-    rating(rating: number): Result<ReviewPublisher, Error> {
+    rating(rating: number): Result<ReviewPublisher> {
       if (rating < 0) {
         return err(new Error('Review rating cannot be negative'));
       } else if (rating > 5) {
@@ -116,7 +117,7 @@ export function create(reviewer: RequiredColumns<User, 'id'>): ReviewPublisher {
           .from('Reviews')
           .insert({
             ...review,
-            created_by_id: reviewer.id,
+            created_by_id: reviewer.supabase_id,
           })
           .select()
           .single(),
