@@ -134,7 +134,6 @@ CREATE TABLE mru_dev."User_Information" (
   rating real null,
   profile_image json null,
   CONSTRAINT User_Information_pkey PRIMARY KEY (id),
-  CONSTRAINT User_Information_id_key unique (id),
   CONSTRAINT User_Information_supabase_id_key unique (supabase_id),
   CONSTRAINT unique_supabase_id unique (supabase_id),
   CONSTRAINT user_information_email_key unique (email),
