@@ -9,6 +9,10 @@ export default function Header() {
         await signOut();
         navigate('/signin');
     };
+
+    const handleProfile = () => {
+        navigate('/profile')
+    }
     
     return (
         <header
@@ -46,6 +50,22 @@ export default function Header() {
               MRU Exchange
             </h1>
           </div>
+          
+          <button
+            onClick={handleProfile}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#007FB5',
+              color: 'white',
+              borderRadius: '0.375rem',
+              border: 'none',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+            }}
+          >
+            Profile
+          </button>
           <button
             onClick={handleSignOut}
             style={{

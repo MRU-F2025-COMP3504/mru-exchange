@@ -9,3 +9,6 @@ export { default as WelcomePage } from '@pages/WelcomePage';
 export { default as Header } from '@pages/Header';
 export { default as Footer } from '@pages/Footer';
 export { default as ContactUsPage } from '@pages/ContactUsPage';
+export { default as ProfilePage } from '@pages/ProfilePage';
+export { default as ProductSearchPage } from '@pages/ProductSearchPage';
+export { default as ProductPage } from '@pages/ProductPage';
