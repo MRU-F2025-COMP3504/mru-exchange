@@ -7,6 +7,13 @@ import {
   CreateAccountPage,
   VerifyEmailPage,
   HomePage,
+  ResetPasswordPage,
+  SignUpPage,
+  ContactUsPage,
+  ProfilePage,
+  ProductSearchPage,
+  ProductPage,
+  MessagingPage
 } from '@pages/index';
 
 function App() {
@@ -18,6 +25,13 @@ function App() {
           <Route path='/signin' element={<SignInPage />} />
           <Route path='/create-account' element={<CreateAccountPage />} />
           <Route path='/verify-email' element={<VerifyEmailPage />} />
+          <Route path='/reset-password' element={<ResetPasswordPage />} />
+          <Route path='/sign-up' element={<SignUpPage />} />
+          <Route path='/contact-us' element={<ContactUsPage />} />
+          <Route path='/profile' element={<ProfilePage />} />
+          <Route path='/product-search' element={<ProductSearchPage />} />
+          <Route path='/product' element={<ProductPage />} />
+          <Route path='/messaging' element={<MessagingPage />} />
           <Route
             path='/home'
             element={
