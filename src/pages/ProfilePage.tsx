@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-    export default function ProfilePage() {
-        
-    }
+export default function ProfilePage() {
+    
+    return(
+        <div></div>
+    )
+}
