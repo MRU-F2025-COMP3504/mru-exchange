@@ -12,3 +12,4 @@ export { default as ContactUsPage } from '@pages/ContactUsPage';
 export { default as ProfilePage } from '@pages/ProfilePage';
 export { default as ProductSearchPage } from '@pages/ProductSearchPage';
 export { default as ProductPage } from '@pages/ProductPage';
+export { default as MessagingPage } from '@pages/MessagingPage';
