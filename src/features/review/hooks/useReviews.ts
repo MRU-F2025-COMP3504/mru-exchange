@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { reviewsApi } from '../api/reviews.api';
-import type { Review } from '../types/database/schema.ts';
+import type { Review } from '@shared/types/database/schema.ts';
 
 /**
  * Hook to fetch product reviews

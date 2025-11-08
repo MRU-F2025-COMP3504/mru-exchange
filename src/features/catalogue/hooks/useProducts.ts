@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { productsApi, type ProductFilters } from '../api/catalogue.api';
-import type { ProductInformation } from '../types/database/schema.ts';
+import type { ProductInformation } from '@shared/types/database/schema.ts';
 
 /**
  * Hook to fetch and manage catalogue
