@@ -13,6 +13,10 @@ export default function Header() {
     const handleProfile = () => {
         navigate('/profile')
     }
+
+    const handleMessaging = () => {
+        navigate('/messaging')
+    }
     
     return (
         <header
@@ -31,7 +35,9 @@ export default function Header() {
             alignItems: 'center',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div onClick={() => navigate("/home")}
+          style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            
             <img
               src='/MruExchangeLogo.png'
               alt='MRU Exchange Logo'
@@ -65,6 +71,22 @@ export default function Header() {
             }}
           >
             Profile
+          </button>
+
+          <button
+            onClick={handleMessaging}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#007FB5',
+              color: 'white',
+              borderRadius: '0.375rem',
+              border: 'none',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+            }}
+          >
+            Messages
           </button>
           <button
             onClick={handleSignOut}
