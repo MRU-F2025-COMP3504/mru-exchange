@@ -1,6 +1,7 @@
 import { useAuth } from '@shared/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
+import '../App.css'
 
 export default function HomePage() {
   const { user, signOut } = useAuth();
@@ -89,7 +90,8 @@ export default function HomePage() {
               Welcome to your campus marketplace! Here's what you can do:
             </p>
             <ul style={{ paddingLeft: '1.5rem', marginTop: '0.75rem' }}>
-              <li style={{ marginBottom: '0.5rem' }}>
+              <li onClick={() => navigate("/product")} 
+                  style={{ marginBottom: '0.5rem' }} className="link-item">
                 Browse products listed by other MRU students
               </li>
               <li style={{ marginBottom: '0.5rem' }}>
