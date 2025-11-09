@@ -90,7 +90,7 @@ export default function HomePage() {
               Welcome to your campus marketplace! Here's what you can do:
             </p>
             <ul style={{ paddingLeft: '1.5rem', marginTop: '0.75rem' }}>
-              <li onClick={() => navigate("/product")} 
+              <li onClick={() => navigate("/product-search")} 
                   style={{ marginBottom: '0.5rem' }} className="link-item">
                 Browse products listed by other MRU students
               </li>
