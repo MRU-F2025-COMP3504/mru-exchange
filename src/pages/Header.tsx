@@ -33,24 +33,29 @@ export default function Header() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            gap: '1rem',
           }}
         >
-          <div onClick={() => navigate("/home")}
-          style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div 
+          style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
             
             <img
               src='/MruExchangeLogo.png'
               alt='MRU Exchange Logo'
+              onClick={() => navigate("/home")}
               style={{
                 width: '50px',
                 height: 'auto',
+                cursor: 'pointer',
               }}
             />
             <h1
+              onClick={() => navigate("/home")}
               style={{
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 color: '#111827',
+                cursor: 'pointer',
               }}
             >
               MRU Exchange
