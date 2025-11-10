@@ -13,7 +13,8 @@ import {
   ProfilePage,
   ProductSearchPage,
   ProductPage,
-  MessagingPage
+  MessagingPage,
+  PostProductPage
 } from '@pages/index';
 
 function App() {
@@ -29,8 +30,16 @@ function App() {
           <Route path='/reset-password' element={<ResetPasswordPage />} />
           <Route path='/sign-up' element={<SignUpPage />} />
           <Route path='/contact-us' element={<ContactUsPage />} />
+<<<<<<< HEAD
           
           {/* Protected routes - require authentication (@mtroyal.ca email) */}
+=======
+          <Route path='/profile' element={<ProfilePage />} />
+          <Route path='/product-search' element={<ProductSearchPage />} />
+          <Route path='/product' element={<ProductPage />} />
+          <Route path='/messaging' element={<MessagingPage />} />
+          <Route path='/post-product' element={<PostProductPage />} />
+>>>>>>> 477fc338b1351c9f377d42864f54d626a0699023
           <Route
             path='/home'
             element={
