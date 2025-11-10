@@ -3,6 +3,7 @@ import { useAuth } from '@shared/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@shared/api';
 import Header from './Header';
+import Footer from './Footer'
 
 interface Product {
     id: number;
@@ -147,7 +148,7 @@ export default function HomePage() {
             </button>
 
             <button
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate('/post-product')}
               style={{
                 padding: '1.5rem 2.5rem',
                 backgroundColor: 'white',
@@ -293,6 +294,7 @@ export default function HomePage() {
           )}
         </div>
       </main>
+      <Footer/>
     </div>
   );
 }
