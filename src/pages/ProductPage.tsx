@@ -18,9 +18,9 @@ export default function ProductPage() {
 
     // Configurable Variables
     const linkData: Array<LinkData> = [
-        { name: 'School', path: '/product-search/school' },
-        { name: 'Course Supplies', path: '/product-search/school/course-supplies/' },
-        { name: 'Textbooks', path: '/product-search/school/course-supplies/textbooks' },
+        { name: 'School', path: '/product-search/school', className: 'hover:text-[#0F76D7]' },
+        { name: 'Course Supplies', path: '/product-search/school/course-supplies/', className: 'hover:text-[#0F76D7]' },
+        { name: 'Textbooks', path: '/product-search/school/course-supplies/textbooks', className: 'hover:text-[#0F76D7]' },
     ];
     const Product: Product = {
         name: "USB Drive 1TB",
