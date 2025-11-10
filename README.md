@@ -162,7 +162,7 @@ $ npm install
 ```
 
 If the running host is experiencing a dependency issue, deleting the `node_modules` folder and re-running the script above may resolve the issue.
-Alternatively, the running host may combine the previous command with `npm run docker:prune` or `npm run docker:build` or both.
+Alternatively, if you are using docker to run the application, the running host may combine the previous command with `npm run docker:prune` or `npm run docker:build` or both.
 
 See the [package.json](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/package.json) for more information on the list of dependencies that the application uses.
 
