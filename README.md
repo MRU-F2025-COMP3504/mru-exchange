@@ -63,23 +63,74 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 
 ---
 
-## Instructions
+## Deployment
 
-The application offers two environment configurations (i.e., development and production).
-We use `npm` scripts for building and running our application.
-For more information on our pre-built `npm` scripts, please see the [package.json](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/package.json).
+The commands below prepares the production server for deployment.
+
+The following assumes that the server has **permissions** to access (read) this private repository.
+The server must have [Git](https://git-scm.com/) and [SSH](https://en.wikipedia.org/wiki/Secure_Shell) installed, configured, and linked with a GitHub account.
+Alternatively, a personal access token (PAT) in place of SSH may be used instead.
+
+- See [below](#daily-operation--development) for installation instructions.
+
+The codebase is already configured with the [CI/CD](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/.github/workflows/cicd.yml) workflow using GitHub Actions.
+Any pushed changes to this repository in the `main` branch automatically runs the workflow.
+In addition, the workflow does not clone the repositoy.
+
+The production server _must_ clone the repository to automate deployment.
 
 ### Clone & Change Directory
 
+The following command uses Git and SSH to clone the repository on the server and changes the working directory into the repository:
+
 ```bash
-$ git clone https://github.com/MRU-F2025-COMP3504/mru-exchange.git && cd mru-exchange
+$ git clone git@github.com:MRU-F2025-COMP3504/mru-exchange.git && cd mru-exchange
+```
+
+Finally, to deploy the application, the following command is as follows:
+
+```bash
+$ DEPLOY_NAME=production npm run deploy
+```
+
+See the [script usage](#production) below for more information.
+
+## Daily Operation & Development
+
+We use the `npm` [(node package manager)](https://www.npmjs.com/) and [docker](https://www.docker.com/) for dependency management and running the application.
+
+- If the host is using the Windows operating system, the host must install and use [Docker Desktop](https://www.docker.com/products/docker-desktop/) to run the application.
+- See the [attached installation instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for how to install `npm`.
+- If using docker is not an option, the application can be run using `vite`. See [below](#development) for more information.
+
+For the host to read (e.g., `git clone`) or make changes to this repository, the host must have [Git](https://git-scm.com/) and [SSH](https://en.wikipedia.org/wiki/Secure_Shell) installed.
+
+- The SSH client should be pre-installed on Windows, macOS, and Linux operating systems.
+- See the [attached installation instructions](https://git-scm.com/install/windows) for how to install `git`.
+
+The application offers two environment configurations (i.e., development and production).
+We use `npm` scripts for building and running our application.
+See the [package.json](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/package.json) for more information on our pre-built `npm` scripts.
+
+### Update
+
+We use Git to manage changes in the local repository.
+To update the local repository to the latest changes:
+
+```bash
+$ git pull
 ```
 
 ### Install Dependencies
 
+To install all dependencies configured for the application:
+
 ```bash
-npm install
+$ npm install
 ```
+
+If the running host is experiencing a dependency issue, deleting the `node_modules` folder and re-running the script above may resolve the issue.
+Alternatively, the running host may run `npm run docker:prune` or `npm run docker:build` or both.
 
 ### Build
 
@@ -93,7 +144,7 @@ This script is automatically executed on deployment via the [CI/CD](https://gith
 
 ### Running
 
-We recommend using [docker](https://www.docker.com/) to ensure consistent dependency behaviours for all environments and deploy to production.
+We recommend using [docker](https://www.docker.com/) for application behaviour consistency on all environments and deploy to production.
 Depending on the running host that the codebase lives on and how docker is installed, running docker may require **root or administrator priviledges**.
 
 #### Production
@@ -101,13 +152,16 @@ Depending on the running host that the codebase lives on and how docker is insta
 The application must be dockerized in order to run the Nginx (reverse proxy) docker image to route and encrypt incoming traffic.
 
 We recommend running the system in a clean slate:
+
 ```bash
-$ DEPLOY_NAME=<container-name> npm run deploy
+$ DEPLOY_NAME=production npm run deploy
 ```
 
 The script above is equivalent to:
+
 ```bash
-$ DEPLOY_NAME=<container-name> \ 
+$ DEPLOY_NAME=production \ 
+    git pull \
     docker stop $DEPLOY_NAME \
     docker system prune -f \
     docker compose up -d --build
@@ -137,6 +191,21 @@ $ npm run docker:build
 ```
 
 The script above is equivalent to passing the `--build` flag on the previouosly mentioned `docker compose` command.
+
+The running host may prune existing data that the dockerized application has cached.
+The following script prunes the cache by force:
+
+```bash
+$ npm run docker:prune
+```
+
+The script above is equivalent to:
+
+```bash
+$ docker system prune -f
+```
+
+For more information, see docker's [command usage](https://docs.docker.com/reference/cli/docker/system/prune/).
 
 Otherwise, the system can be run on `vite` directly using:
 
