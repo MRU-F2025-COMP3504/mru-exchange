@@ -5,9 +5,11 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+// Wrapper for routes that require authentication
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
 
+  // Show loading spinner while checking auth
   if (loading) {
     return (
       <div
@@ -42,10 +44,12 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
+  // Redirect to sign in if not authenticated
   if (!user) {
     return <Navigate to='/signin' replace />;
   }
 
+  // Redirect to verify email if not confirmed
   if (!user.email_confirmed_at) {
     return <Navigate to='/verify-email' replace />;
   }

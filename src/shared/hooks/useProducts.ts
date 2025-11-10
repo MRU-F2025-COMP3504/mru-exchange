@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { productsApi, type ProductFilters } from '../api/catalogue.api';
 import type { ProductInformation } from '../types/database/schema.ts';
 
-/**
- * Hook to fetch and manage catalogue
- */
+// Fetch and manage products from catalogue
 export const useProducts = (filters?: ProductFilters) => {
   const [products, setProducts] = useState<ProductInformation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,9 +39,7 @@ export const useProducts = (filters?: ProductFilters) => {
   };
 };
 
-/**
- * Hook to fetch a single product
- */
+// Fetch a single product by ID
 export const useProduct = (productId: number | null) => {
   const [product, setProduct] = useState<ProductInformation | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,9 +83,7 @@ export const useProduct = (productId: number | null) => {
   };
 };
 
-/**
- * Hook to fetch user's catalogue
- */
+// Fetch all products for a specific user
 export const useUserProducts = (userId: string | null) => {
   const [products, setProducts] = useState<ProductInformation[]>([]);
   const [loading, setLoading] = useState(true);

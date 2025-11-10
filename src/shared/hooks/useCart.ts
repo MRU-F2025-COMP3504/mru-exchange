@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { cartApi } from '../api/cart.api';
 import type { ShoppingCart } from '../types/database/schema.ts';
 
-/**
- * Hook to manage user's shopping cart
- */
+// Manage user's shopping cart
 export const useCart = (userId: string | null) => {
   const [cartItems, setCartItems] = useState<ShoppingCart[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,9 +100,7 @@ export const useCart = (userId: string | null) => {
   };
 };
 
-/**
- * Hook to check if a single product is in cart
- */
+// Check if a specific product is in the cart
 export const useIsInCart = (
   userId: string | null,
   productId: number | null,
