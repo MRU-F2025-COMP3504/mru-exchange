@@ -28,22 +28,34 @@ export default function ProductPage() {
     }
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#F9FAFB' }}>
+        <div className="bg-[#F9FAFB] min-h-screen">
 
             <Header />
 
-            <main style={{ padding: '2rem', backgroundColor: '#A7E2FC', color: '#003A5F' }}>
+            {/* Main display */}
+            <main className="p-8 bg-[#A7E2FC] text-[#003A5F]">
 
-                {/* Main display */}
+                {/* Navigation */}
                 <section>
 
-                    {/* Navigation */}
+                    {/* Breadcrumbs */}
                     <div>
-                        <BreadcrumbTrail breadcrumbs={breadcrumbs}/>
+                        <BreadcrumbTrail breadcrumbs={breadcrumbs} />
                     </div>
 
-                    <h1>{Product.name}</h1>
 
+                </section>
+
+                {/* Product Details */}
+                <section className="p-5 flex flex-col sm:flex-row gap-5">
+
+                    
+                    <img src={Product.imageUrl}
+                        alt={Product.name}
+                        width='250px'
+                        height='250px'
+                        className="bg-red-500 object-cover mx-auto sm:mx-0" />
+                    <h1>{Product.name}</h1>
 
                 </section>
             </main>
