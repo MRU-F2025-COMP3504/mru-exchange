@@ -1,179 +1,83 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import type { User, Session } from '@supabase/supabase-js';
-import { supabase } from '../api/database/connection.ts';
+import {
+  type ReactNode,
+  type JSX,
+  useCallback,
+  useEffect,
+  useState,
+  createContext,
+} from 'react';
+import type { Result } from '@shared/types';
+import type { User } from '@supabase/supabase-js';
+import { empty, HookUtils, ok } from '@shared/utils';
+import { AuthAPI } from '@features/auth';
+import type { AuthPromiseResult, UserSession } from '@features/auth/types';
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: Result<User>;
   loading: boolean;
-  signUp: (
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-  ) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<void>;
-  resendVerificationEmail: (email: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, firstName: string, lastName: string) => AuthPromiseResult<UserSession>;
+  signIn: (email: string, password: string) => AuthPromiseResult<UserSession>;
+  signOut: () => AuthPromiseResult<null>;
+  resendEmailVerification: (email: string) => AuthPromiseResult<null>;
+  resetPassword: (email: string) => AuthPromiseResult<null>;
+  updatePassword: (password: string) => AuthPromiseResult<User>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<Result<User>>(() => empty());
 
-  useEffect(() => {
-    // Initialize session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-
-      // Create user record in database on sign in
-      if (_event === 'SIGNED_IN' && session?.user) {
-        checkAndCreateUserInfo(session.user).catch(console.error);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+  const signUp = useCallback(async (email: string, password: string, firstName: string, lastName: string) => {
+    return AuthAPI.signUp(email, password, firstName, lastName);
+  }, []);
+  const signIn = useCallback(async (email: string, password: string) => {
+    return AuthAPI.signIn(email, password);
+  }, []);
+  const signOut = useCallback(async () => {
+    return AuthAPI.signOut();
+  }, []);
+  const resendEmailVerification = useCallback(async (email: string) => {
+    return AuthAPI.resendEmailVerification(email);
+  }, []);
+  const resetPassword = useCallback(async (email: string) => {
+    return AuthAPI.resetPassword(email);
+  }, []);
+  const updatePassword = useCallback(async (password: string) => {
+    return AuthAPI.updatePassword(password);
   }, []);
 
-  // Create user record in User_Information table if it doesn't exist
-  const checkAndCreateUserInfo = async (user: User) => {
-    try {
-      const { data: existingUser, error: checkError } = await supabase
-        .from('User_Information')
-        .select('id')
-        .eq('supabase_id', user.id)
-        .single();
+  useEffect(() => {
+    void HookUtils.load(setLoading, AuthAPI.getUser()).then(setUser);
 
-      if (checkError && checkError.code === 'PGRST116') {
-        if (user.email) {
-          const { error: insertError } = await supabase.from('User_Information').insert({
-            supabase_id: user.id,
-            email: user.email,
-            first_name: user.user_metadata?.first_name || '',
-            last_name: user.user_metadata?.last_name || '',
-            user_name: user.email.split('@')[0],
-            is_deleted: false,
-            is_flagged: false,
-          });
-
-          if (insertError) {
-            console.error('Error creating user info:', insertError);
-          }
-        }
+    const subscription = AuthAPI.onAuthStateChange((_event, result) => {
+      if (result.ok) {
+        setUser(ok(result.data.user));
+      } else {
+        setUser(result);
       }
-    } catch (error) {
-      console.error('Error checking user info:', error);
-    }
-  };
+    });
 
-  // Register new user with @mtroyal.ca email
-  const signUp = async (
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-  ) => {
-    try {
-      if (!email.endsWith('@mtroyal.ca')) {
-        return {
-          error: { message: 'Please use a valid @mtroyal.ca email address' },
-        };
-      }
-
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/home`,
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-          },
-        },
-      });
-
-      if (error) return { error };
-
-      return { error: null };
-    } catch (error: any) {
-      return { error };
-    }
-  };
-
-  // Sign in existing user
-  const signIn = async (email: string, password: string) => {
-    try {
-      if (!email.endsWith('@mtroyal.ca')) {
-        return {
-          error: { message: 'Please use a valid @mtroyal.ca email address' },
-        };
-      }
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      return { error };
-    } catch (error: any) {
-      return { error };
-    }
-  };
-
-  // Sign out current user
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
-
-  // Resend verification email for signup
-  const resendVerificationEmail = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email,
-      });
-      return { error };
-    } catch (error: any) {
-      return { error };
-    }
-  };
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        session,
         loading,
         signUp,
         signIn,
         signOut,
-        resendVerificationEmail,
+        resendEmailVerification,
+        resetPassword,
+        updatePassword,
       }}
     >
-      {children}
+    {children}
     </AuthContext.Provider>
   );
-}
-
-// Hook to use auth context
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 }
