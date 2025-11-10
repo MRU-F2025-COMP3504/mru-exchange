@@ -114,8 +114,8 @@ See the [package.json](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/m
 
 ### Update
 
-We use Git to manage changes in the local repository.
-To update the local repository to the latest changes:
+We use Git for version control and manage code changes.
+To update the local repository to the latest upstream changes:
 
 ```bash
 $ git pull
@@ -144,12 +144,15 @@ This script is automatically executed on deployment via the [CI/CD](https://gith
 
 ### Running
 
-We recommend using [docker](https://www.docker.com/) for application behaviour consistency on all environments and deploy to production.
+We recommend using [docker](https://www.docker.com/) for application behaviour consistency on all environments and deploying to production.
 Depending on the running host that the codebase lives on and how docker is installed, running docker may require **root or administrator priviledges**.
 
 #### Production
 
 The application must be dockerized in order to run the Nginx (reverse proxy) docker image to route and encrypt incoming traffic.
+Our Nginx configuration uses [LetsEncrypt](https://letsencrypt.org/) for HTTPS traffic.
+
+- We recommend using [certbot](https://certbot.eff.org/) to install and automate SSL certificate renewal.
 
 We recommend running the system in a clean slate:
 
