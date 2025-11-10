@@ -13,7 +13,8 @@ import {
   ProfilePage,
   ProductSearchPage,
   ProductPage,
-  MessagingPage
+  MessagingPage,
+  PostProductPage
 } from '@pages/index';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
           <Route path='/product-search' element={<ProductSearchPage />} />
           <Route path='/product' element={<ProductPage />} />
           <Route path='/messaging' element={<MessagingPage />} />
+          <Route path='/post-product' element={<PostProductPage />} />
           <Route
             path='/home'
             element={
