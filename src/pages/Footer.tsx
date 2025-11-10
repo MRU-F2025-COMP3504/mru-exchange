@@ -1,5 +1,7 @@
 
 import { Link } from 'react-router-dom';
+import type { LinkData } from '../shared/components/LinkDelimitedList';
+import LinkDelimitedList from '../shared/components/LinkDelimitedList';
 
 export default function Footer() {
 
@@ -12,6 +14,11 @@ export default function Footer() {
     const phone: string = '1-800-467-6287';
     const separator: string = " | ";
     const startYear: number = 2025;
+    const indexLinks: Array<LinkData> = [
+        { name: 'Home', path: '/', className: 'text-sm hover:text-[#C2EAFC] hover:underline' },
+        { name: 'Contact Us', path: '/contact-us', className: 'text-sm hover:text-[#C2EAFC] hover:underline' },
+    ]
+    const indexSeparator: string = " • ";
 
     // Functions
     /**
@@ -54,12 +61,9 @@ export default function Footer() {
                 <p>
                     {sitename}{separator}{address}{separator}{phone}
                 </p>
-                <Link
-                    to='/contact-us'
-                    className='text-sm hover:text-[#C2EAFC] hover:underline'
-                >
-                    Contact Us
-                </Link>
+                <div>
+                    <LinkDelimitedList items={indexLinks} separator={indexSeparator}/>
+                </div>
             </section>
 
         </footer>

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 export type LinkData = {
     name: string;
     path: string;
+    className?: string;
 }
 
 /**
@@ -21,18 +22,25 @@ export default function LinkDelimitedList(props: { items: Array<LinkData>, separ
         props.items.map((LinkData: LinkData, i: number) => {
 
             // Initialize
-            let link: JSX.Element[] = [];
+            let segment: JSX.Element[] = [];
 
             // If this is the second or later link, add a separator.
             if (i > 0) {
-                link.push(<span key={`sep-${i}`}>{props.separator}</span>);
+                segment.push(<span key={`sep-${i}`}>{props.separator}</span>);
             }
 
             // Add markup
-            link.push(<Link key={LinkData.name} to={LinkData.path}>{LinkData.name}</Link>);
+            let link: JSX.Element = <Link 
+                key={LinkData.name} 
+                to={LinkData.path} 
+                className={LinkData.className ? LinkData.className : undefined}
+                >
+                {LinkData.name}
+                </Link>;
+            segment.push(link);
 
             // Return
-            return link;
+            return segment;
 
         })
     );
