@@ -7,11 +7,41 @@ export default function Footer() {
     const navigate = useNavigate();
 
 
-    // Initialize
+    // Variables
     const sitename = "MRUExchange.com";
     const address = "4825 Mt Royal Gate SW, Calgary, Alberta, Canada, T3E 6K6"
     const phone = '1-800-467-6287';
     const separator = " | ";
+    const startYear = 2025;
+
+    // Constants
+    const currentYear = new Date().getFullYear();
+
+    // Functions
+    function copyrightYear() {
+
+        // Initialize
+        let str = `${startYear}`;
+
+        // If multi-year,
+        if (currentYear > startYear) {
+
+            // Update
+            str = `${startYear}-${currentYear}`;
+
+        }
+        // Otherwise, if before start year,
+        else if (currentYear < startYear) {
+
+            // Throw an error.
+            throw new Error("Current year is before start year.");
+            
+        }
+
+        // Return
+        return str;
+
+    }
 
     // Return
     return (
@@ -20,7 +50,7 @@ export default function Footer() {
             {/* Copyright section */}
             <section style={{ padding: '1rem 0' }}>
                 <p className='text-center text-sm'>
-                    &copy; {new Date().getFullYear()}-{new Date().getFullYear()}, {sitename}
+                    &copy; {copyrightYear()}, {sitename}
                 </p>
             </section>
 
