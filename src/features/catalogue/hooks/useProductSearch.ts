@@ -3,25 +3,24 @@ import { ProductCatalogueAPI } from '@features/catalogue';
 import type {
   DatabaseQueryResult,
   Product,
-  RequiredColumns,
 } from '@shared/types';
 import { empty, HookUtils } from '@shared/utils';
 
-interface UseProductsReturn {
+interface UseProductSearchReturn {
   loading: boolean;
-  result: UseProductsResult;
+  result: UseProductSearchResult;
 }
 
-type UseProductsResult = DatabaseQueryResult<Product[], '*'>;
+type UseProductSearchResult = DatabaseQueryResult<Product[], '*'>;
 
-export default function(...array: RequiredColumns<Product, 'id'>[]): UseProductsReturn {
+export default function(text: string): UseProductSearchReturn {
   const [loading, setLoading] = useState<boolean>(true);
-  const [result, setResult] = useState<UseProductsResult>(() => empty());
+  const [result, setResult] = useState<UseProductSearchResult>(() => empty());
 
   useEffect(() => {
-    void HookUtils.load(setLoading, ProductCatalogueAPI.get(...array))
+    void HookUtils.load(setLoading, ProductCatalogueAPI.getBySearch(text))
       .then(setResult);
-  }, [array]);
+  }, [text]);
 
   return {
     loading,
