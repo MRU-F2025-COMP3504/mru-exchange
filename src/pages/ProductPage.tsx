@@ -2,8 +2,8 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
-import type { Breadcrumb } from '../shared/components/BreadcrumbTrail';
-import BreadcrumbTrail from '../shared/components/BreadcrumbTrail';
+import type { LinkData } from '../shared/components/LinkDelimitedList';
+import LinkDelimitedList from '../shared/components/LinkDelimitedList';
 
 export default function ProductPage() {
 
@@ -17,10 +17,10 @@ export default function ProductPage() {
     }
 
     // Configurable Variables
-    const breadcrumbs: Array<Breadcrumb> = [
-        { name: 'School', path: '/product-search/school' },
-        { name: 'Course Supplies', path: '/product-search/school/course-supplies/' },
-        { name: 'Textbooks', path: '/product-search/school/course-supplies/textbooks' },
+    const linkData: Array<LinkData> = [
+        { name: 'School', path: '/product-search/school', className: 'hover:text-[#0F76D7]' },
+        { name: 'Course Supplies', path: '/product-search/school/course-supplies/', className: 'hover:text-[#0F76D7]' },
+        { name: 'Textbooks', path: '/product-search/school/course-supplies/textbooks', className: 'hover:text-[#0F76D7]' },
     ];
     const Product: Product = {
         name: "USB Drive 1TB",
@@ -30,7 +30,7 @@ export default function ProductPage() {
             Perfect for storing and transferring files between devices.
             Comes as-is, along with the swivel cap to protect the USB connector when not in use.`,
         price: 49.99,
-        imageUrl: "https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fi5.walmartimages.com%2Fseo%2FUSB-Flash-Drive-1TB-1000GB-Rotatable-Thumb-Drive-Memory-Stick-for-Computer-USB-Backup-Zip-Drive_4b925a9c-0c5c-4863-800e-a82a919ab23d.94a5aea196db4b49e091d1499cc127d6.png&sp=1762804044T796c87204efcae04dec3b1f417608ce027f536b1121533529a28dae6e473500b"
+        imageUrl: "https://i5.walmartimages.com/seo/USB-Flash-Drive-1TB-1000GB-Rotatable-Thumb-Drive-Memory-Stick-for-Computer-USB-Backup-Zip-Drive_4b925a9c-0c5c-4863-800e-a82a919ab23d.94a5aea196db4b49e091d1499cc127d6.png?odnHeight=573&odnWidth=573&odnBg=FFFFFF"
     }
 
     // Main
@@ -50,7 +50,7 @@ export default function ProductPage() {
 
                         {/* Breadcrumbs */}
                         <div>
-                            <BreadcrumbTrail breadcrumbs={breadcrumbs} />
+                            <LinkDelimitedList items={linkData} separator=" &gt; " />
                         </div>
 
 
