@@ -15,3 +15,7 @@ BEGIN
   RETURN new;
 END;
 $$;
+
+create or replace trigger on_rating_update
+after insert on mru_dev."Reviews" for each row
+execute function mru_dev.update_user_rating();
