@@ -313,3 +313,131 @@ BEGIN
         END LOOP;
     END LOOP;
 END $$;
+
+
+
+DO $$
+DECLARE
+    send_id uuid;
+    user_id_1 uuid;
+    user_id_2 uuid;
+    hour integer := floor(random() * 12 + 1);
+    meridiem text := (ARRAY['am','pm'])[floor(random() * 2 + 1)];
+
+    greeting_sender text[] := ARRAY[
+        'Hello!',
+        'Hi there!',
+        'Hey, how''s it going?',
+        'Hi, I saw your post about the item.',
+        'Hey! I''m interested in something you''re selling.'
+    ];
+
+    greeting_responses text[] := ARRAY[
+        'Hi! How can I help you?',
+        'Hey! Yes, what''s up?',
+        'Hi there, which item are you looking at?',
+        'Hello! Thanks for reaching out.',
+        'Hey, good to hear from you!'
+    ];
+    
+    availability_sender text[] := ARRAY[
+        'Is this product still available?',
+        'Do you still have this for sale?',
+        'Are you still selling this item?',
+        'Hey, just checking if this is still up for grabs.',
+        'Do you happen to have any extras of this?'
+    ];
+
+    availability_responses text[] := ARRAY[
+        'Yes, it''s still available!',
+        'I''ve got one left!',
+        'Sorry, it just sold earlier today.',
+        'Yeah, it''s still up for sale.',
+        'I only have one more available.'
+    ];
+
+    negotiation_sender text[] := ARRAY[
+        'I''m really interested, but could you do a bit cheaper?',
+        'Would you take $5 less?',
+        'Could you do $10 off if I pick it up today?',
+        'Is the price negotiable?',
+        'That''s a bit expensive for me, can we work something out?'
+    ];
+
+    negotiation_responses text[] := ARRAY[
+        'Hmm, I can do a small discount, maybe $5 off.',
+        'Sorry, the price is firm.',
+        'If you pick it up today, I can lower it a little.',
+        'Let''s say $5 less — deal?',
+        'I''ve already dropped the price quite a bit, sorry!'
+    ];
+
+    meetup_sender text[] := ARRAY[
+        'Where should we meet up?',
+        'What times are you free to meet?',
+        'Can we meet on campus?',
+        'Would tomorrow afternoon work?',
+        'Does ' || hour::text || meridiem || ' work for you?'
+    ];
+
+    meetup_responses text[] := ARRAY[
+        'I can meet near the library.',
+        'Let''s do outside the student center?',
+        'I''m free after 3pm today.',
+        'Tomorrow works great, what time?',
+        hour::text || meridiem || ' sounds good to me!'
+    ];
+
+    closing_sender text[] := ARRAY[
+        'Perfect, see you then!',
+        'Thanks so much!',
+        'Sounds good, I''ll message when I''m there.',
+        'Alright, I''ll bring cash.',
+        'Appreciate it!'
+    ];
+
+    closing_responses text[] := ARRAY[
+        'See you soon!',
+        'No problem, thanks!',
+        'Okay, looking forward to it.',
+        'Awesome, have a good one!',
+        'Great, thanks again!'
+    ];
+
+    mes_types text[][] :=
+    ARRAY
+    [
+        greeting_sender text[],
+        greeting_responses text[],
+        availability_sender text[],
+        availability_responses text[],
+        negotiation_sender text[],
+        negotiation_responses text[],
+        meetup_sender text[],
+        meetup_responses text[],
+        closing_sender text[],
+        closing_responses text[]
+    ];
+
+BEGIN
+    FOR chat IN 
+        SELECT id, user_id_1, user_id_2
+        FROM mru_dev."Chats" 
+    LOOP
+        count int8 := 0;
+
+        FOREACH mes IN ARRAY mes_types LOOP
+            IF count % 2 = 0 THEN send_id := chat.user_id_1;
+            ELSE send_id := chat.user_id_2;
+            END IF;
+
+
+            message := mes[floor(random() * array_length(mes, 1) + 1)::int];
+
+            INSERT INTO mru_dev."Messages"(chat.id, sender_id, logged_message)
+            VALUES (chat_id, send_id, message);
+
+            count := count +1;
+        END LOOP;
+    END LOOP;
+END $$;
