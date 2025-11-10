@@ -3,15 +3,15 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
 
-    // Variables
+    // System Variables
+    const currentYear: number = new Date().getFullYear();
+
+    // Configurable Variables
     const sitename: string = "MRUExchange.com";
     const address: string = "4825 Mt Royal Gate SW, Calgary, Alberta, Canada, T3E 6K6"
     const phone: string = '1-800-467-6287';
     const separator: string = " | ";
     const startYear: number = 2025;
-
-    // Derived variables
-    const currentYear: number = new Date().getFullYear();
 
     // Functions
     /**

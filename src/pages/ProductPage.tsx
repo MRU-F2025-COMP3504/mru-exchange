@@ -7,12 +7,7 @@ import BreadcrumbTrail from '../shared/components/BreadcrumbTrail';
 
 export default function ProductPage() {
 
-    const breadcrumbs: Array<Breadcrumb> = [
-        { name: 'School', path: '/product-search/school' },
-        { name: 'Course Supplies', path: '/product-search/school/course-supplies/' },
-        { name: 'Textbooks', path: '/product-search/school/course-supplies/textbooks' },
-    ];
-
+    // System Variables
     type Product = {
         name: string;
         description: string;
@@ -20,6 +15,12 @@ export default function ProductPage() {
         imageUrl: string;
     }
 
+    // Configurable Variables
+    const breadcrumbs: Array<Breadcrumb> = [
+        { name: 'School', path: '/product-search/school' },
+        { name: 'Course Supplies', path: '/product-search/school/course-supplies/' },
+        { name: 'Textbooks', path: '/product-search/school/course-supplies/textbooks' },
+    ];
     const Product: Product = {
         name: "Textbooks",
         description: "Unused textbooks.",
@@ -27,6 +28,7 @@ export default function ProductPage() {
         imageUrl: "https://www.startpage.com/av/proxy-image?piurl=https%3A%2F%2Fthumbs.dreamstime.com%2Fz%2Fstack-textbooks-20767064.jpg&sp=1762724834T32da08f0ce1d6153cedfbd344b1dde3a60716543a8f64376066d650b2292b1ae"
     }
 
+    // Main
     return (
         <div className="bg-[#F9FAFB] min-h-screen">
 
