@@ -32,6 +32,26 @@ export default function ProductPage() {
         price: 49.99,
         imageUrl: "https://i5.walmartimages.com/seo/USB-Flash-Drive-1TB-1000GB-Rotatable-Thumb-Drive-Memory-Stick-for-Computer-USB-Backup-Zip-Drive_4b925a9c-0c5c-4863-800e-a82a919ab23d.94a5aea196db4b49e091d1499cc127d6.png?odnHeight=573&odnWidth=573&odnBg=FFFFFF"
     }
+    const avgRating: number = Math.round(3.49);
+    const totalReviews: number = 24;
+
+    // Functions
+    function displayStars(avgRating: number): string {
+
+        // Initialize
+        const fullStar: string = '★';
+        const emptyStar: string = '☆';
+        let result: string = "";
+
+        // Build
+        for (let i = 1; i <= 5; i++){
+            result += i <= avgRating ? fullStar : emptyStar;
+        }
+
+        // Return
+        return result;
+
+    }
 
     // Main
     return (
@@ -85,8 +105,9 @@ export default function ProductPage() {
                 </section>
 
                 {/* Reviews */}
-                <section>
-
+                <section className="p-10">
+                    <h2 className="text-2xl">Reviews</h2>
+                    <p className="text-2xl"><span className="text-3xl">{ displayStars(avgRating) }</span> ({totalReviews})</p>
                 </section>
             </main>
 
