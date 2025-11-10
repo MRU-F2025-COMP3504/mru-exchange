@@ -76,12 +76,12 @@ export async function getAverageProductRating(
 
 export async function getAverageSellerRating(
   seller: RequiredColumns<UserProfile, 'supabase_id'>,
-): DatabaseQuery<Review, 'created_on_id' | 'rating'> {
+): DatabaseQuery<Review, 'rating'> {
   return query(
     await supabase
-      .from('Reviews')
-      .select('created_on_id,rating:rating.ave()')
-      .eq('created_on_id', seller.supabase_id)
+      .from('User_Information')
+      .select('rating')
+      .eq('supabase_id', seller.supabase_id)
       .single(),
   );
 }
