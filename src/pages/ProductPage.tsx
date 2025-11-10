@@ -51,13 +51,19 @@ export default function ProductPage() {
                 {/* Product Details */}
                 <section className="p-5 flex flex-col sm:flex-row gap-5">
 
-                    
-                    <img src={Product.imageUrl}
-                        alt={Product.name}
-                        width='250px'
-                        height='250px'
-                        className="bg-red-500 object-cover mx-auto sm:mx-0" />
-                    <h1>{Product.name}</h1>
+                    <div>
+                        <img src={Product.imageUrl}
+                            alt={Product.name}
+                            width='250px'
+                            height='250px'
+                            className="bg-red-500 object-cover mx-auto sm:mx-0" />
+                    </div>
+
+                    <div className="p-3 w-full bg-amber-50">
+                        <h1 className="text-3xl py-2">{Product.name}</h1>
+
+                        <p>{Product.description}</p>
+                    </div>
 
                 </section>
             </main>
