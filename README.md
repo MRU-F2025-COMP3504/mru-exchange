@@ -59,6 +59,10 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 
 ---
 
+### Using the System 
+
+ - Running: 
+
 ## 📖 Additional Resources
 
 - [Supabase Documentation](https://supabase.com/docs)
