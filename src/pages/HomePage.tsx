@@ -147,7 +147,7 @@ export default function HomePage() {
             </button>
 
             <button
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate('/post-product')}
               style={{
                 padding: '1.5rem 2.5rem',
                 backgroundColor: 'white',
