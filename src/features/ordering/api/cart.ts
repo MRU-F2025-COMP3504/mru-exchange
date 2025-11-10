@@ -4,24 +4,24 @@ import type {
   RequiredColumns,
   ShoppingCart,
   ShoppingCartProduct,
+  UserProfile,
 } from '@shared/types';
-import type { User } from '@supabase/supabase-js';
 import { query, supabase } from '@shared/api';
 
 export async function get(
-  user: RequiredColumns<User, 'id'>,
+  user: RequiredColumns<UserProfile, 'supabase_id'>,
 ): DatabaseQuery<ShoppingCart, '*'> {
   return query(
     await supabase
       .from('Shopping_Cart')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', user.supabase_id)
       .single(),
   );
 }
 
 export async function getProducts(
-  cart: RequiredColumns<Product, 'id'>,
+  cart: RequiredColumns<ShoppingCart, 'id'>,
 ): DatabaseQuery<ShoppingCartProduct[], '*'> {
   return query(
     await supabase
@@ -33,13 +33,13 @@ export async function getProducts(
 }
 
 export async function register(
-  user: RequiredColumns<User, 'id'>,
+  user: RequiredColumns<UserProfile, 'id'>,
 ): DatabaseQuery<ShoppingCart, 'id'> {
   return query(
     await supabase
       .from('Shopping_Cart')
       .insert({
-        user_id: user.id,
+        user_id: user.supabase_id,
       })
       .select('id')
       .single(),
