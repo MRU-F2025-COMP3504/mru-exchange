@@ -1,46 +1,42 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-    export default function Footer() {
-
-        
-        const navigate = useNavigate();
+export default function Footer() {
 
 
-        // Initialize
-        const sitename = "MRUExchange.com";
-        const address = "4825 Mt Royal Gate SW, Calgary, Alberta, Canada, T3E 6K6"
-        const phone = '1-800-467-6287';
-        const separator = " | ";
+    const navigate = useNavigate();
 
-        // Return
-        return (
-            <footer className="bg-gray-500 py-6 mt-8">
 
-                {/* Copyright line */}
-                <div>
-                    <p className='text-center text-sm text-white'>
-                        &copy; {new Date().getFullYear()}-{new Date().getFullYear()}, {sitename}
-                    </p>
-                </div>
+    // Initialize
+    const sitename = "MRUExchange.com";
+    const address = "4825 Mt Royal Gate SW, Calgary, Alberta, Canada, T3E 6K6"
+    const phone = '1-800-467-6287';
+    const separator = " | ";
 
-                {/* Address line */}
-                <div>
-                    <p className='text-center text-sm text-gray-900'>
-                        {sitename}{separator}{address}{separator}{phone}
-                    </p>
-                </div>
+    // Return
+    return (
+        <footer className="py-6 mt-8 text-white bg-[#003A5F]">
 
-                {/* Links */}
-                <div className='mt-4 text-center'>
-                    <Link
+            {/* Copyright section */}
+            <section style={{ padding: '1rem 0' }}>
+                <p className='text-center text-sm'>
+                    &copy; {new Date().getFullYear()}-{new Date().getFullYear()}, {sitename}
+                </p>
+            </section>
+
+            {/* Info section */}
+            <section style={{ padding: '0 0 1rem 0' }} className='text-center text-sm'>
+                <p>
+                    {sitename}{separator}{address}{separator}{phone}
+                </p>
+                <Link
                     to='/contact-us'
-                    className='text-sm text-indigo-600 hover:text-indigo-800 hover:underline'
-                    >
+                    className='text-sm hover:text-[#C2EAFC] hover:underline'
+                >
                     Contact Us
-                    </Link>
-                </div>
-                
-            </footer>
+                </Link>
+            </section>
+
+        </footer>
     )
-    }
+}
