@@ -33,24 +33,29 @@ export default function Header() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            gap: '1rem',
           }}
         >
-          <div onClick={() => navigate("/home")}
-          style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div 
+          style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
             
             <img
               src='/MruExchangeLogo.png'
               alt='MRU Exchange Logo'
+              onClick={() => navigate("/home")}
               style={{
                 width: '50px',
                 height: 'auto',
+                cursor: 'pointer',
               }}
             />
             <h1
+              onClick={() => navigate("/home")}
               style={{
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 color: '#111827',
+                cursor: 'pointer',
               }}
             >
               MRU Exchange
@@ -61,7 +66,7 @@ export default function Header() {
             onClick={handleProfile}
             style={{
               padding: '0.5rem 1rem',
-              backgroundColor: '#007FB5',
+              backgroundColor: '#0F76D7',
               color: 'white',
               borderRadius: '0.375rem',
               border: 'none',
@@ -77,7 +82,7 @@ export default function Header() {
             onClick={handleMessaging}
             style={{
               padding: '0.5rem 1rem',
-              backgroundColor: '#007FB5',
+              backgroundColor: '#0F76D7',
               color: 'white',
               borderRadius: '0.375rem',
               border: 'none',

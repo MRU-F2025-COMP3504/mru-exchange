@@ -60,7 +60,7 @@ export function create(): UserReporter {
           .insert({
             ...report,
             created_on_id: target.supabase_id,
-          })
+          } as UserReport)
           .select('id')
           .single(),
       );

@@ -2,7 +2,6 @@ import type {
   Chat,
   DatabaseQuery,
   RequiredColumns,
-  UserMessage,
   UserProfile,
 } from '@shared/types';
 import { query, supabase } from '@shared/api';
@@ -11,6 +10,26 @@ import {
   type RealtimeChannel,
   type RealtimePostgresInsertPayload,
 } from '@supabase/supabase-js';
+
+export function subscribe(
+  user: RequiredColumns<UserProfile, 'supabase_id'>,
+  callback: (payload: RealtimePostgresInsertPayload<Chat>) => void,
+): RealtimeChannel {
+  const id = user.supabase_id;
+  return supabase
+    .channel(`user-chat-${id}`)
+    .on(
+      REALTIME_LISTEN_TYPES.POSTGRES_CHANGES,
+      {
+        event: 'INSERT',
+        schema: 'mru_dev',
+        table: 'Chats',
+        filter: `user_id_1=eq.${id}&user_id_2=eq.${id}`,
+      },
+      callback,
+    )
+    .subscribe();
+}
 
 export async function get(
   chat: RequiredColumns<Chat, 'id'>,
@@ -33,38 +52,17 @@ export async function getByUser(
   );
 }
 
-export async function setVisible(
-  chat: RequiredColumns<Chat, 'id'>,
+export async function show(
   visible: boolean,
-): DatabaseQuery<Chat, 'id'> {
+  ...chats: RequiredColumns<Chat, 'id'>[]
+): DatabaseQuery<Chat[], 'id'> {
   return query(
     await supabase
       .from('Chats')
       .update({ visible })
-      .eq('id', chat.id)
+      .in('id', chats.map((chat) => chat.id))
       .select('id')
-      .single(),
   );
-}
-
-export function subscribe(
-  chat: RequiredColumns<Chat, 'id'>,
-  callback: (payload: RealtimePostgresInsertPayload<UserMessage>) => void,
-): RealtimeChannel {
-  const id = chat.id.toString();
-  return supabase
-    .channel(`chat-${id}`)
-    .on(
-      REALTIME_LISTEN_TYPES.POSTGRES_CHANGES,
-      {
-        event: 'INSERT',
-        schema: 'mru_dev',
-        table: 'Messages',
-        filter: `chat_id=eq.${id}`,
-      },
-      callback,
-    )
-    .subscribe();
 }
 
 export async function create(
