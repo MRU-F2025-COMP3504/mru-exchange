@@ -61,7 +61,7 @@ export function register(): ProductBuilder {
       return query(
         await supabase
           .from('Product_Information')
-          .insert(product)
+          .insert(product as Product)
           .select('id')
           .single(),
       );

@@ -50,7 +50,7 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - ✅ Search functionality
 - ✅ Row Level Security (RLS) for data protection
 
-### Categories
+### Product Categories
 
 - 🅿️ **Parking** - Parking spot rentals/sales
 - 📚 **Textbooks** - Course textbooks
@@ -58,6 +58,13 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - 👨‍🏫 **Tutoring** - Tutoring services
 
 ---
+
+### Using the System 
+
+ - **Building** - 
+ - **Running** - In a new terminal type and run 'npm install' and wait for it to finish.
+ Then type and run 'npm run dev' and wait for it to finish. Hold ctrl and click on the 'Local' link. 
+ - **Testing** - 
 
 ## 📖 Additional Resources
 

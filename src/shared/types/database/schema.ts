@@ -42,6 +42,13 @@ export type Database = {
             foreignKeyName: "Catagory_Assigned_Products_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
+            referencedRelation: "get_reviews_created_on_user"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "Catagory_Assigned_Products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "Product_Information"
             referencedColumns: ["id"]
           },
@@ -50,21 +57,21 @@ export type Database = {
       Category_Tags: {
         Row: {
           created_at: string
-          description: string | null
+          description: string
           id: number
-          name: string | null
+          name: string
         }
         Insert: {
           created_at?: string
-          description?: string | null
+          description: string
           id?: number
-          name?: string | null
+          name: string
         }
         Update: {
           created_at?: string
-          description?: string | null
+          description?: string
           id?: number
-          name?: string | null
+          name?: string
         }
         Relationships: []
       }
@@ -72,31 +79,45 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          user_id_1: string | null
-          user_id_2: string | null
-          visible: boolean | null
+          user_id_1: string
+          user_id_2: string
+          visible: boolean
         }
         Insert: {
           created_at?: string
           id?: number
-          user_id_1?: string | null
-          user_id_2?: string | null
-          visible?: boolean | null
+          user_id_1?: string
+          user_id_2: string
+          visible?: boolean
         }
         Update: {
           created_at?: string
           id?: number
-          user_id_1?: string | null
-          user_id_2?: string | null
-          visible?: boolean | null
+          user_id_1?: string
+          user_id_2?: string
+          visible?: boolean
         }
         Relationships: [
           {
             foreignKeyName: "Chats_user_id_1_fkey"
             columns: ["user_id_1"]
             isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "Chats_user_id_1_fkey"
+            columns: ["user_id_1"]
+            isOneToOne: false
             referencedRelation: "User_Information"
             referencedColumns: ["supabase_id"]
+          },
+          {
+            foreignKeyName: "Chats_user_id_2_fkey"
+            columns: ["user_id_2"]
+            isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
           },
           {
             foreignKeyName: "Chats_user_id_2_fkey"
@@ -109,28 +130,28 @@ export type Database = {
       }
       Messages: {
         Row: {
-          chat_id: number | null
+          chat_id: number
           created_at: string
           id: number
-          logged_message: string | null
-          sender_id: string | null
-          visible: boolean | null
+          logged_message: string
+          sender_id: string
+          visible: boolean
         }
         Insert: {
-          chat_id?: number | null
+          chat_id: number
           created_at?: string
           id?: number
-          logged_message?: string | null
-          sender_id?: string | null
-          visible?: boolean | null
+          logged_message: string
+          sender_id: string
+          visible?: boolean
         }
         Update: {
-          chat_id?: number | null
+          chat_id?: number
           created_at?: string
           id?: number
-          logged_message?: string | null
-          sender_id?: string | null
-          visible?: boolean | null
+          logged_message?: string
+          sender_id?: string
+          visible?: boolean
         }
         Relationships: [
           {
@@ -144,6 +165,13 @@ export type Database = {
             foreignKeyName: "Messages_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "Messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
             referencedRelation: "User_Information"
             referencedColumns: ["supabase_id"]
           },
@@ -152,41 +180,48 @@ export type Database = {
       Product_Information: {
         Row: {
           created_at: string
-          description: string | null
+          description: string
           id: number
           image: Json | null
-          isDeleted: boolean | null
-          isListed: boolean | null
-          price: number | null
-          stock_count: number | null
-          title: string | null
-          user_id: string | null
+          isDeleted: boolean
+          isListed: boolean
+          price: number
+          stock_count: number
+          title: string
+          user_id: string
         }
         Insert: {
           created_at?: string
-          description?: string | null
+          description: string
           id?: number
           image?: Json | null
-          isDeleted?: boolean | null
-          isListed?: boolean | null
-          price?: number | null
-          stock_count?: number | null
-          title?: string | null
-          user_id?: string | null
+          isDeleted?: boolean
+          isListed?: boolean
+          price: number
+          stock_count?: number
+          title: string
+          user_id: string
         }
         Update: {
           created_at?: string
-          description?: string | null
+          description?: string
           id?: number
           image?: Json | null
-          isDeleted?: boolean | null
-          isListed?: boolean | null
-          price?: number | null
-          stock_count?: number | null
-          title?: string | null
-          user_id?: string | null
+          isDeleted?: boolean
+          isListed?: boolean
+          price?: number
+          stock_count?: number
+          title?: string
+          user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "Product_Information_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
+          },
           {
             foreignKeyName: "Product_Information_user_id_fkey"
             columns: ["user_id"]
@@ -196,35 +231,85 @@ export type Database = {
           },
         ]
       }
+      Product_Order: {
+        Row: {
+          created_at: string
+          id: number
+          ordered_by_id: string
+          product_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          ordered_by_id?: string
+          product_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          ordered_by_id?: string
+          product_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Product_Order_ordered_by_id_fkey"
+            columns: ["ordered_by_id"]
+            isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "Product_Order_ordered_by_id_fkey"
+            columns: ["ordered_by_id"]
+            isOneToOne: false
+            referencedRelation: "User_Information"
+            referencedColumns: ["supabase_id"]
+          },
+          {
+            foreignKeyName: "Product_Order_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "get_reviews_created_on_user"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "Product_Order_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "Product_Information"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Reports: {
         Row: {
           closed_date: string | null
           created_at: string
-          created_by_id: string | null
-          created_on_id: string | null
-          description: string | null
+          created_by_id: string
+          created_on_id: string
+          description: string
           id: number
-          is_closed: boolean | null
+          is_closed: boolean
           linked_information: string | null
         }
         Insert: {
           closed_date?: string | null
           created_at?: string
-          created_by_id?: string | null
-          created_on_id?: string | null
-          description?: string | null
+          created_by_id?: string
+          created_on_id: string
+          description: string
           id?: number
-          is_closed?: boolean | null
+          is_closed?: boolean
           linked_information?: string | null
         }
         Update: {
           closed_date?: string | null
           created_at?: string
-          created_by_id?: string | null
-          created_on_id?: string | null
-          description?: string | null
+          created_by_id?: string
+          created_on_id?: string
+          description?: string
           id?: number
-          is_closed?: boolean | null
+          is_closed?: boolean
           linked_information?: string | null
         }
         Relationships: [
@@ -232,8 +317,22 @@ export type Database = {
             foreignKeyName: "Reports_created_by_id_fkey"
             columns: ["created_by_id"]
             isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "Reports_created_by_id_fkey"
+            columns: ["created_by_id"]
+            isOneToOne: false
             referencedRelation: "User_Information"
             referencedColumns: ["supabase_id"]
+          },
+          {
+            foreignKeyName: "Reports_created_on_id_fkey"
+            columns: ["created_on_id"]
+            isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
           },
           {
             foreignKeyName: "Reports_created_on_id_fkey"
@@ -247,32 +346,39 @@ export type Database = {
       Reviews: {
         Row: {
           created_at: string
-          created_by_id: string | null
-          created_on_id: string | null
-          description: string | null
+          created_by_id: string
+          created_on_id: string
+          description: string
           id: number
           product_id: number | null
-          rating: number | null
+          rating: number
         }
         Insert: {
           created_at?: string
-          created_by_id?: string | null
-          created_on_id?: string | null
-          description?: string | null
+          created_by_id?: string
+          created_on_id: string
+          description?: string
           id?: number
           product_id?: number | null
-          rating?: number | null
+          rating: number
         }
         Update: {
           created_at?: string
-          created_by_id?: string | null
-          created_on_id?: string | null
-          description?: string | null
+          created_by_id?: string
+          created_on_id?: string
+          description?: string
           id?: number
           product_id?: number | null
-          rating?: number | null
+          rating?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "Reviews_created_by_id_fkey"
+            columns: ["created_by_id"]
+            isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
+          },
           {
             foreignKeyName: "Reviews_created_by_id_fkey"
             columns: ["created_by_id"]
@@ -284,8 +390,22 @@ export type Database = {
             foreignKeyName: "Reviews_created_on_id_fkey"
             columns: ["created_on_id"]
             isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "Reviews_created_on_id_fkey"
+            columns: ["created_on_id"]
+            isOneToOne: false
             referencedRelation: "User_Information"
             referencedColumns: ["supabase_id"]
+          },
+          {
+            foreignKeyName: "Reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "get_reviews_created_on_user"
+            referencedColumns: ["product_id"]
           },
           {
             foreignKeyName: "Reviews_product_id_fkey"
@@ -300,19 +420,26 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
           id?: number
-          user_id?: string | null
+          user_id?: string
         }
         Update: {
           created_at?: string
           id?: number
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "Shopping_Cart_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
+          },
           {
             foreignKeyName: "Shopping_Cart_user_id_fkey"
             columns: ["user_id"]
@@ -343,6 +470,13 @@ export type Database = {
             foreignKeyName: "Shopping_Cart_Products_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
+            referencedRelation: "get_reviews_created_on_user"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "Shopping_Cart_Products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
             referencedRelation: "Product_Information"
             referencedColumns: ["id"]
           },
@@ -359,12 +493,12 @@ export type Database = {
         Row: {
           created_at: string
           deleted_on: string | null
-          email: string | null
+          email: string
           first_name: string | null
           flagged_type: string | null
           id: number
-          is_deleted: boolean | null
-          is_flagged: boolean | null
+          is_deleted: boolean
+          is_flagged: boolean
           last_name: string | null
           profile_image: Json | null
           rating: number | null
@@ -374,12 +508,12 @@ export type Database = {
         Insert: {
           created_at?: string
           deleted_on?: string | null
-          email?: string | null
+          email: string
           first_name?: string | null
           flagged_type?: string | null
           id?: number
-          is_deleted?: boolean | null
-          is_flagged?: boolean | null
+          is_deleted?: boolean
+          is_flagged?: boolean
           last_name?: string | null
           profile_image?: Json | null
           rating?: number | null
@@ -389,12 +523,12 @@ export type Database = {
         Update: {
           created_at?: string
           deleted_on?: string | null
-          email?: string | null
+          email?: string
           first_name?: string | null
           flagged_type?: string | null
           id?: number
-          is_deleted?: boolean | null
-          is_flagged?: boolean | null
+          is_deleted?: boolean
+          is_flagged?: boolean
           last_name?: string | null
           profile_image?: Json | null
           rating?: number | null
@@ -407,40 +541,54 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          user_1_is_blocked: boolean | null
-          user_1_is_muted: boolean | null
-          user_2_is_blocked: boolean | null
-          user_2_is_muted: boolean | null
-          user_id_1: string | null
-          user_id_2: string | null
+          user_1_is_blocked: boolean
+          user_1_is_muted: boolean
+          user_2_is_blocked: boolean
+          user_2_is_muted: boolean
+          user_id_1: string
+          user_id_2: string
         }
         Insert: {
           created_at?: string
           id?: number
-          user_1_is_blocked?: boolean | null
-          user_1_is_muted?: boolean | null
-          user_2_is_blocked?: boolean | null
-          user_2_is_muted?: boolean | null
-          user_id_1?: string | null
-          user_id_2?: string | null
+          user_1_is_blocked?: boolean
+          user_1_is_muted?: boolean
+          user_2_is_blocked?: boolean
+          user_2_is_muted?: boolean
+          user_id_1?: string
+          user_id_2: string
         }
         Update: {
           created_at?: string
           id?: number
-          user_1_is_blocked?: boolean | null
-          user_1_is_muted?: boolean | null
-          user_2_is_blocked?: boolean | null
-          user_2_is_muted?: boolean | null
-          user_id_1?: string | null
-          user_id_2?: string | null
+          user_1_is_blocked?: boolean
+          user_1_is_muted?: boolean
+          user_2_is_blocked?: boolean
+          user_2_is_muted?: boolean
+          user_id_1?: string
+          user_id_2?: string
         }
         Relationships: [
           {
             foreignKeyName: "User_Interactions_user_id_1_fkey"
             columns: ["user_id_1"]
             isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
+          },
+          {
+            foreignKeyName: "User_Interactions_user_id_1_fkey"
+            columns: ["user_id_1"]
+            isOneToOne: false
             referencedRelation: "User_Information"
             referencedColumns: ["supabase_id"]
+          },
+          {
+            foreignKeyName: "User_Interactions_user_id_2_fkey"
+            columns: ["user_id_2"]
+            isOneToOne: false
+            referencedRelation: "get_shopping_cart_information_for_user"
+            referencedColumns: ["seller_id"]
           },
           {
             foreignKeyName: "User_Interactions_user_id_2_fkey"
@@ -453,6 +601,28 @@ export type Database = {
       }
     }
     Views: {
+      get_blocked_accounts_for_user: {
+        Row: {
+          first_name: string | null
+          last_name: string | null
+        }
+        Relationships: []
+      }
+      get_category_tags_for_user: {
+        Row: {
+          description: string | null
+          name: string | null
+        }
+        Insert: {
+          description?: string | null
+          name?: string | null
+        }
+        Update: {
+          description?: string | null
+          name?: string | null
+        }
+        Relationships: []
+      }
       get_chat_messages_for_user: {
         Row: {
           created_at: string | null
@@ -471,9 +641,112 @@ export type Database = {
         }
         Relationships: []
       }
+      get_list_of_products_for_user: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          image: Json | null
+          price: number | null
+          stock_count: number | null
+          title: string | null
+        }
+        Relationships: []
+      }
       get_messages_for_user: {
         Row: {
           logged_message: string | null
+        }
+        Relationships: []
+      }
+      get_muted_accounts_for_user: {
+        Row: {
+          first_name: string | null
+          last_name: string | null
+        }
+        Relationships: []
+      }
+      get_product_information_for_user: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          first_name: string | null
+          image: Json | null
+          last_name: string | null
+          price: number | null
+          rating: number | null
+          stock_count: number | null
+          title: string | null
+        }
+        Relationships: []
+      }
+      get_reports_created_for_user: {
+        Row: {
+          created_by_first_name: string | null
+          created_by_last_name: string | null
+          created_date: string | null
+          created_on_first_name: string | null
+          created_on_last_name: string | null
+          description: string | null
+          is_report_closed: boolean | null
+          linked_information: string | null
+        }
+        Relationships: []
+      }
+      get_reviews_created_by_user: {
+        Row: {
+          created_at: string | null
+          created_by_first_name: string | null
+          created_by_last_name: string | null
+          created_on_first_name: string | null
+          created_on_last_name: string | null
+          product_title: string | null
+          review_message: string | null
+          review_rating: number | null
+        }
+        Relationships: []
+      }
+      get_reviews_created_on_user: {
+        Row: {
+          first_name: string | null
+          last_name: string | null
+          primary_user_rating: number | null
+          product_id: number | null
+          product_title: string | null
+          review_rating: number | null
+        }
+        Relationships: []
+      }
+      get_shopping_cart_information_for_user: {
+        Row: {
+          product_name: string | null
+          product_price: number | null
+          seller_id: string | null
+        }
+        Relationships: []
+      }
+      get_user_profile_information_for_user: {
+        Row: {
+          email: string | null
+          first_name: string | null
+          last_name: string | null
+          profile_image: Json | null
+          rating: number | null
+        }
+        Insert: {
+          email?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          profile_image?: Json | null
+          rating?: number | null
+        }
+        Update: {
+          email?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          profile_image?: Json | null
+          rating?: number | null
         }
         Relationships: []
       }

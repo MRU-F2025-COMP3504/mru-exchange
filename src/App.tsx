@@ -13,7 +13,8 @@ import {
   ProfilePage,
   ProductSearchPage,
   ProductPage,
-  MessagingPage
+  MessagingPage,
+  PostProductPage
 } from '@pages/index';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public routes */}
           <Route path='/' element={<WelcomePage />} />
           <Route path='/signin' element={<SignInPage />} />
           <Route path='/create-account' element={<CreateAccountPage />} />
@@ -28,10 +30,8 @@ function App() {
           <Route path='/reset-password' element={<ResetPasswordPage />} />
           <Route path='/sign-up' element={<SignUpPage />} />
           <Route path='/contact-us' element={<ContactUsPage />} />
-          <Route path='/profile' element={<ProfilePage />} />
-          <Route path='/product-search' element={<ProductSearchPage />} />
-          <Route path='/product' element={<ProductPage />} />
-          <Route path='/messaging' element={<MessagingPage />} />
+          
+          {/* Protected routes */}
           <Route
             path='/home'
             element={
@@ -40,6 +40,48 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path='/product-search'
+            element={
+              <ProtectedRoute>
+                <ProductSearchPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/product'
+            element={
+              <ProtectedRoute>
+                <ProductPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/profile'
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/messaging'
+            element={
+              <ProtectedRoute>
+                <MessagingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/post-product'
+            element={
+              <ProtectedRoute>
+                <PostProductPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Catch all */}
           <Route path='*' element={<Navigate to='/' replace />} />
         </Routes>
       </BrowserRouter>

@@ -119,14 +119,265 @@ def generateChatData():
         Chats.append(chat)
         
 def generateMessagesData():
-    Messages.append(['id', 'chat_id', 'sender_id', 'logged_message', 'created_at'])
+    Messages.append(['chat_id', 'sender_id', 'logged_message', 'created_at'])
+    hour = random.randint(1, 12)
+    meridiem = random.choice(['am', 'pm'])
+
+    messages = [
+        # Greetings
+        "Hi",
+        "Hello!",
+        "Hey there!",
+        "Hi, is this still available?",
+        "Yo, you still selling this?",
+        "Hey, I’m interested in this item.",
+        "Hey! Just saw your post about this.",
+        "Hi! Is this the same one you used for class last semester?",
+        "Hey, I saw your post — looks like something I need!",
+        "Yooo, I've been looking for this, is this still availible?",
+
+        # Availability & condition
+        "Is this product still available?",
+        "Do you still have this?",
+        "How old is this item?",
+        "Is it in good condition?",
+        "Any scratches or damages?",
+        "Do you have any extras of this?",
+        "Has this been used much?",
+        "Just making sure this still works, right?",
+        "Does it come with the original packaging?",
+        "Is the access code still valid?",
+
+        # Negotiation / price discussion
+        "Could you do $5 cheaper?",
+        "Would you take $20 for it?",
+        "Is the price negotiable?",
+        "Can you lower the price a bit?",
+        "Would you accept a trade?",
+        "I’m on a tight budget, could you go any lower?",
+        "Would you take coffee instead of cash? 😂",
+        "If I pick it up today, could you do $10 off?",
+        "Could you hold it for me until tomorrow?",
+        "Any student discount? 😅",
+
+        # Seller responses
+        "Yeah, it’s still available!",
+        "Sure, I can do $5 off.",
+        "Sorry, someone else messaged me first.",
+        "It’s yours if you can pick it up today.",
+        "I can’t really go lower, sorry.",
+        "Sure, I’ll hold it for you.",
+        "Yep, still good as new.",
+        "Thanks for your interest!",
+        "I just sold it earlier, sorry!",
+        "No problem, I’ll keep you posted if it doesn’t sell.",
+
+        # Meetup coordination
+        "Where should we meet up?",
+        f"Does {hour}{meridiem} work for you?",
+        "What times are you free to meet up?",
+        "Are you on campus today?",
+        "Could we meet at the library?",
+        "Can we meet near the student center?",
+        "I can meet after class around 3pm, does that work?",
+        f"I’m free around {hour}{meridiem}, would that work for you?",
+        "Let’s meet by the cafeteria entrance.",
+        "I’ll be in the parking lot near Building B.",
+        "I’m wearing a red hoodie so you can spot me.",
+
+        # Running Late
+        "Sorry, I'm running a bit late, I'll be there soon",
+        "Hey, I'm actually not gonna make it today, can we organize for another time?",
+        "Can we rescheduale?",
+        "Stuck in traffic, give me 10 mins!",
+        "Class ran over time, sorry!",
+        "Could we meet later tonight instead?",
+        "Can we push it to tomorrow?",
+        "Just realized I left it at home, sorry about that.",
+
+        # Ghosted / follow-ups
+        "Just following up, is this still available?",
+        "Hey, just checking in — haven’t heard back.",
+        "Are you still interested?",
+        "Let me know if you changed your mind.",
+        "Still want this?",
+        "Did you end up selling it?",
+        "You there?",
+        "Guess I’ll take that as a no 😂",
+
+        # Confirmations & polite messages
+        "Sounds good, see you then!",
+        "Thanks!",
+        "Cool, I’ll be there.",
+        "Let me know when you’re on your way.",
+        "Can you send a quick confirmation before you leave?",
+        "I’m here, where are you?",
+        "Running a few minutes late, sorry!",
+        "No worries, take your time.",
+        "Got it, thanks!",
+        "Awesome, appreciate it.",
+
+        # Product-specific
+        "Is this the 8th edition textbook?",
+        "Does it include the access code?",
+        "Is this for PSYC 1101?",
+        "Does it come with the charger?",
+        "Are all the pages intact?",
+        "Can you send a picture of the inside?",
+        "Is this still sealed?",
+        "Are you firm on the price?",
+        "Does it come with the manual?",
+        "Do you still have the receipt?",
+
+        # Misc small talk / student chatter
+        "Sorry, just saw your message.",
+        "Thanks for holding it for me!",
+        "I can grab it after my lecture.",
+        "Appreciate it, I’ve been looking for this all week.",
+        "Sweet, that works perfectly.",
+        "No worries if it’s already sold.",
+        "Cool, I’ll message you when I’m heading out.",
+        "Thanks again!",
+        "How’s your semester going so far?",
+        "Ugh, midterms are killing me.",
+        "Do you have the same prof for this course?",
+        "I used this book last term — total lifesaver.",
+        "This class was brutal lol.",
+        "Good luck with finals!",
+        "You a CS major too?",
+        "Man, I wish I’d found this earlier.",
+
+        # Complaints / issues
+        "Hey, there are pages missing from this book.",
+        "This doesn’t look like the photo you posted.",
+        "It’s not turning on — did it work when you sold it?",
+        "The cover’s pretty damaged, just FYI.",
+        "This wasn’t mentioned in the description.",
+        "Hey, I think you gave me the wrong charger.",
+        "Can we work something out? It’s kind of broken.",
+        "I’m a bit disappointed, not as described.",
+        "It smells a bit weird, just saying.",
+        "Hey, next time please mention the condition properly.",
+        "You didn’t show up yesterday, what happened?",
+        "I waited 20 minutes and you never came.",
+        "Not cool, man. You could’ve just said you sold it.",
+        "Hey, can I get a refund or something?",
+
+        # Lighthearted / random chatter
+        "Lol I totally forgot about this class.",
+        "I only passed because of this book 😂",
+        "Haha yeah, I’ve been meaning to sell this forever.",
+        "I used to love this course until midterms happened.",
+        "Thanks again, you’re a lifesaver!",
+        "Bro this deal was too good to pass up.",
+        "My roommate told me to grab this before it’s gone.",
+        "Finally got rid of that heavy textbook 😂",
+        "Good doing business with you!",
+        "Have a good one!"
+    ]
+    
+    greeting_sender = [
+        "Hello!",
+        "Hi there!",
+        "Hey, how’s it going?",
+        "Hi, I saw your post about the item.",
+        "Hey! I’m interested in something you’re selling."
+    ]
+
+    greeting_responses = [
+        "Hi! How can I help you?",
+        "Hey! Yes, what’s up?",
+        "Hi there, which item are you looking at?",
+        "Hello! Thanks for reaching out.",
+        "Hey, good to hear from you!"
+    ]
+    
+    availability_sender = [
+        "Is this product still available?",
+        "Do you still have this for sale?",
+        "Are you still selling this item?",
+        "Hey, just checking if this is still up for grabs.",
+        "Do you happen to have any extras of this?"
+    ]
+
+    availability_responses = [
+        "Yes, it’s still available!",
+        "I’ve got one left!",
+        "Sorry, it just sold earlier today.",
+        "Yeah, it’s still up for sale.",
+        "I only have one more available."
+    ]
+
+    negotiation_sender = [
+        "I’m really interested, but could you do a bit cheaper?",
+        "Would you take $5 less?",
+        "Could you do $10 off if I pick it up today?",
+        "Is the price negotiable?",
+        "That’s a bit expensive for me, can we work something out?"
+    ]
+
+    negotiation_responses = [
+        "Hmm, I can do a small discount, maybe $5 off.",
+        "Sorry, the price is firm.",
+        "If you pick it up today, I can lower it a little.",
+        "Let’s say $5 less — deal?",
+        "I’ve already dropped the price quite a bit, sorry!"
+    ]
+
+    meetup_sender = [
+        "Where should we meet up?",
+        "What times are you free to meet?",
+        "Can we meet on campus?",
+        "Would tomorrow afternoon work?",
+        f"Does {hour}{meridiem} work for you?",
+    ]
+
+    meetup_responses = [
+        "I can meet near the library.",
+        "Let’s do outside the student center?",
+        "I’m free after 3pm today.",
+        "Tomorrow works great, what time?",
+        f"{hour}{meridiem} sounds good to me!",
+    ]
+
+    closing_sender = [
+        "Perfect, see you then!",
+        "Thanks so much!",
+        "Sounds good, I’ll message when I’m there.",
+        "Alright, I’ll bring cash.",
+        "Appreciate it!"
+    ]
+
+    closing_responses = [
+        "See you soon!",
+        "No problem, thanks!",
+        "Okay, looking forward to it.",
+        "Awesome, have a good one!",
+        "Great, thanks again!"
+    ]
+    
     for i in range(rowsToGenerate):
+        # get chat id
+        # get user_id_1
+        # get user_id_2
+        
+        
+        random.choice(greeting_sender),
+        random.choice(greeting_responses),
+        random.choice(availability_sender),
+        random.choice(availability_responses),
+        random.choice(negotiation_sender),
+        random.choice(negotiation_responses),
+        random.choice(meetup_sender),
+        random.choice(meetup_responses ),
+        random.choice(closing_sender),
+        random.choice(closing_responses),
+        
         message = [
-        i,
+        random.randint(1, 100),
         chatList[random.randint(num_users_low, num_users_high)],
         uuidList[random.randint(num_users_low, num_users_high)],
-        "This is not a real message",
-        now.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        random.choice(messages),
         ]
         Messages.append(message)
 
