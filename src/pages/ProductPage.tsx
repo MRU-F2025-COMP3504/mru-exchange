@@ -2,8 +2,6 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
-import type { Breadcrumb } from '../shared/components/BreadcrumbTrail';
-import BreadcrumbTrail from '../shared/components/BreadcrumbTrail';
 import type { LinkData } from '../shared/components/LinkDelimitedList';
 import LinkDelimitedList from '../shared/components/LinkDelimitedList';
 
@@ -19,11 +17,6 @@ export default function ProductPage() {
     }
 
     // Configurable Variables
-    const breadcrumbs: Array<Breadcrumb> = [
-        { name: 'School', path: '/product-search/school' },
-        { name: 'Course Supplies', path: '/product-search/school/course-supplies/' },
-        { name: 'Textbooks', path: '/product-search/school/course-supplies/textbooks' },
-    ];
     const linkData: Array<LinkData> = [
         { name: 'School', path: '/product-search/school' },
         { name: 'Course Supplies', path: '/product-search/school/course-supplies/' },
