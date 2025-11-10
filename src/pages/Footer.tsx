@@ -3,10 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 
 export default function Footer() {
 
-
-    const navigate = useNavigate();
-
-
     // Variables
     const sitename = "MRUExchange.com";
     const address = "4825 Mt Royal Gate SW, Calgary, Alberta, Canada, T3E 6K6"
