@@ -4,35 +4,34 @@ import { useNavigate, Link } from 'react-router-dom';
 export default function Footer() {
 
     // Variables
-    const sitename = "MRUExchange.com";
-    const address = "4825 Mt Royal Gate SW, Calgary, Alberta, Canada, T3E 6K6"
-    const phone = '1-800-467-6287';
-    const separator = " | ";
-    const startYear = 2025;
+    const sitename: string = "MRUExchange.com";
+    const address: string = "4825 Mt Royal Gate SW, Calgary, Alberta, Canada, T3E 6K6"
+    const phone: string = '1-800-467-6287';
+    const separator: string = " | ";
+    const startYear: number = 2025;
 
-    // Constants
-    const currentYear = new Date().getFullYear();
+    // Derived variables
+    const currentYear: number = new Date().getFullYear();
 
     // Functions
-    function copyrightYear() {
+    /**
+     * Formats a range of years for display.
+     * @param year1 The starting year.
+     * @param year2 The ending year.
+     * @returns Formatted year range string.
+     */
+    function formatYearRange(year1: number, year2: number): string {
 
-        // Initialize
-        let str = `${startYear}`;
-
-        // If multi-year,
-        if (currentYear > startYear) {
-
-            // Update
-            str = `${startYear}-${currentYear}`;
-
-        }
-        // Otherwise, if before start year,
-        else if (currentYear < startYear) {
+        // If before year1,
+        if (year2 < year1) {
 
             // Throw an error.
-            throw new Error("Current year is before start year.");
+            throw new Error("The starting year for the range cannot be before the ending year.");
             
         }
+
+        // If the same year, display the year, otherwise, display a range.
+        let str: string = year1 === year2 ? `${year1}` : `${year1}-${year2}`;
 
         // Return
         return str;
@@ -46,7 +45,7 @@ export default function Footer() {
             {/* Copyright section */}
             <section style={{ padding: '1rem 0' }}>
                 <p className='text-center text-sm'>
-                    &copy; {copyrightYear()}, {sitename}
+                    &copy; {formatYearRange(startYear, currentYear)}, {sitename}
                 </p>
             </section>
 
