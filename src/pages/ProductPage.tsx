@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Header from './Header';
+import Footer from './Footer';
 
 export default function ProductPage() {
     
@@ -18,6 +19,8 @@ export default function ProductPage() {
         <main style={{ padding: '2rem', backgroundColor: 'gray'}}>
             <h1>{Product.name}</h1>
         </main>
+
+        <Footer/>
         </div>
     )
 }   
