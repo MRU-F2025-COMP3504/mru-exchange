@@ -40,7 +40,7 @@ export default function Footer() {
 
     // Return
     return (
-        <footer className="p-6 mt-8 text-white bg-[#003A5F]">
+        <footer className="p-6 text-white bg-[#003A5F]">
 
             {/* Copyright section */}
             <section className="py-4">
