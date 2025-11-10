@@ -66,7 +66,7 @@ export default function Header() {
             onClick={handleProfile}
             style={{
               padding: '0.5rem 1rem',
-              backgroundColor: '#007FB5',
+              backgroundColor: '#0F76D7',
               color: 'white',
               borderRadius: '0.375rem',
               border: 'none',
@@ -82,7 +82,7 @@ export default function Header() {
             onClick={handleMessaging}
             style={{
               padding: '0.5rem 1rem',
-              backgroundColor: '#007FB5',
+              backgroundColor: '#0F76D7',
               color: 'white',
               borderRadius: '0.375rem',
               border: 'none',
