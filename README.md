@@ -61,6 +61,8 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - 📝 **Notes** - Study notes and materials
 - 👨‍🏫 **Tutoring** - Tutoring services
 
+***Tests are not completely implemented.***
+
 ---
 
 ## Deployment
