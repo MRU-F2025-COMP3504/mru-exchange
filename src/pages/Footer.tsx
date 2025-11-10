@@ -14,7 +14,7 @@ export default function Footer() {
     const separator: string = " | ";
     const startYear: number = 2025;
     const indexLinks: Array<LinkData> = [
-        { name: 'Home', path: '/', className: 'text-sm hover:text-[#C2EAFC] hover:underline' },
+        { name: 'Home', path: '/home', className: 'text-sm hover:text-[#C2EAFC] hover:underline' },
         { name: 'Contact Us', path: '/contact-us', className: 'text-sm hover:text-[#C2EAFC] hover:underline' },
     ]
     const indexSeparator: string = " • ";
