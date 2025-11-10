@@ -12,7 +12,7 @@ export type Breadcrumb = {
  * @param props An object containing an Array called 'breadcrumbs' of Breadcrumb objects representing the breadcrumb trail.
  * @returns An array of JSX elements that can be displayed.
  */
-function BreadcrumbTrail(props: {breadcrumbs: Array<Breadcrumb>} ): JSX.Element[][] {
+export default function BreadcrumbTrail(props: {breadcrumbs: Array<Breadcrumb>} ): JSX.Element[][] {
     
     // Return
     return (
@@ -37,5 +37,3 @@ function BreadcrumbTrail(props: {breadcrumbs: Array<Breadcrumb>} ): JSX.Element[
         })
     );
 }
-
-export default BreadcrumbTrail;
