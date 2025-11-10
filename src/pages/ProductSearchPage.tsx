@@ -240,6 +240,7 @@ export default function ProductSearchPage() {
                     </button>
                 </form>
                 <button 
+                    onClick={() => navigate('/post-product')}
                     style={{
                         backgroundColor: "White",
                         padding: "0.6rem 1.2rem",
