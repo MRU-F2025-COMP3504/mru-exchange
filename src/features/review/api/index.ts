@@ -22,7 +22,7 @@ export async function getProductReviews(
   );
 }
 
-export async function getProductReviewsByUserProfile(
+export async function getProductReviewsByReviewer(
   reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
   product: RequiredColumns<Product, 'id'>,
 ): DatabaseQuery<Review[], '*'> {
@@ -48,7 +48,7 @@ export async function getSellerReviews(
   );
 }
 
-export async function getSellerReviewsByUserProfile(
+export async function getSellerReviewsByReviewer(
   reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
   seller: RequiredColumns<UserProfile, 'supabase_id'>,
 ): DatabaseQuery<Review[], '*'> {
@@ -64,7 +64,7 @@ export async function getSellerReviewsByUserProfile(
 
 export async function getAverageProductRating(
   product: RequiredColumns<Product, 'id'>,
-): DatabaseQuery<Review[], 'id' | 'rating'> {
+): DatabaseQuery<Review, 'id' | 'rating'> {
   return query(
     await supabase
       .from('Reviews')
@@ -87,7 +87,7 @@ export async function getAverageSellerRating(
 }
 
 export function create(
-  reviewer: RequiredColumns<UserProfile, 'id'>,
+  reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
 ): ReviewPublisher {
   const review: Partial<Review> = {};
   return {
@@ -118,7 +118,7 @@ export function create(
           .insert({
             ...review,
             created_by_id: reviewer.supabase_id,
-          })
+          } as Review)
           .select()
           .single(),
       );
