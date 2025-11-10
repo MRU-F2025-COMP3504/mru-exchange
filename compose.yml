@@ -1,6 +1,6 @@
 services:
   web:
-    container_name: web-prod
+    container_name: production
     build: ./
     ports:
       - '80:80'

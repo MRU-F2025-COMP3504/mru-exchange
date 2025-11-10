@@ -1,6 +1,6 @@
 services:
   web:
-    container_name: web-dev
+    container_name: development
     build:
       context: ./
       dockerfile: dev.Dockerfile
