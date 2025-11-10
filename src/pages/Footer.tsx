@@ -40,17 +40,17 @@ export default function Footer() {
 
     // Return
     return (
-        <footer className="py-6 mt-8 text-white bg-[#003A5F]">
+        <footer className="p-6 mt-8 text-white bg-[#003A5F]">
 
             {/* Copyright section */}
-            <section style={{ padding: '1rem 0' }}>
+            <section className="py-4">
                 <p className='text-center text-sm'>
                     &copy; {formatYearRange(startYear, currentYear)}, {sitename}
                 </p>
             </section>
 
             {/* Info section */}
-            <section style={{ padding: '0 0 1rem 0' }} className='text-center text-sm'>
+            <section className='pb-4 text-center text-sm'>
                 <p>
                     {sitename}{separator}{address}{separator}{phone}
                 </p>
