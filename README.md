@@ -101,6 +101,7 @@ We use the `npm` [(node package manager)](https://www.npmjs.com/) and [docker](h
 
 - If the host is using the Windows operating system, the host must install and use [Docker Desktop](https://www.docker.com/products/docker-desktop/) to run the application.
 - See the [attached installation instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for how to install `npm`.
+- See the [attached installation instructions](https://docs.docker.com/engine/install/) for how to install `docker`.
 - If using docker is not an option, the application can be run using `vite`. See [below](#development) for more information.
 
 For the host to read (e.g., `git clone`) or make changes to this repository, the host must have [Git](https://git-scm.com/) and [SSH](https://en.wikipedia.org/wiki/Secure_Shell) installed.
