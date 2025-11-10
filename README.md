@@ -79,7 +79,7 @@ In addition, the workflow does not clone the repositoy.
 
 The production server _must_ clone the repository to automate deployment.
 
-### Clone & Change Directory
+### Clone Repository
 
 The following command uses Git and SSH to clone the repository on the server and changes the working directory into the repository:
 
@@ -95,6 +95,18 @@ $ DEPLOY_NAME=production npm run deploy
 
 See the [script usage](#production) below for more information.
 
+### Website Access
+
+The website is accessed using the following URL:
+
+```
+mruexchange.app
+```
+
+By default, the DNS record for the website and the path to the SSL certificate are hardcoded.
+The server listens on port `80` and `443` for HTTP and HTTPS, respectively.
+See the [nginx.conf](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/nginx.conf) to configure the reverse proxy for the production server.
+
 ## Daily Operation & Development
 
 We use the `npm` [(node package manager)](https://www.npmjs.com/) and [docker](https://www.docker.com/) for dependency management and running the application.
@@ -104,14 +116,33 @@ We use the `npm` [(node package manager)](https://www.npmjs.com/) and [docker](h
     - If the host is using the Windows operating system, the host must install and use [Docker Desktop](https://www.docker.com/products/docker-desktop/) to run the application.
     - If using docker is not an option, the application can be run using `vite`. See [below](#development) for more information.
 
-For the host to read (e.g., `git clone`) or make changes to this repository, the host must have [Git](https://git-scm.com/) and [SSH](https://en.wikipedia.org/wiki/Secure_Shell) installed.
+For the host to read (e.g., `git clone`) or make changes to this repository, the host must have [Git](https://git-scm.com/) installed.
+If you are working in a development environment, cloning the repository via HTTPS can be used. Using [SSH](https://en.wikipedia.org/wiki/Secure_Shell) to access the repository is optional.
+See [below](#clone-repository-1) for more information.
 
 - The SSH client should be pre-installed on Windows, macOS, and Linux operating systems.
-- See the [attached installation instructions](https://git-scm.com/install/windows) for how to install `git`.
+- See the [attached installation instructions](https://git-scm.com/install/windows) for how to install `git`. 
+
+Git must be configured and linked with a GitHub account. If the host is using SSH to access the repository, it must be configured using public and private keys with the account.
+- See the [attached instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/about-ssh) for how to configure SSH with a GitHub account.
 
 The application offers two environment configurations (i.e., development and production).
-We use `npm` scripts for building and running our application.
-See the [package.json](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/package.json) for more information on our pre-built `npm` scripts.
+We use `npm` scripts for building and running the application.
+See the [package.json](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/package.json) for more information on the pre-built `npm` scripts.
+
+### Clone Repository
+
+We recommend using the same approach for [deployment](#clone-repository--change-directory), which uses SSH for read-write access:
+
+```bash
+$ git clone git@github.com:MRU-F2025-COMP3504/mru-exchange.git && cd mru-exchange
+```
+
+Alternatively, the host can clone the repository via HTTPS:
+
+```bash
+$ git clone https://github.com/MRU-F2025-COMP3504/mru-exchange.git && cd mru-exchange
+```
 
 ### Update
 
@@ -131,7 +162,9 @@ $ npm install
 ```
 
 If the running host is experiencing a dependency issue, deleting the `node_modules` folder and re-running the script above may resolve the issue.
-Alternatively, the running host may run `npm run docker:prune` or `npm run docker:build` or both.
+Alternatively, the running host may combine the previous command with `npm run docker:prune` or `npm run docker:build` or both.
+
+See the [package.json](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/package.json) for more information on the list of dependencies that the application uses.
 
 ### Build
 
