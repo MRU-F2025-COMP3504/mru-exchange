@@ -5,3 +5,4 @@
  */
 
 export * from '@shared/api/database';
+export * as AuthAPI from '@shared/api/auth';

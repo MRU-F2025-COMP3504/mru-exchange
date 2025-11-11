@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@shared/contexts/AuthContext';
+import { useAuth } from '@shared/contexts';
 
 export default function SignInPage() {
   const navigate = useNavigate();
@@ -35,9 +35,9 @@ export default function SignInPage() {
 
     setIsSubmitting(true);
     try {
-      const { error } = await signIn(formData.email, formData.password);
+      const result = await signIn(formData.email, formData.password);
 
-      if (error) {
+      if (!result.ok) {
         setErrors({ general: 'Invalid email or password' });
         return;
       }

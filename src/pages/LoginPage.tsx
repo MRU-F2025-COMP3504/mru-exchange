@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@features/auth';
+import { useAuth } from '@shared/contexts';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');

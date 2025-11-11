@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthAPI } from '@features/auth';
+import { AuthAPI } from '@shared/api';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');

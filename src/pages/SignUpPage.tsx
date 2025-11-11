@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@features/auth';
+import { useAuth } from '@shared/contexts';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -42,7 +42,7 @@ export default function SignUpPage() {
       return;
     }
 
-    const result = await auth.signUp(email, password);
+    const result = await auth.signUp(email, password, firstName, lastName);
 
     if (result.ok) {
       setSuccessMessage(

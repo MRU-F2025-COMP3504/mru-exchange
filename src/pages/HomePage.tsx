@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@shared/contexts/AuthContext';
+import { useAuth } from '@shared/contexts';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@shared/api';
 import Header from './Header';
@@ -28,13 +28,13 @@ export default function HomePage() {
 
   // Get user first name
   const fetchUserName = async () => {
-    if (!user) return;
+    if (!user.ok) return;
 
     try {
       const { data, error } = await supabase
         .from('User_Information')
         .select('first_name')
-        .eq('supabase_id', user.id)
+        .eq('supabase_id', user.data.id)
         .single();
 
       if (!error && data) {
