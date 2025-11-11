@@ -50,18 +50,18 @@ export default function CreateAccountPage() {
 
     setIsSubmitting(true);
     try {
-      const { error } = await signUp(
+      const result = await signUp(
         formData.email,
         formData.password,
         formData.firstName,
         formData.lastName,
       );
 
-      if (error) {
-        if (error.message.includes('already registered')) {
+      if (!result.ok) {
+        if (result.error.message.includes('already registered')) {
           setErrors({ email: 'An account with this email already exists.' });
         } else {
-          setErrors({ general: error.message });
+          setErrors({ general: result.error.message });
         }
         return;
       }

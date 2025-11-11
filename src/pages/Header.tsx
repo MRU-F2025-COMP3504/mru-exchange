@@ -1,4 +1,4 @@
-import { useAuth } from '@shared/contexts/AuthContext';
+import { useAuth } from '@shared/contexts';
 import { useNavigate } from 'react-router-dom';
 
 export default function Header() {

@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@shared/contexts/AuthContext';
+import { useAuth } from '@shared/contexts';
 import { get, getByUser, show, create } from '@features/messaging/api/chat.ts';
 import Header from './Header';
 import { supabase } from '@shared/api';
+import { getUser } from '@shared/api/auth.ts';
 
 interface Chat {
     id: number;
@@ -23,19 +24,17 @@ interface UserMessage {
     visible: boolean;
 }
 
-export default async function MessagingPage() {
+export default function MessagingPage() {
     const { user } = useAuth();
 
 
-    if(!user) return;
-    try {
-        const chats  = await getByUser({supabase_id: user.id});
+    if(!user.ok) return;
 
+    void getByUser({ supabase_id: user.data.id })
+      .then((chats) => {
         if(chats.ok) console.log("Chats: ", chats.data);
         else console.error("Error: ", chats.error);
-    } catch (error) {
-      console.error('Error fetching chats:', error);
-    }
+      });
 
 
     
