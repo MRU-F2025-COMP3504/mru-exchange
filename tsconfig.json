@@ -30,7 +30,8 @@
       "@features/*": ["./features/*"],
       "@pages/*": ["./pages/*"],
       "@assets/*": ["./assets/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["./shared/*"],
+      "@itests/*": ["./tests/*"],
     }
   },
   "include": ["vite.config.ts", "src"]
