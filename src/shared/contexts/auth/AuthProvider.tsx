@@ -4,28 +4,14 @@ import {
   useCallback,
   useEffect,
   useState,
-  createContext,
 } from 'react';
+import { AuthContext } from '@shared/contexts';
 import type { Result } from '@shared/types';
 import type { User } from '@supabase/supabase-js';
 import { empty, HookUtils, ok } from '@shared/utils';
-import { AuthAPI } from '@features/auth';
-import type { AuthPromiseResult, UserSession } from '@features/auth/types';
+import { AuthAPI } from '@shared/api';
 
-interface AuthContextType {
-  user: Result<User>;
-  loading: boolean;
-  signUp: (email: string, password: string, firstName: string, lastName: string) => AuthPromiseResult<UserSession>;
-  signIn: (email: string, password: string) => AuthPromiseResult<UserSession>;
-  signOut: () => AuthPromiseResult<null>;
-  resendEmailVerification: (email: string) => AuthPromiseResult<null>;
-  resetPassword: (email: string) => AuthPromiseResult<null>;
-  updatePassword: (password: string) => AuthPromiseResult<User>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export default function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
+export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const [user, setUser] = useState<Result<User>>(() => empty());
 
@@ -49,7 +35,8 @@ export default function AuthProvider({ children }: { children: ReactNode }): JSX
   }, []);
 
   useEffect(() => {
-    void HookUtils.load(setLoading, AuthAPI.getUser()).then(setUser);
+    void HookUtils.load(setLoading, AuthAPI.getUser())
+      .then(setUser);
 
     const subscription = AuthAPI.onAuthStateChange((_event, result) => {
       if (result.ok) {
@@ -77,7 +64,7 @@ export default function AuthProvider({ children }: { children: ReactNode }): JSX
         updatePassword,
       }}
     >
-    {children}
+      {children}
     </AuthContext.Provider>
   );
 }

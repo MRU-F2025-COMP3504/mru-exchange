@@ -1,1 +1,1 @@
-export * from '@shared/contexts/AuthContext';
+export * from '@shared/contexts/auth';
