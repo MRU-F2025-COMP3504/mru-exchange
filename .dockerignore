@@ -29,7 +29,6 @@ dist-ssr
 .gitignore
 .github
 .vercel
-.env*
 .dockerignore
 Dockerfile
 dev.Dockerfile
