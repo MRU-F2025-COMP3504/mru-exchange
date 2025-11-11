@@ -22,7 +22,12 @@ interface Category {
 
 export default function PostProductPage() {
 
-    const [products, setProducts] = useState<Product[]>([]);
+    //const product = {
+        //id: "",
+
+    //}
+
+    //const product.id = $state("");
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
     
@@ -127,7 +132,7 @@ export default function PostProductPage() {
                         <input type="dropdown" placeholder="Enter description here... " /> 
                     </label>
                     <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
-                        <input type="file" 
+                        <input type="file"
                         accept="image/*"
                         multiple
                         required
@@ -136,8 +141,42 @@ export default function PostProductPage() {
                         /> 
                     </label>
                 </aside>
-                <main>
+                <main 
+                    style={{
+                        flex: 1,
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
+                        gap: "2rem",
+                    }}
+                >
+                    
+                    <div
+                        
+                        style={{
+                            background: "white",
+                            borderRadius: "12px",
+                            padding: "1rem",
+                            boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                        }}
+                    >
+                        <div
+                            style={{
+                                width: "100%",
+                                height: "140px",
+                                backgroundColor: "#d9d9d9",
+                                borderRadius: "8px",
+                            }}
+                        ></div>
 
+                        <div 
+                            style={{
+                                marginTop: "0.5rem",
+                            }}
+                        >
+                            <h4></h4>
+                            <p> </p>
+                        </div>
+                    </div>
                 </main>
             </div>
         </div>
