@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
@@ -42,7 +42,7 @@ export default function ProductPage() {
     const { productId } = useParams<{ productId: string }>();
     const navigate = useNavigate();
     const { user } = useAuth();
-    
+
     const [product, setProduct] = useState<Product | null>(null);
     const [seller, setSeller] = useState<SellerInfo | null>(null);
     const [reviews, setReviews] = useState<Review[]>([]);
@@ -51,6 +51,8 @@ export default function ProductPage() {
     const [bookmarking, setBookmarking] = useState(false);
     const [bookmarkSuccess, setBookmarkSuccess] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(false);
+
+    const mainImgRef = useRef<HTMLImageElement>(null);
 
     const currentUserId = user.ok ? user.data.id : null;
 
@@ -199,7 +201,7 @@ export default function ProductPage() {
 
                 if (createCartError) throw createCartError;
                 if (!newCart) throw new Error('Failed to create shopping cart');
-                
+
                 cartId = newCart.id;
             } else {
                 cartId = cartData.id;
@@ -294,29 +296,44 @@ export default function ProductPage() {
         }
     };
 
-    const getImageUrl = (imageData: any): string | null => {
+
+    const getImageUrls = (imageData: { [key: string]: string }): string[] | null => {
         if (!imageData) return null;
-        
+
         try {
-            let imagePath: string | null = null;
-            
-            if (typeof imageData === 'object' && imageData !== null) {
-                imagePath = imageData.image || imageData.path || imageData.url || imageData.filename;
-            } else if (typeof imageData === 'string') {
-                imagePath = imageData;
+
+            // Create an array.
+            const imagesArray = [];
+
+            // For every image,
+            for (let key in imageData) {
+
+                // Get the imagePath.
+                let imagePath: string = imageData[key];
+
+                if (!imagePath) return null;
+
+                if (imagePath.startsWith('http')) {
+                    imagesArray.push(imagePath);
+                }
+
+
+                const filename = imagePath.replace('database/images/', '').split('/').pop();
+
+                if (!filename) return null;
+
+                const { data } = supabase.storage
+                    .from('product-images')
+                    .getPublicUrl(filename);
+
+                imagesArray.push(data.publicUrl);
+
             }
-            
-            if (!imagePath) return null;
-            if (imagePath.startsWith('http')) return imagePath;
-            
-            const filename = imagePath.replace('database/images/', '').split('/').pop();
-            if (!filename) return null;
-            
-            const { data } = supabase.storage
-                .from('product-images')
-                .getPublicUrl(filename);
-            
-            return data.publicUrl;
+
+            // Return
+            return imagesArray;
+
+
         } catch (error) {
             console.error('Error getting image URL:', error);
             return null;
@@ -372,7 +389,7 @@ export default function ProductPage() {
     }
 
     const avgRating = calculateAverageRating();
-    const imageUrl = getImageUrl(product.image);
+    const imageUrls: string[] | null = getImageUrls(product.image);
     const isOwnProduct = currentUserId && seller && currentUserId === product.user_id;
     const isOutOfStock = !product.stock_count || product.stock_count <= 0;
 
@@ -403,10 +420,11 @@ export default function ProductPage() {
 
                         <div className="lg:w-1/3">
                             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                                {imageUrl ? (
-                                    <img 
-                                        src={imageUrl}
-                                        alt={product.title || 'Product'} 
+                                {imageUrls ? (
+                                    <img
+                                        ref={mainImgRef}
+                                        src={imageUrls[0]}
+                                        alt={product.title || 'Product'}
                                         className="w-full h-[300px] object-cover"
                                         onError={(e) => {
                                             const target = e.currentTarget as HTMLImageElement;
@@ -421,6 +439,76 @@ export default function ProductPage() {
                                         <span className="text-gray-500">No Image Available</span>
                                     </div>
                                 )}
+                            </div>
+                            <div className="flex">
+                                {
+                                imageUrls ? (imageUrls.map((value: string, i: number) => (
+                                    <>
+                                    <div className="my-2 mr-1">
+                                        <img
+                                            id={"img" + i}
+                                            src={imageUrls[i]}
+                                            alt={product.title || 'Product'}
+                                            className="w-[50px] h-[50px] object-cover rounded-lg cursor-pointer"
+                                            onClick={(e) => {
+
+                                                // Get elements.
+                                                const thisImg: HTMLImageElement = e.target as HTMLImageElement;
+
+                                                // If it exists,
+                                                if(mainImgRef.current){
+
+                                                    // Update its link.
+                                                    mainImgRef.current.src = thisImg.src;
+
+                                                }
+
+                                            }}
+                                            onError={(e) => {
+                                                const target = e.currentTarget as HTMLImageElement;
+                                                target.style.display = 'none';
+                                                if (target.parentElement) {
+                                                    target.parentElement.innerHTML = '<div class="w-full h-[300px] flex items-center justify-center bg-gray-200"><span class="text-gray-500">Image unavailable</span></div>';
+                                                }
+                                            
+                                            }}
+                                        />
+                                    </div>
+                                    {/* <div className="my-2 mr-1">
+                                        <img
+                                            id={"img" + i}
+                                            src={imageUrls[i]}
+                                            alt={product.title || 'Product'}
+                                            className="w-[50px] h-[50px] object-cover rounded-lg cursor-pointer"
+                                            onClick={(e) => {
+
+                                                // Get elements.
+                                                const thisImg: HTMLImageElement = e.target as HTMLImageElement;
+
+                                                // If it exists,
+                                                if(mainImgRef.current){
+
+                                                    // Update its link.
+                                                    mainImgRef.current.src = "google.com";
+
+                                                }
+
+                                            }}
+                                            onError={(e) => {
+                                                const target = e.currentTarget as HTMLImageElement;
+                                                target.style.display = 'none';
+                                                if (target.parentElement) {
+                                                    target.parentElement.innerHTML = '<div class="w-full h-[300px] flex items-center justify-center bg-gray-200"><span class="text-gray-500">Image unavailable</span></div>';
+                                                }
+                                            
+                                            }}
+                                        />
+                                    </div> */}
+                                    </>
+
+                                )
+                                )) : null
+                            }
                             </div>
                         </div>
 
@@ -454,13 +542,12 @@ export default function ProductPage() {
                                     <button
                                         onClick={handleToggleBookmark}
                                         disabled={bookmarking}
-                                        className={`px-6 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                                            bookmarking
+                                        className={`px-6 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${bookmarking
                                                 ? 'bg-gray-400 cursor-not-allowed'
                                                 : isBookmarked
-                                                ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                                                : 'bg-[#007FB5] hover:bg-[#006B9E] text-white'
-                                        }`}
+                                                    ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                                                    : 'bg-[#007FB5] hover:bg-[#006B9E] text-white'
+                                            }`}
                                     >
                                         <span className="text-xl">{isBookmarked ? '★' : '☆'}</span>
                                         {bookmarking ? 'Updating...' : isBookmarked ? 'Bookmarked' : 'Bookmark'}
@@ -535,6 +622,6 @@ export default function ProductPage() {
             </main>
 
             <Footer />
-        </div>
+        </div >
     );
 }
