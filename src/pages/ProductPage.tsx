@@ -144,7 +144,7 @@ export default function ProductPage() {
             const { data: cartData, error: cartError } = await supabase
                 .from('Shopping_Cart')
                 .select('id')
-                .eq('user_id', currentUserId)
+                .eq('user_id', currentUserId as string)
                 .maybeSingle();
 
             if (cartError || !cartData) return;
@@ -182,7 +182,7 @@ export default function ProductPage() {
             let { data: cartData, error: cartError } = await supabase
                 .from('Shopping_Cart')
                 .select('id')
-                .eq('user_id', currentUserId)
+                .eq('user_id', currentUserId as string)
                 .maybeSingle();
 
             if (cartError && cartError.code !== 'PGRST116') {
@@ -193,7 +193,7 @@ export default function ProductPage() {
             if (!cartData) {
                 const { data: newCart, error: createCartError } = await supabase
                     .from('Shopping_Cart')
-                    .insert({ user_id: currentUserId })
+                    .insert({ user_id: currentUserId as string })
                     .select('id')
                     .single();
 
@@ -264,7 +264,7 @@ export default function ProductPage() {
                 const { data: newChat, error: chatCreateError } = await supabase
                     .from('Chats')
                     .insert({
-                        user_id_1: currentUserId,
+                        user_id_1: currentUserId as string,
                         user_id_2: seller.supabase_id,
                         visible: true
                     })
@@ -278,7 +278,7 @@ export default function ProductPage() {
                     .from('Messages')
                     .insert({
                         chat_id: chatId,
-                        sender_id: currentUserId,
+                        sender_id: currentUserId as string,
                         logged_message: `Hi! I'm interested in your product: ${product.title}`,
                         visible: true
                     });
