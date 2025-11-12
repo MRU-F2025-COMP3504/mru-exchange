@@ -38,7 +38,6 @@ export default function ProductSearchPage() {
         fetchProducts();
     }, [selectedCategories]);
 
-    // Get all categories
     const fetchCategories = async () => {
         try {
             const { data, error: fetchError } = await supabase
@@ -56,7 +55,6 @@ export default function ProductSearchPage() {
         }
     };
 
-    // Get products with filters
     const fetchProducts = async () => {
         try {
             setLoading(true);
@@ -68,7 +66,6 @@ export default function ProductSearchPage() {
                 .eq('"isListed"', true)
                 .eq('"isDeleted"', false);
 
-            // Filter by category if selected
             if (selectedCategories.length > 0) {
                 const { data: categoryProducts, error: categoryError } = await supabase
                     .from('Category_Assigned_Products')
@@ -103,7 +100,6 @@ export default function ProductSearchPage() {
         }
     };
 
-    // Search products
     const handleSearch = async (e: FormEvent) => {
         e.preventDefault();
         
@@ -123,7 +119,6 @@ export default function ProductSearchPage() {
                 .eq('"isDeleted"', false)
                 .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
 
-            // Apply category filter to search
             if (selectedCategories.length > 0) {
                 const { data: categoryProducts, error: categoryError } = await supabase
                     .from('Category_Assigned_Products')
@@ -158,7 +153,6 @@ export default function ProductSearchPage() {
         }
     };
 
-    // Toggle category filter
     const handleCategoryToggle = (categoryId: number) => {
         setSelectedCategories(prev => {
             if (prev.includes(categoryId)) {
@@ -169,7 +163,6 @@ export default function ProductSearchPage() {
         });
     };
 
-    // Get image URL from Supabase
     const getImageUrl = (imageData: any): string | null => {
         if (!imageData) return null;
         

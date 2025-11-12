@@ -52,6 +52,8 @@ export default function ProductPage() {
     const [bookmarkSuccess, setBookmarkSuccess] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(false);
 
+    const currentUserId = user.ok ? user.data.id : null;
+
     useEffect(() => {
         if (productId) {
             fetchProductDetails();
@@ -60,10 +62,10 @@ export default function ProductPage() {
     }, [productId]);
 
     useEffect(() => {
-        if (user && productId && product) {
+        if (currentUserId && productId && product) {
             checkIfBookmarked();
         }
-    }, [user, productId, product]);
+    }, [currentUserId, productId, product]);
 
     const fetchProductDetails = async () => {
         try {
@@ -136,13 +138,13 @@ export default function ProductPage() {
     };
 
     const checkIfBookmarked = async () => {
-        if (!user || !productId || !product) return;
+        if (!currentUserId || !productId || !product) return;
 
         try {
             const { data: cartData, error: cartError } = await supabase
                 .from('Shopping_Cart')
                 .select('id')
-                .eq('user_id', user.id)
+                .eq('user_id', currentUserId)
                 .maybeSingle();
 
             if (cartError || !cartData) return;
@@ -163,7 +165,7 @@ export default function ProductPage() {
     };
 
     const handleToggleBookmark = async () => {
-        if (!user) {
+        if (!currentUserId) {
             setError('You must be logged in to bookmark products');
             return;
         }
@@ -180,7 +182,7 @@ export default function ProductPage() {
             let { data: cartData, error: cartError } = await supabase
                 .from('Shopping_Cart')
                 .select('id')
-                .eq('user_id', user.id)
+                .eq('user_id', currentUserId)
                 .maybeSingle();
 
             if (cartError && cartError.code !== 'PGRST116') {
@@ -191,7 +193,7 @@ export default function ProductPage() {
             if (!cartData) {
                 const { data: newCart, error: createCartError } = await supabase
                     .from('Shopping_Cart')
-                    .insert({ user_id: user.id })
+                    .insert({ user_id: currentUserId })
                     .select('id')
                     .single();
 
@@ -238,7 +240,7 @@ export default function ProductPage() {
     };
 
     const handleMessageSeller = async () => {
-        if (!user || !product || !seller) {
+        if (!currentUserId || !product || !seller) {
             setError('You must be logged in to message sellers');
             return;
         }
@@ -247,7 +249,7 @@ export default function ProductPage() {
             const { data: existingChat, error: chatCheckError } = await supabase
                 .from('Chats')
                 .select('id')
-                .or(`and(user_id_1.eq.${user.id},user_id_2.eq.${seller.supabase_id}),and(user_id_1.eq.${seller.supabase_id},user_id_2.eq.${user.id})`)
+                .or(`and(user_id_1.eq.${currentUserId},user_id_2.eq.${seller.supabase_id}),and(user_id_1.eq.${seller.supabase_id},user_id_2.eq.${currentUserId})`)
                 .maybeSingle();
 
             if (chatCheckError && chatCheckError.code !== 'PGRST116') {
@@ -262,7 +264,7 @@ export default function ProductPage() {
                 const { data: newChat, error: chatCreateError } = await supabase
                     .from('Chats')
                     .insert({
-                        user_id_1: user.id,
+                        user_id_1: currentUserId,
                         user_id_2: seller.supabase_id,
                         visible: true
                     })
@@ -276,7 +278,7 @@ export default function ProductPage() {
                     .from('Messages')
                     .insert({
                         chat_id: chatId,
-                        sender_id: user.id,
+                        sender_id: currentUserId,
                         logged_message: `Hi! I'm interested in your product: ${product.title}`,
                         visible: true
                     });
@@ -371,7 +373,7 @@ export default function ProductPage() {
 
     const avgRating = calculateAverageRating();
     const imageUrl = getImageUrl(product.image);
-    const isOwnProduct = user && seller && user.id === product.user_id;
+    const isOwnProduct = currentUserId && seller && currentUserId === product.user_id;
     const isOutOfStock = !product.stock_count || product.stock_count <= 0;
 
     const linkData: Array<LinkData> = [
