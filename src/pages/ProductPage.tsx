@@ -75,7 +75,7 @@ export default function ProductPage() {
             const { data: productData, error: productError } = await supabase
                 .from('Product_Information')
                 .select('*')
-                .eq('id', productId!)
+                .eq('id', Number(productId))
                 .eq('"isListed"', true)
                 .eq('"isDeleted"', false)
                 .single();
@@ -117,7 +117,7 @@ export default function ProductPage() {
                         last_name
                     )
                 `)
-                .eq('product_id', productId!)
+                .eq('product_id', Number(productId))
                 .order('created_at', { ascending: false });
 
             if (reviewsError) throw reviewsError;
