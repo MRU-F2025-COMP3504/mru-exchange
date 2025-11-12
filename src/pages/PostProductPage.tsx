@@ -56,8 +56,6 @@ export default function PostProductPage() {
     setProduct((prev) => ({ ...prev, [field]: value }));
   };
 
-  const passProduct = () => {};
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
 
@@ -78,6 +76,24 @@ export default function PostProductPage() {
     updatedImg.splice(index, 1);
     updateProduct('image', updatedImg);
   };
+
+  // Validates the required fields to pass into the Preview Page
+  const handlePreviewButton = () => {
+
+    if (
+      !product.title?.trim() || 
+      !product.description?.trim() ||
+      product.price === null ||
+      product.stock_count === null ||
+      !product.image ||
+      product.image.length === 0
+    ) {
+      alert("Please fill out all fields and upload at least one image before previewing")
+      return;
+    }
+
+    navigate('/preview-post', { state: { product } })
+  }
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F9FAFB' }}>
@@ -324,7 +340,7 @@ export default function PostProductPage() {
             </p>
           </label>
           <button
-            onClick={() => navigate('/preview-post', { state: { product } })}
+            onClick={handlePreviewButton}
             style={{
               padding: '0.5rem 1rem',
               backgroundColor: '#0F76D7',
@@ -386,7 +402,7 @@ export default function PostProductPage() {
                 style={{
                   width: '340px',
                   height: '140px',
-                  backgroundColor: '#d9d9d9',
+                  backgroundColor: product.image && product.image.length > 0? 'transparent' : '#d9d9d9',
                   borderRadius: '12px',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -394,7 +410,21 @@ export default function PostProductPage() {
                   boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                 }}
-              ></div>
+              >
+                {product.image && product.image.length > 0 ? (
+                  <img
+                    src={URL.createObjectURL(product.image[0])}
+                    alt="Preview"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                ) : ( 
+                  <span style={{ color: '#555', fontSize: '0.9rem' }}> No Image Selected </span>
+                )}
+              </div>
 
               <div
                 style={{
@@ -441,7 +471,7 @@ export default function PostProductPage() {
                     color: '#28a745',
                   }}
                 >
-                  {product.stock_count}
+                  {product.stock_count} in stock
                 </p>
               </div>
             </div>
