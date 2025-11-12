@@ -33,7 +33,7 @@ export async function getProducts(
 }
 
 export async function register(
-  user: RequiredColumns<UserProfile, 'id'>,
+  user: RequiredColumns<UserProfile, 'supabase_id'>,
 ): DatabaseQuery<ShoppingCart, 'id'> {
   return query(
     await supabase
