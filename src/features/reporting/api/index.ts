@@ -7,7 +7,7 @@ import type {
 } from '@shared/types';
 import { query, supabase } from '@shared/api';
 import type { UserReporter } from '@features/reporting';
-import { err, ok } from '@shared/utils';
+import { err, ok, REGEX_TEXT_PATH } from '@shared/utils';
 
 export async function getByReporter(
   reporter: RequiredColumns<UserProfile, 'supabase_id'>,
@@ -45,7 +45,7 @@ export function create(): UserReporter {
       return ok(this);
     },
     link(link: string): Result<UserReporter> {
-      if (!link) {
+      if (!REGEX_TEXT_PATH.test(link)) {
         return err(new Error('User report link information is not specified'));
       }
 
@@ -69,12 +69,14 @@ export function create(): UserReporter {
 }
 
 export async function remove(
+  reporter: RequiredColumns<UserProfile, 'supabase_id'>,
   ...reports: RequiredColumns<UserReport, 'id'>[]
 ): DatabaseQuery<UserReport[], 'id'> {
   return query(
     await supabase
       .from('Reports')
       .delete()
+      .eq('created_by_id', reporter.supabase_id)
       .in(
         'id',
         reports.map((report) => report.id),
@@ -84,6 +86,7 @@ export async function remove(
 }
 
 export async function close(
+  reporter: RequiredColumns<UserProfile, 'supabase_id'>,
   ...reports: RequiredColumns<UserReport, 'id'>[]
 ): DatabaseQuery<UserReport[], 'id'> {
   return query(
@@ -93,6 +96,7 @@ export async function close(
         is_closed: false,
         closed_date: new Date().toISOString().split('T')[0],
       })
+      .eq('created_by_id', reporter.supabase_id)
       .in(
         'id',
         reports.map((report) => report.id),
@@ -102,6 +106,7 @@ export async function close(
 }
 
 export async function open(
+  reporter: RequiredColumns<UserProfile, 'supabase_id'>,
   ...reports: RequiredColumns<UserReport, 'id'>[]
 ): DatabaseQuery<UserReport[], 'id'> {
   return query(
@@ -111,6 +116,7 @@ export async function open(
         is_closed: false,
         closed_date: null,
       })
+      .eq('created_by_id', reporter.supabase_id)
       .in(
         'id',
         reports.map((report) => report.id),
