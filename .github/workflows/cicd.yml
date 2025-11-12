@@ -42,7 +42,18 @@ jobs:
             cd ~/${{ secrets.DEPLOY_PATH }}
             git fetch origin
             git reset --hard origin/main
+            
+            # Stop all docker containers
             docker compose down || true
+            docker ps -aq | xargs -r docker stop || true
+            docker ps -aq | xargs -r docker rm || true
+            
+            # Kill any process using port 80
+            sudo fuser -k 80/tcp || true
+            
+            # Clean up docker
             docker system prune -f
+            
+            # Start fresh
             docker compose up -d --build
           ENDSSH
