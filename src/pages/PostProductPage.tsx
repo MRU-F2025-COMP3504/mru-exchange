@@ -1,14 +1,15 @@
-import { useState, type FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState, type FormEvent } from 'react';
+import { useNavigate} from 'react-router-dom';
 import Header from './Header';
 import { supabase } from '@shared/api';
+import { getTags } from '../features/catalogue/api/category'
 
 interface Product {
     id?: number;
     title: string | null;
     description: string | null;
     price: number | null;
-    image: any | null;
+    image:  File[] | null;
     stock_count: number | null;
     isListed: boolean | null;
     isDeleted: boolean | null;
@@ -25,6 +26,7 @@ export default function PostProductPage() {
 
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+    const navigate = useNavigate();
     const [product, setProduct] = useState<Product>({
         title: "",
         description: "",
@@ -36,19 +38,15 @@ export default function PostProductPage() {
         category: null
     });
 
-    
+    useEffect(() => {
+        fetchCategories();
+    }, []);
     // Get all categories
     const fetchCategories = async () => {
         try {
-            const { data, error: fetchError } = await supabase
-                .from('Category_Tags')
-                .select('*')
-                .order('name', { ascending: true });
-
-            if (fetchError) {
-                throw fetchError;
-            }
-
+            const { data } = (await getTags()) as {
+                data: Category[] | null;
+            };
             setCategories(data || []);
         } catch (err: any) {
             console.error('Error fetching categories:', err);
@@ -59,20 +57,32 @@ export default function PostProductPage() {
         setProduct(prev => ({ ...prev, [field]: value}))
     }
 
-    //const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
+    const passProduct = () => {
         
+    }
 
-       // const selected = Array.from(e.target.files);
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-       // const images = selected.filter(file => file.type.startsWith("image/"));
+        const selected = Array.from(e.target.files || []);
 
-       // if (images.length !== selected.length) {
-           // alert("Only image files are allowed.");
-        //}
+        const images = selected.filter(file => file.type.startsWith("image/"));
 
-        //setFiles(images);
-    //}
+        if (images.length !== selected.length) {
+            alert("Only image files are allowed.");
+            return;
+        }
+
+        // Takes all the images and slices it upon the 10th one
+        const total = [...(product.image|| []), ...images].slice(0,10);
+        updateProduct("image", total);
+
+    }
+
+    const handleRemoveImage = (index: number) => {
+            const updatedImg = [...(product.image || [])];
+            updatedImg.splice(index, 1);
+            updateProduct("image", updatedImg);
+        }
 
     return(
         
@@ -98,58 +108,197 @@ export default function PostProductPage() {
                         height: "fit-content",
                     }}
                 >
-                    <h3></h3>
-                    <label style={{ display: "block", marginBottom: "0.5rem", }}>
+                    <h3 
+                        style={{ 
+                            marginBottom: "1rem", fontSize: "1.25rem", fontWeight: 600 
+                            }}
+                    > Enter Product Details:
+                    </h3>
+
+                    <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem",}}>
                         <input 
                             type="textbox" 
                             placeholder="Enter title here..."
+                            value={product.title || ""}
                             onChange={(e) => updateProduct("title", e.target.value)}
-                            className="p-2 bg-gray-50 rounded-lg"
+                            style={{
+                                width: "100%",
+                                padding: "0.5rem",
+                                borderRadius: "0.375rem",
+                                border: "1px solid #ccc",
+                                fontSize: "1rem",
+                                backgroundColor: "white",
+                                cursor: "pointer"
+                            }}
                         />
                     </label>
-                    <label style={{ display: "block", marginBottom: "0.5rem", }}>
+                    <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
                         <input 
-                            type="textbox"
+                            type="number"
+                            min="0"
+                            max="10000"
                             placeholder="Enter price here..." 
+                            value={product.price || ""}
                             onChange={(e) => updateProduct("price", e.target.value)}
-                            className="p-2 bg-gray-50 rounded-lg"
-                        /> 
-                    </label>
-                    <label style={{ display: "block", marginBottom: "0.5rem", }}>
-                        <input 
-                            type="dropdown" 
-                            placeholder="Choose category..." 
-                            onChange={(e) => updateProduct("category", e.target.value)}
-                            className="p-2 bg-gray-50 rounded-lg"
-                        /> 
-                    </label>
-                    <label style={{ display: "block", marginBottom: "0.5rem", }}>
-                        <input 
-                            type="textbox" 
-                            placeholder="Description" 
-                            onChange={(e) => updateProduct("description", e.target.value)}
-                            className="p-2 bg-gray-50 rounded-lg w-sm"
+                            style={{
+                                width: "100%",
+                                padding: "0.5rem",
+                                borderRadius: "0.375rem",
+                                border: "1px solid #ccc",
+                                fontSize: "1rem",
+                                backgroundColor: "white",
+                                cursor: "pointer"
+                            }}
                         /> 
                     </label>
                     <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
-                        <input type="file"
-                        accept="image/*"
-                        multiple
-                        required
-                        //onChange={handleFileChange}
-                        placeholder="Add Photos" 
-                        className="p-2 bg-gray-50 rounded-lg"
+                        <select
+                            value={product.category || ""}
+                            onChange={(e) => updateProduct("category", e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "0.5rem",
+                                borderRadius: "0.375rem",
+                                border: "1px solid #ccc",
+                                fontSize: "1rem",
+                                backgroundColor: "white",
+                                cursor: "pointer"
+                            }}
+                        > 
+                            <option value="">Choose Category...</option>
+                            {categories.map((cat) => (
+                                <option key={cat.id} value={cat.name || ""}>
+                                    {cat.name}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                    <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
+                        <input 
+                            type="textbox" 
+                            placeholder="Description" 
+                            value={product.description || ""}
+                            onChange={(e) => updateProduct("description", e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "0.5rem",
+                                borderRadius: "0.375rem",
+                                border: "1px solid #ccc",
+                                fontSize: "1rem",
+                                backgroundColor: "white",
+                                cursor: "pointer"
+                            }}
                         /> 
                     </label>
-                    <button style={{
-                        padding: '0.5rem 1rem',
-                        backgroundColor: '#0F76D7',
-                        color: 'white',
-                        borderRadius: '0.375rem',
-                        border: 'none',
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        cursor: 'pointer',
+                    <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
+                        <input 
+                            type="number" 
+                            min="1"
+                            max="999"
+                            placeholder="Stock Count" 
+                            value={product.stock_count || ""}
+                            onChange={(e) => updateProduct("stock_count", e.target.value)}
+                            style={{
+                                width: "100%",
+                                padding: "0.5rem",
+                                borderRadius: "0.375rem",
+                                border: "1px solid #ccc",
+                                fontSize: "1rem",
+                                backgroundColor: "white",
+                                cursor: "pointer"
+                            }}
+                        /> 
+                    </label>
+                    <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
+                        <div 
+                            style={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: "0.5rem",
+                                marginBottom: "1rem"
+                            }}
+                        >
+                            {(product.image || []).map((file, index) => {
+                                const url = URL.createObjectURL(file);
+                                return (
+                                    <div 
+                                        key={index}
+                                        style={{
+                                            position: "relative",
+                                            width: "90px",
+                                            height: "90px",
+                                            borderRadius: "8px",
+                                            overflow: "hidden",
+                                            boxShadow: "0 1px 4px rgba(0,0,0,0.1)"
+                                        }}
+                                    >
+                                        <img 
+                                            src={url}
+                                            alt={`Upload ${index}`}
+                                            style={{
+                                                width: "100%",
+                                                height: "100%",
+                                                objectFit: "cover"
+                                            }}
+                                        />
+
+                                        <button 
+                                            type="button"
+                                            onClick={() => handleRemoveImage(index)}
+                                            style={{
+                                                position: "absolute",
+                                                top: "2px",
+                                                right: "4px",
+                                                background: "rgba(255,255,255,0.8)",
+                                                border:"none",
+                                            }}
+                                        >x</button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {(product.image?.length || 0) < 10 && (
+                            <input 
+                                type="file"
+                                accept="jpg/*"
+                                multiple
+                                required
+                                onChange={handleFileChange}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    backgroundColor: 'gray',
+                                    color: 'white',
+                                    borderRadius: '0.375rem',
+                                    border: 'none',
+                                    fontSize: '0.875rem',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                }}
+                            /> 
+                        )}
+
+                        <p
+                            style={{
+                                fontSize: "0.85rem",
+                                color: "#666",
+                                marginTop: "0.3rem"
+                            }}
+                        >
+                            {product.image?.length || 0}/10 images selected
+                        </p>
+                    </label>
+                    <button 
+                        onClick={() => navigate("/preview-post", { state: { product }})}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            backgroundColor: '#0F76D7',
+                            color: 'white',
+                            borderRadius: '0.375rem',
+                            border: 'none',
+                            fontSize: '0.875rem',
+                            fontWeight: '500',
+                            cursor: 'pointer',
                     }}>
                         Preview Page
                     </button>
@@ -174,7 +323,7 @@ export default function PostProductPage() {
                                 marginBottom: "1rem",
                                 fontSize: "1.25rem",
                                 fontWeight: 600,
-                                color: "#374151"
+                                color: "red"
                         }}>
                             Preview
                         </h3>
@@ -216,13 +365,38 @@ export default function PostProductPage() {
                                     marginTop: "0.5rem",
                                 }}
                             >
-                                <h4>{product.title}</h4>
-                                <p>
+                                <h4 style={{ margin: '0.5rem 0', fontSize: '1.1rem', color: '#111827' }}>
+                                    
+                                    {product.title}
+                                </h4>
+                                <p style={{ 
+                                        margin: '0.5rem 0', 
+                                        color: '#666',
+                                        fontSize: '0.9rem',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical',
+                                    }}>
+                                        {product.description}
+                                </p>
+                                <p 
+                                    style={{ 
+                                        margin: '0.5rem 0', 
+                                        fontSize: '1.2rem',
+                                        fontWeight: 'bold',
+                                        color: '#007FB5'
+                                    }}>
                                     ${product.price} 
-                                    <br/>
-                                    {product.category}
-                                    <br/>
-                                    {product.description}
+                                </p>
+                                <p
+                                    style={{ 
+                                        margin: '0.5rem 0', 
+                                        fontSize: '0.85rem',
+                                        color: '#28a745' 
+                                    }}>
+                                    {product.stock_count} 
                                 </p>
                             </div>
                         </div>
