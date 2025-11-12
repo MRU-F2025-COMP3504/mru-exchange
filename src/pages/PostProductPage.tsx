@@ -99,32 +99,36 @@ export default function PostProductPage() {
                     }}
                 >
                     <h3></h3>
-                    <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem",}}>
+                    <label style={{ display: "block", marginBottom: "0.5rem", }}>
                         <input 
                             type="textbox" 
                             placeholder="Enter title here..."
                             onChange={(e) => updateProduct("title", e.target.value)}
+                            className="p-2 bg-gray-50 rounded-lg"
                         />
                     </label>
-                    <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
+                    <label style={{ display: "block", marginBottom: "0.5rem", }}>
                         <input 
                             type="textbox"
                             placeholder="Enter price here..." 
                             onChange={(e) => updateProduct("price", e.target.value)}
+                            className="p-2 bg-gray-50 rounded-lg"
                         /> 
                     </label>
-                    <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
+                    <label style={{ display: "block", marginBottom: "0.5rem", }}>
                         <input 
                             type="dropdown" 
                             placeholder="Choose category..." 
                             onChange={(e) => updateProduct("category", e.target.value)}
+                            className="p-2 bg-gray-50 rounded-lg"
                         /> 
                     </label>
-                    <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
+                    <label style={{ display: "block", marginBottom: "0.5rem", }}>
                         <input 
                             type="textbox" 
                             placeholder="Description" 
                             onChange={(e) => updateProduct("description", e.target.value)}
+                            className="p-2 bg-gray-50 rounded-lg w-sm"
                         /> 
                     </label>
                     <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
@@ -134,6 +138,7 @@ export default function PostProductPage() {
                         required
                         //onChange={handleFileChange}
                         placeholder="Add Photos" 
+                        className="p-2 bg-gray-50 rounded-lg"
                         /> 
                     </label>
                     <button style={{
