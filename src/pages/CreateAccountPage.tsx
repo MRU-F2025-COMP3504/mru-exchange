@@ -49,30 +49,25 @@ export default function CreateAccountPage() {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    try {
-      const result = await signUp(
-        formData.email,
-        formData.password,
-        formData.firstName,
-        formData.lastName,
-      );
 
-      if (!result.ok) {
-        if (result.error.message.includes('already registered')) {
-          setErrors({ email: 'An account with this email already exists.' });
-        } else {
-          setErrors({ general: result.error.message });
-        }
-        return;
+    const result = await signUp(
+      formData.email,
+      formData.password,
+      formData.firstName,
+      formData.lastName,
+    );
+
+    if (!result.ok) {
+      if (result.error.message.includes('already registered')) {
+        setErrors({ email: 'An account with this email already exists.' });
+      } else {
+        setErrors({ general: result.error.message });
       }
-
-      navigate('/verify-email', { state: { email: formData.email } });
-    } catch (error: any) {
-      console.error('Error creating account:', error);
-      setErrors({ general: 'An error occurred. Please try again.' });
-    } finally {
-      setIsSubmitting(false);
+      return;
     }
+
+    navigate('/verify-email', { state: { email: formData.email } });
+    setIsSubmitting(false);
   };
 
   const handleChange = (field: string, value: string) => {
