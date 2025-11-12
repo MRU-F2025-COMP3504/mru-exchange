@@ -81,11 +81,11 @@ export async function block(
 }
 
 export async function mute(
-  blocker: RequiredColumns<UserProfile, 'supabase_id'>,
+  muter: RequiredColumns<UserProfile, 'supabase_id'>,
   target: RequiredColumns<UserProfile, 'supabase_id'>,
   flag = true,
 ): DatabaseQuery<UserInteraction, 'id'> {
-  const interaction = await get(blocker, target);
+  const interaction = await get(muter, target);
   if (!interaction.ok) {
     return interaction;
   }
