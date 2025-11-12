@@ -40,9 +40,9 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
             cd ~/${{ secrets.DEPLOY_PATH }}
-            git pull origin main
-            docker stop ${{ secrets.DEPLOY_NAME }} || true
-            docker rm ${{ secrets.DEPLOY_NAME }} || true
+            git fetch origin
+            git reset --hard origin/main
+            docker compose down || true
             docker system prune -f
             docker compose up -d --build
           ENDSSH
