@@ -14,7 +14,9 @@ describe('User Chat', () => {
     let success = false;
 
     try {
-      ChatAPI.subscribe(user, (_) => { /* empty */ });
+      ChatAPI.subscribe(user, (_) => {
+        /* empty */
+      });
 
       success = true;
     } catch (error: unknown) {
@@ -44,7 +46,9 @@ describe('User Chat', () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         or: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+          order: vi
+            .fn()
+            .mockReturnValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });
@@ -60,7 +64,9 @@ describe('User Chat', () => {
     mockQuery({
       update: vi.fn().mockReturnValue({
         in: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+          select: vi
+            .fn()
+            .mockReturnValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });

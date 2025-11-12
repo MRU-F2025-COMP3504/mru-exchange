@@ -135,8 +135,11 @@ export async function remove(
       .from('Reviews')
       .delete()
       .eq('created_by_id', reviewer.supabase_id)
-      .in('id', reviews.map((review) => review.id))
-      .select()
+      .in(
+        'id',
+        reviews.map((review) => review.id),
+      )
+      .select(),
   );
 }
 

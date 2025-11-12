@@ -11,13 +11,25 @@ import type { User } from '@supabase/supabase-js';
 import { empty, HookUtils, ok } from '@shared/utils';
 import { AuthAPI } from '@shared/api';
 
-export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
+export function AuthProvider({
+  children,
+}: {
+  children: ReactNode;
+}): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const [user, setUser] = useState<Result<User>>(() => empty());
 
-  const signUp = useCallback(async (email: string, password: string, firstName: string, lastName: string) => {
-    return AuthAPI.signUp(email, password, firstName, lastName);
-  }, []);
+  const signUp = useCallback(
+    async (
+      email: string,
+      password: string,
+      firstName: string,
+      lastName: string,
+    ) => {
+      return AuthAPI.signUp(email, password, firstName, lastName);
+    },
+    [],
+  );
   const signIn = useCallback(async (email: string, password: string) => {
     return AuthAPI.signIn(email, password);
   }, []);
@@ -35,8 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
   }, []);
 
   useEffect(() => {
-    void HookUtils.load(setLoading, AuthAPI.getUser())
-      .then(setUser);
+    void HookUtils.load(setLoading, AuthAPI.getUser()).then(setUser);
 
     const subscription = AuthAPI.onAuthStateChange((_event, result) => {
       if (result.ok) {

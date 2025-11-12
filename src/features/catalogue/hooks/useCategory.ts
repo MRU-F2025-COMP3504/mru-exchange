@@ -17,13 +17,16 @@ type UseCategoryResult = DatabaseQueryResult<Category, '*'>;
 /**
  * Hook to fetch a single category
  */
-export default function(category: RequiredColumns<Category, 'id'>): UseCategoryReturn {
+export default function (
+  category: RequiredColumns<Category, 'id'>,
+): UseCategoryReturn {
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<UseCategoryResult>(() => empty());
 
   useEffect(() => {
-    void HookUtils.load(setLoading, CategoryCatalogueAPI.getTag(category))
-      .then(setResult);
+    void HookUtils.load(setLoading, CategoryCatalogueAPI.getTag(category)).then(
+      setResult,
+    );
   }, [category]);
 
   return {

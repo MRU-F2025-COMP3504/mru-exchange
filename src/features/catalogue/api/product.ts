@@ -9,27 +9,32 @@ import type {
 import { err, ok } from '@shared/utils';
 import type { ProductFilter } from '@features/catalogue';
 
-export async function get(...products: RequiredColumns<Product, 'id'>[]): DatabaseQuery<Product[], '*'> {
+export async function get(
+  ...products: RequiredColumns<Product, 'id'>[]
+): DatabaseQuery<Product[], '*'> {
   return query(
     await supabase
       .from('Product_Information')
       .select('*')
-      .in('id', products.map((product) => product.id))
-  )
-}
-
-export async function getBySeller(seller: RequiredColumns<UserProfile, 'supabase_id'>): DatabaseQuery<Product[], '*'> {
-  return query(
-    await supabase
-      .from('Product_Information')
-      .select('*')
-      .eq('user_id', seller.supabase_id)
+      .in(
+        'id',
+        products.map((product) => product.id),
+      ),
   );
 }
 
-export async function getBySearch(
-  text: string,
+export async function getBySeller(
+  seller: RequiredColumns<UserProfile, 'supabase_id'>,
 ): DatabaseQuery<Product[], '*'> {
+  return query(
+    await supabase
+      .from('Product_Information')
+      .select('*')
+      .eq('user_id', seller.supabase_id),
+  );
+}
+
+export async function getBySearch(text: string): DatabaseQuery<Product[], '*'> {
   const search = text.replace(/[%_\\]/g, '\\$&'); // prevents sql injection
   return query(
     await supabase
@@ -44,7 +49,9 @@ export function getByFilter(): ProductFilter {
   let categories: number[] = [];
 
   return {
-    seller(seller: RequiredColumns<UserProfile, 'supabase_id'>): Result<ProductFilter> {
+    seller(
+      seller: RequiredColumns<UserProfile, 'supabase_id'>,
+    ): Result<ProductFilter> {
       if (!seller.supabase_id) {
         return err(new Error('Seller ID is not specified'));
       } else {
@@ -101,7 +108,7 @@ export function getByFilter(): ProductFilter {
             'product_id',
             products.data.map((product) => product.id),
           )
-          .in('category_id', categories)
+          .in('category_id', categories),
       );
     },
   };

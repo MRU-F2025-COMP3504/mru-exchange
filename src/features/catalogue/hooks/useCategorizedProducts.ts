@@ -13,22 +13,31 @@ interface UseCategorizedProductsReturn {
   result: UseCategorizedProductsResult;
 }
 
-type UseCategorizedProductsResult = DatabaseQueryResult<CategorizedProduct[], '*'>;
+type UseCategorizedProductsResult = DatabaseQueryResult<
+  CategorizedProduct[],
+  '*'
+>;
 
 /**
  * Hook to fetch catalogue in a category
  */
-export default function(category: RequiredColumns<Category, 'id'>): UseCategorizedProductsReturn {
+export default function (
+  category: RequiredColumns<Category, 'id'>,
+): UseCategorizedProductsReturn {
   const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<UseCategorizedProductsResult>(() => empty());
+  const [result, setResult] = useState<UseCategorizedProductsResult>(() =>
+    empty(),
+  );
 
   useEffect(() => {
-    void HookUtils.load(setLoading, CategoryCatalogueAPI.getProductsByAssignedTag(category))
-      .then(setResult);
+    void HookUtils.load(
+      setLoading,
+      CategoryCatalogueAPI.getProductsByAssignedTag(category),
+    ).then(setResult);
   }, [category]);
 
   return {
     loading,
     result,
-  }
+  };
 }

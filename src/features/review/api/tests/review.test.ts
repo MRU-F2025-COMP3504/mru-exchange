@@ -18,12 +18,16 @@ describe('Review Creation/Modification', () => {
     const validDescription = 'this is a description';
     const validDescriptionResult = create.description(validDescription);
 
-    expect(validDescriptionResult.ok, 'create.description() invalid').toBe(true);
+    expect(validDescriptionResult.ok, 'create.description() invalid').toBe(
+      true,
+    );
 
     const invalidDescription = '';
     const invalidDescriptionResult = create.description(invalidDescription);
 
-    expect(invalidDescriptionResult.ok, 'create.description() valid').toBe(false);
+    expect(invalidDescriptionResult.ok, 'create.description() valid').toBe(
+      false,
+    );
 
     const validRating = 3.5;
     const validRatingResult = create.rating(validRating);
@@ -51,7 +55,9 @@ describe('Review Creation/Modification', () => {
       delete: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           in: vi.fn().mockReturnValue({
-            select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+            select: vi
+              .fn()
+              .mockReturnValue({ data: new Array<object>(), error: null }),
           }),
         }),
       }),
@@ -95,7 +101,9 @@ describe('Product Review', () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+          order: vi
+            .fn()
+            .mockReturnValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });
@@ -112,7 +120,9 @@ describe('Product Review', () => {
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+            order: vi
+              .fn()
+              .mockReturnValue({ data: new Array<object>(), error: null }),
           }),
         }),
       }),
@@ -148,7 +158,9 @@ describe('Seller Review', () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+          order: vi
+            .fn()
+            .mockReturnValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });
@@ -165,7 +177,9 @@ describe('Seller Review', () => {
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+            order: vi
+              .fn()
+              .mockReturnValue({ data: new Array<object>(), error: null }),
           }),
         }),
       }),
@@ -195,4 +209,3 @@ describe('Seller Review', () => {
     expect(result.ok, 'getAverageSellerRating() failed').toBe(true);
   });
 });
-

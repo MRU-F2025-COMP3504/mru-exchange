@@ -15,32 +15,38 @@ interface UseProductReviewsReturn {
   refresh: () => PromiseResult<string>;
 }
 
-export default function(product: RequiredColumns<Product, 'id'>): UseProductReviewsReturn {
+export default function (
+  product: RequiredColumns<Product, 'id'>,
+): UseProductReviewsReturn {
   const [loading, setLoading] = useState<boolean>(true);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [rating, setRating] = useState<number>(0);
 
   const fetchReviews = useCallback(async () => {
-    return HookUtils.load(setLoading, ReviewAPI.getProductReviews(product))
-      .then((result) => {
-        if (result.ok) {
-          setReviews(result.data);
-        }
+    return HookUtils.load(
+      setLoading,
+      ReviewAPI.getProductReviews(product),
+    ).then((result) => {
+      if (result.ok) {
+        setReviews(result.data);
+      }
 
-        return result;
-      });
+      return result;
+    });
   }, [product]);
 
   const fetchAverageRating = useCallback(async () => {
-    return HookUtils.load(setLoading, ReviewAPI.getAverageProductRating(product))
-      .then((result) => {
-        if (result.ok) {
-          setRating(result.data.rating);
-        }
+    return HookUtils.load(
+      setLoading,
+      ReviewAPI.getAverageProductRating(product),
+    ).then((result) => {
+      if (result.ok) {
+        setRating(result.data.rating);
+      }
 
-        return result;
-      });
-  }, [product])
+      return result;
+    });
+  }, [product]);
 
   const refresh = useCallback(async () => {
     const rating = await fetchAverageRating();
@@ -57,12 +63,11 @@ export default function(product: RequiredColumns<Product, 'id'>): UseProductRevi
   }, [fetchAverageRating, fetchReviews]);
 
   useEffect(() => {
-    void refresh()
-      .then((result) => {
-        if (!result.ok) {
-          console.error(result.error);
-        }
-      });
+    void refresh().then((result) => {
+      if (!result.ok) {
+        console.error(result.error);
+      }
+    });
   }, [refresh]);
 
   return {

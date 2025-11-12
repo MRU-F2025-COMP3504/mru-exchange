@@ -60,8 +60,11 @@ export async function show(
     await supabase
       .from('Chats')
       .update({ visible })
-      .in('id', chats.map((chat) => chat.id))
-      .select('id')
+      .in(
+        'id',
+        chats.map((chat) => chat.id),
+      )
+      .select('id'),
   );
 }
 

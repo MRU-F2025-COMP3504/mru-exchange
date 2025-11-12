@@ -15,13 +15,19 @@ interface UseProductsBySellerReturn {
 
 type UseProductsBySellerResult = DatabaseQueryResult<Product[], '*'>;
 
-export default function(seller: RequiredColumns<UserProfile, 'supabase_id'>): UseProductsBySellerReturn {
+export default function (
+  seller: RequiredColumns<UserProfile, 'supabase_id'>,
+): UseProductsBySellerReturn {
   const [loading, setLoading] = useState<boolean>(true);
-  const [result, setResult] = useState<UseProductsBySellerResult>(() => empty());
+  const [result, setResult] = useState<UseProductsBySellerResult>(() =>
+    empty(),
+  );
 
   useEffect(() => {
-    void HookUtils.load(setLoading, ProductCatalogueAPI.getBySeller(seller))
-      .then(setResult);
+    void HookUtils.load(
+      setLoading,
+      ProductCatalogueAPI.getBySeller(seller),
+    ).then(setResult);
   }, [seller]);
 
   return {

@@ -15,28 +15,32 @@ interface UseProductReviewersReturn {
   refresh: () => DatabaseQuery<Review[], '*'>;
 }
 
-export default function(reviewer: RequiredColumns<UserProfile, 'supabase_id'>, product: RequiredColumns<Product, 'id'>): UseProductReviewersReturn {
+export default function (
+  reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
+  product: RequiredColumns<Product, 'id'>,
+): UseProductReviewersReturn {
   const [loading, setLoading] = useState<boolean>(true);
   const [reviews, setReviews] = useState<Review[]>([]);
 
   const refresh = useCallback(async () => {
-    return HookUtils.load(setLoading, ReviewAPI.getProductReviewsByReviewer(reviewer, product))
-      .then((result) => {
-        if (result.ok) {
-          setReviews(result.data);
-        }
+    return HookUtils.load(
+      setLoading,
+      ReviewAPI.getProductReviewsByReviewer(reviewer, product),
+    ).then((result) => {
+      if (result.ok) {
+        setReviews(result.data);
+      }
 
-        return result;
-      })
+      return result;
+    });
   }, [product, reviewer]);
 
   useEffect(() => {
-    void refresh()
-      .then((result) => {
-        if (!result.ok) {
-          console.error(result.error);
-        }
-      });
+    void refresh().then((result) => {
+      if (!result.ok) {
+        console.error(result.error);
+      }
+    });
   }, [refresh]);
 
   return {

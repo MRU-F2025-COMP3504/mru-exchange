@@ -14,4 +14,4 @@ export { default as ProductSearchPage } from '@pages/ProductSearchPage';
 export { default as ProductPage } from '@pages/ProductPage';
 export { default as MessagingPage } from '@pages/MessagingPage';
 export { default as PostProductPage } from '@pages/PostProductPage';
-export { default as PreviewPostPage } from '@pages/PreviewPostPage'
+export { default as PreviewPostPage } from '@pages/PreviewPostPage';

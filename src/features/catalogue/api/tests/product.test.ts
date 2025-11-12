@@ -6,7 +6,9 @@ describe('Product Catalogue', () => {
   it('returns products', async () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
-        in: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+        in: vi
+          .fn()
+          .mockResolvedValue({ data: new Array<object>(), error: null }),
       }),
     });
 
@@ -20,7 +22,9 @@ describe('Product Catalogue', () => {
   it('returns products by seller', async () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+        eq: vi
+          .fn()
+          .mockResolvedValue({ data: new Array<object>(), error: null }),
       }),
     });
 
@@ -34,7 +38,9 @@ describe('Product Catalogue', () => {
   it('returns products by search query', async () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
-        or: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+        or: vi
+          .fn()
+          .mockResolvedValue({ data: new Array<object>(), error: null }),
       }),
     });
 
@@ -88,7 +94,10 @@ describe('Product Catalogue', () => {
           const uncategorizedProductsQuery = stockFilter.data.find();
           const uncategorizedProductsResult = await uncategorizedProductsQuery;
 
-          expect(uncategorizedProductsResult.ok, 'getByFilter.find() invalid').toBe(true);
+          expect(
+            uncategorizedProductsResult.ok,
+            'getByFilter.find() invalid',
+          ).toBe(true);
 
           const categoryFilter = stockFilter.data.categories(0, 1, 2, 3, 4, 5);
 
@@ -104,10 +113,15 @@ describe('Product Catalogue', () => {
             const categorizedProductsQuery = categoryFilter.data.find();
             const categorizedProductsResult = await categorizedProductsQuery;
 
-            expect(categorizedProductsResult.ok, 'getByFilter.find() invalid').toBe(true);
+            expect(
+              categorizedProductsResult.ok,
+              'getByFilter.find() invalid',
+            ).toBe(true);
           }
 
-          expect(categoryFilter.ok, 'getByFilter.category() invalid').toBe(true);
+          expect(categoryFilter.ok, 'getByFilter.category() invalid').toBe(
+            true,
+          );
         }
 
         expect(stockFilter.ok, 'getByFilter.stock() invalid').toBe(true);

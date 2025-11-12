@@ -2,7 +2,10 @@ import type { PostgrestSingleResponse } from '@supabase/supabase-js';
 import type { DatabaseQueryResult, ExtractTable, Result } from '@shared/types';
 import { err, ok } from '@shared/utils';
 
-export function query<Table extends object | null, Columns extends '*' | keyof ExtractTable<Table>>(
+export function query<
+  Table extends object | null,
+  Columns extends '*' | keyof ExtractTable<Table>,
+>(
   response: PostgrestSingleResponse<Table>,
 ): DatabaseQueryResult<Table, Columns> {
   const { data, error } = response;

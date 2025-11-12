@@ -27,7 +27,9 @@ describe('Category Creation/Modification', () => {
     mockQuery({
       delete: vi.fn().mockReturnValue({
         in: vi.fn().mockReturnValue({
-          select: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+          select: vi
+            .fn()
+            .mockResolvedValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });
@@ -67,7 +69,9 @@ describe('Category Tagging', () => {
   it('tags product', async () => {
     mockQuery({
       insert: vi.fn().mockReturnValue({
-        select: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+        select: vi
+          .fn()
+          .mockResolvedValue({ data: new Array<object>(), error: null }),
       }),
     });
 

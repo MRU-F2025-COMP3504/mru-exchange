@@ -46,13 +46,13 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - ✅ User profiles
 - ✅ Listings CRUD (Create, Read, Update, Delete)
 - ✅ Real-time messaging (database query only)
-  - ***Chat initiation establishment via express-js not yet implemented.***
+  - **_Chat initiation establishment via express-js not yet implemented._**
 - ✅ Favorites/bookmarks system
 - ✅ Image upload support
 - ✅ Category filtering (Parking, Textbooks, Notes, Tutoring)
 - ✅ Search functionality
 - ✅ Row Level Security (RLS) for data protection
-  - ***Currently disabled indefinitely***.
+  - **_Currently disabled indefinitely_**.
 
 ### Product Categories
 
@@ -61,7 +61,7 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - 📝 **Notes** - Study notes and materials
 - 👨‍🏫 **Tutoring** - Tutoring services
 
-***Tests are not completely implemented.***
+**_Tests are not completely implemented._**
 
 ---
 
@@ -114,8 +114,8 @@ We use the `npm` [(node package manager)](https://www.npmjs.com/) and [docker](h
 
 - See the [attached installation instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for how to install `npm`.
 - See the [attached installation instructions](https://docs.docker.com/engine/install/) for how to install `docker`.
-    - If the host is using the Windows operating system, the host must install and use [Docker Desktop](https://www.docker.com/products/docker-desktop/) to run the application.
-    - If using docker is not an option, the application can be run using `vite`. See [below](#development) for more information.
+  - If the host is using the Windows operating system, the host must install and use [Docker Desktop](https://www.docker.com/products/docker-desktop/) to run the application.
+  - If using docker is not an option, the application can be run using `vite`. See [below](#development) for more information.
 
 We use [Git](https://git-scm.com/) for version control and manage code changes.
 For the host to read (e.g., `git clone`) or make changes to this repository, the host must have Git installed.
@@ -124,10 +124,11 @@ Using [SSH](https://en.wikipedia.org/wiki/Secure_Shell) to access the repository
 See [below](#clone-repository-1) for more information.
 
 - The SSH client should be pre-installed on Windows, macOS, and Linux operating systems.
-- See the [attached installation instructions](https://git-scm.com/install/windows) for how to install `git`. 
+- See the [attached installation instructions](https://git-scm.com/install/windows) for how to install `git`.
 
-Git must be configured and linked with a GitHub account. 
+Git must be configured and linked with a GitHub account.
 If the host is using SSH to access the repository, Git must be configured using a public and private key linked with the account.
+
 - See the [attached instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/about-ssh) for how to configure SSH with a GitHub account.
 
 The application offers two environment configurations (i.e., development and production).
@@ -185,6 +186,7 @@ When the build fails, the workflow would be cancelled.
 
 We recommend using [docker](https://www.docker.com/) for application behaviour consistency that runs in a reproducable environment and deploying to production.
 Depending on the host and how docker is configured, running docker may require **root or administrator priviledges**.
+
 - See the documentation for [Windows](https://docs.docker.com/desktop/setup/install/windows-permission-requirements/) about permission requirements for more information.
 - See the documentation for [Linux](https://docs.docker.com/engine/install/linux-postinstall/) about root priviledges for more information.
 
@@ -204,7 +206,7 @@ $ DEPLOY_NAME=production npm run deploy
 The script above is equivalent to:
 
 ```bash
-$ DEPLOY_NAME=production \ 
+$ DEPLOY_NAME=production \
     git pull \
     docker stop $DEPLOY_NAME \
     docker system prune -f \

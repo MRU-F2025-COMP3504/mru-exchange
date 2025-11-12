@@ -14,7 +14,9 @@ describe('User Messaging', () => {
     let success = false;
 
     try {
-      MessageAPI.subscribe(chat, (_) => { /* empty */ });
+      MessageAPI.subscribe(chat, (_) => {
+        /* empty */
+      });
 
       success = true;
     } catch (error: unknown) {
@@ -29,7 +31,9 @@ describe('User Messaging', () => {
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            order: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+            order: vi
+              .fn()
+              .mockReturnValue({ data: new Array<object>(), error: null }),
           }),
         }),
       }),
@@ -66,7 +70,9 @@ describe('User Messaging', () => {
         eq: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             in: vi.fn().mockReturnValue({
-              select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+              select: vi
+                .fn()
+                .mockReturnValue({ data: new Array<object>(), error: null }),
             }),
           }),
         }),
@@ -89,7 +95,9 @@ describe('User Messaging', () => {
         eq: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             in: vi.fn().mockReturnValue({
-              select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+              select: vi
+                .fn()
+                .mockReturnValue({ data: new Array<object>(), error: null }),
             }),
           }),
         }),

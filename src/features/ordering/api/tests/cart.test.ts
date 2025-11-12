@@ -23,7 +23,9 @@ describe('Shopping Cart', () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+          select: vi
+            .fn()
+            .mockReturnValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });
@@ -54,11 +56,13 @@ describe('Shopping Cart', () => {
   it('store products to cart', async () => {
     mockQuery({
       insert: vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+        select: vi
+          .fn()
+          .mockReturnValue({ data: new Array<object>(), error: null }),
       }),
     });
 
-    const cart = { id: 0};
+    const cart = { id: 0 };
     const products = [{ id: 0 }, { id: 1 }, { id: 2 }];
     const query = CartAPI.store(cart, ...products);
     const result = await query;
@@ -71,7 +75,9 @@ describe('Shopping Cart', () => {
       delete: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           in: vi.fn().mockReturnValue({
-            select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+            select: vi
+              .fn()
+              .mockReturnValue({ data: new Array<object>(), error: null }),
           }),
         }),
       }),
@@ -89,7 +95,9 @@ describe('Shopping Cart', () => {
     mockQuery({
       delete: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+          select: vi
+            .fn()
+            .mockReturnValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });

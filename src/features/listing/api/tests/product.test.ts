@@ -37,14 +37,25 @@ describe('Product Listing', () => {
     const validDescription = 'description here';
     const validDescriptionResult = register.description(validDescription);
 
-    expect(validDescriptionResult.ok, 'register.description() invalid').toBe(true);
+    expect(validDescriptionResult.ok, 'register.description() invalid').toBe(
+      true,
+    );
 
     const invalidDescription = '';
     const invalidDescriptionResult = register.description(invalidDescription);
 
-    expect(invalidDescriptionResult.ok, 'register.description() valid').toBe(false);
+    expect(invalidDescriptionResult.ok, 'register.description() valid').toBe(
+      false,
+    );
 
-    const validImages = ['database/images/test.jpg', 'test.jpg', 'test.png', 'database/images/test.jpg', '/test/image.png', '/test/image.jpg'];
+    const validImages = [
+      'database/images/test.jpg',
+      'test.jpg',
+      'test.png',
+      'database/images/test.jpg',
+      '/test/image.png',
+      '/test/image.jpg',
+    ];
 
     for (const image of validImages) {
       const validImageResult = register.image(image);
@@ -52,7 +63,14 @@ describe('Product Listing', () => {
       expect(validImageResult.ok, 'register.image() invalid').toBe(true);
     }
 
-    const invalidImage = ['', '. database/images/test.jpg', '$!@#,', 'c:/', '.png', '.jpg'];
+    const invalidImage = [
+      '',
+      '. database/images/test.jpg',
+      '$!@#,',
+      'c:/',
+      '.png',
+      '.jpg',
+    ];
 
     for (const image of invalidImage) {
       const invalidImageResult = register.image(image);
@@ -90,7 +108,9 @@ describe('Product Listing', () => {
     mockQuery({
       update: vi.fn().mockReturnValue({
         in: vi.fn().mockReturnValue({
-          select: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+          select: vi
+            .fn()
+            .mockResolvedValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });
@@ -107,7 +127,9 @@ describe('Product Listing', () => {
     mockQuery({
       delete: vi.fn().mockReturnValue({
         in: vi.fn().mockReturnValue({
-          select: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+          select: vi
+            .fn()
+            .mockResolvedValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });
@@ -146,14 +168,25 @@ describe('Product Listing', () => {
     const validDescription = 'description here';
     const validDescriptionResult = attribute.description(validDescription);
 
-    expect(validDescriptionResult.ok, 'attribute.description() invalid').toBe(true);
+    expect(validDescriptionResult.ok, 'attribute.description() invalid').toBe(
+      true,
+    );
 
     const invalidDescription = '';
     const invalidDescriptionResult = attribute.description(invalidDescription);
 
-    expect(invalidDescriptionResult.ok, 'attribute.description() valid').toBe(false);
+    expect(invalidDescriptionResult.ok, 'attribute.description() valid').toBe(
+      false,
+    );
 
-    const validImages = ['database/images/test.jpg', 'test.jpg', 'test.png', 'database/images/test.jpg', '/test/image.png', '/test/image.jpg'];
+    const validImages = [
+      'database/images/test.jpg',
+      'test.jpg',
+      'test.png',
+      'database/images/test.jpg',
+      '/test/image.png',
+      '/test/image.jpg',
+    ];
 
     for (const image of validImages) {
       const validImageResult = attribute.image(image);
@@ -161,7 +194,14 @@ describe('Product Listing', () => {
       expect(validImageResult.ok, 'attribute.image() invalid').toBe(true);
     }
 
-    const invalidImage = ['', '. database/images/test.jpg', '$!@#,', 'c:/', '.png', '.jpg'];
+    const invalidImage = [
+      '',
+      '. database/images/test.jpg',
+      '$!@#,',
+      'c:/',
+      '.png',
+      '.jpg',
+    ];
 
     for (const image of invalidImage) {
       const invalidImageResult = attribute.image(image);

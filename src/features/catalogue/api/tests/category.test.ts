@@ -6,7 +6,9 @@ describe('Category Tag Catalogue', () => {
   it('returns all category tags', async () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
-        order: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+        order: vi
+          .fn()
+          .mockResolvedValue({ data: new Array<object>(), error: null }),
       }),
     });
 
@@ -35,7 +37,9 @@ describe('Category Tag Catalogue', () => {
   it('returns products assigned with a category tag', async () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+        eq: vi
+          .fn()
+          .mockResolvedValue({ data: new Array<object>(), error: null }),
       }),
     });
 
@@ -49,7 +53,9 @@ describe('Category Tag Catalogue', () => {
   it('returns assigned category tags by a given product', async () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+        eq: vi
+          .fn()
+          .mockResolvedValue({ data: new Array<object>(), error: null }),
       }),
     });
 
@@ -58,5 +64,5 @@ describe('Category Tag Catalogue', () => {
     const result = await query;
 
     expect(result.ok, 'getAssignedTagsByProduct()').toBe(true);
-  })
+  });
 });

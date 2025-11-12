@@ -2,7 +2,8 @@ import type {
   Chat,
   DatabaseQuery,
   RequiredColumns,
-  UserMessage, UserProfile,
+  UserMessage,
+  UserProfile,
 } from '@shared/types';
 import { query, supabase } from '@shared/api';
 import {

@@ -22,8 +22,11 @@ export async function remove(
     await supabase
       .from('Category_Tags')
       .delete()
-      .in('id', categories.map((category) => category.id))
-      .select('id')
+      .in(
+        'id',
+        categories.map((category) => category.id),
+      )
+      .select('id'),
   );
 }
 

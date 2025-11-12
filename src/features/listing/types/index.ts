@@ -1,7 +1,9 @@
 import type {
   DatabaseQuery,
-  Product, RequiredColumns,
-  Result, UserProfile,
+  Product,
+  RequiredColumns,
+  Result,
+  UserProfile,
 } from '@shared/types';
 
 export interface ProductBuilder {
@@ -18,5 +20,5 @@ export interface ProductAttributeModifier {
   title(title: string): Result<this>;
   description(description: string): Result<this>;
   image(url: string): Result<this>;
-  modify(): DatabaseQuery<Product, 'id'>
+  modify(): DatabaseQuery<Product, 'id'>;
 }

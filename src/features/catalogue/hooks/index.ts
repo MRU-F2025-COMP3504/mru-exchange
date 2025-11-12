@@ -4,4 +4,4 @@ export { default as useCategory } from '@features/catalogue/hooks/useCategory';
 export { default as useProductFilter } from '@features/catalogue/hooks/useProductFilter';
 export { default as useProducts } from '@features/catalogue/hooks/useProducts';
 export { default as useProductsBySeller } from '@features/catalogue/hooks/useProductsBySeller';
-export { default as useProductSearch} from '@features/catalogue/hooks/useProductSearch';
+export { default as useProductSearch } from '@features/catalogue/hooks/useProductSearch';

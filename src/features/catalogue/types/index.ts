@@ -1,4 +1,10 @@
-import type { DatabaseQuery, Product, RequiredColumns, Result, UserProfile } from '@shared/types';
+import type {
+  DatabaseQuery,
+  Product,
+  RequiredColumns,
+  Result,
+  UserProfile,
+} from '@shared/types';
 
 export interface ProductFilter {
   seller(seller: RequiredColumns<UserProfile, 'supabase_id'>): Result<this>;

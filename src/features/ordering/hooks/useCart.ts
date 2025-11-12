@@ -16,65 +16,85 @@ interface UseCartReturn {
   cart: ShoppingCartResult;
   products: ShoppingCartProduct[];
   refresh: () => DatabaseQuery<ShoppingCart, '*'>;
-  store: (...array: RequiredColumns<Product, 'id'>[]) => DatabaseQuery<ShoppingCartProduct[], '*'>;
-  remove: (...array: RequiredColumns<Product, 'id'>[]) => DatabaseQuery<ShoppingCartProduct[], '*'>;
+  store: (
+    ...array: RequiredColumns<Product, 'id'>[]
+  ) => DatabaseQuery<ShoppingCartProduct[], '*'>;
+  remove: (
+    ...array: RequiredColumns<Product, 'id'>[]
+  ) => DatabaseQuery<ShoppingCartProduct[], '*'>;
   clear: () => DatabaseQuery<ShoppingCartProduct[], 'product_id'>;
 }
 
 type ShoppingCartResult = DatabaseQueryResult<ShoppingCart, '*'>;
 
-export default function(buyer: RequiredColumns<UserProfile, 'supabase_id'>): UseCartReturn {
+export default function (
+  buyer: RequiredColumns<UserProfile, 'supabase_id'>,
+): UseCartReturn {
   const [loading, setLoading] = useState<boolean>(true);
   const [cart, setCart] = useState<ShoppingCartResult>(() => empty());
   const [products, setProducts] = useState<ShoppingCartProduct[]>([]);
 
   const refresh = useCallback(async () => {
-    return HookUtils.load(setLoading, CartAPI.get(buyer))
-      .then((result) => {
-        if (result.ok) {
-          setCart(result);
-        }
+    return HookUtils.load(setLoading, CartAPI.get(buyer)).then((result) => {
+      if (result.ok) {
+        setCart(result);
+      }
 
-        return result;
-      });
+      return result;
+    });
   }, [buyer]);
 
-  const store = useCallback(async (...array: RequiredColumns<Product, 'id'>[]) => {
-    if (cart.ok) {
-      return HookUtils.load(setLoading, CartAPI.store(cart.data,...array))
-        .then((result) => {
+  const store = useCallback(
+    async (...array: RequiredColumns<Product, 'id'>[]) => {
+      if (cart.ok) {
+        return HookUtils.load(
+          setLoading,
+          CartAPI.store(cart.data, ...array),
+        ).then((result) => {
           if (result.ok) {
             setProducts([...products, ...result.data]);
           }
 
           return result;
         });
-    }
+      }
 
-    return cart;
-  }, [cart, products]);
+      return cart;
+    },
+    [cart, products],
+  );
 
-  const remove = useCallback(async (...array: RequiredColumns<Product, 'id'>[]) => {
-    if (cart.ok) {
-      return HookUtils.load(setLoading, CartAPI.remove(cart.data, ...array))
-        .then((result) => {
+  const remove = useCallback(
+    async (...array: RequiredColumns<Product, 'id'>[]) => {
+      if (cart.ok) {
+        return HookUtils.load(
+          setLoading,
+          CartAPI.remove(cart.data, ...array),
+        ).then((result) => {
           if (!result.ok) {
             return result;
           }
 
-          setProducts(products.filter((product) => !array.find((change) => product.product_id === change.id)));
+          setProducts(
+            products.filter(
+              (product) =>
+                !array.find((change) => product.product_id === change.id),
+            ),
+          );
 
           return result;
         });
-    }
+      }
 
-    return cart;
-  }, [cart, products]);
+      return cart;
+    },
+    [cart, products],
+  );
 
   const clear = useCallback(async () => {
     if (cart.ok) {
-      return HookUtils.load(setLoading, CartAPI.clear(cart.data))
-        .then((result) => {
+      return HookUtils.load(setLoading, CartAPI.clear(cart.data)).then(
+        (result) => {
           if (!result.ok) {
             return result;
           }
@@ -82,19 +102,19 @@ export default function(buyer: RequiredColumns<UserProfile, 'supabase_id'>): Use
           setProducts([]);
 
           return result;
-        })
+        },
+      );
     }
 
     return cart;
   }, [cart]);
 
   useEffect(() => {
-    void refresh()
-      .then((result) => {
-        if (!result.ok) {
-          console.error(result.error);
-        }
-      });
+    void refresh().then((result) => {
+      if (!result.ok) {
+        console.error(result.error);
+      }
+    });
   }, [buyer, refresh]);
 
   return {
@@ -105,5 +125,5 @@ export default function(buyer: RequiredColumns<UserProfile, 'supabase_id'>): Use
     store,
     remove,
     clear,
-  }
+  };
 }

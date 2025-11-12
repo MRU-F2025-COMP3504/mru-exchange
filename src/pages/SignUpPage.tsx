@@ -50,7 +50,9 @@ export default function SignUpPage() {
       );
 
       // Optionally redirect after a delay
-      setTimeout(() => { navigate('/login'); }, 3000);
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
     }
 
     setIsLoading(false);
@@ -86,7 +88,9 @@ export default function SignUpPage() {
                 id='firstName'
                 type='text'
                 value={firstName}
-                onChange={(e) => { setFirstName(e.target.value); }}
+                onChange={(e) => {
+                  setFirstName(e.target.value);
+                }}
                 placeholder='John'
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
                 disabled={isLoading}
@@ -105,7 +109,9 @@ export default function SignUpPage() {
                 id='lastName'
                 type='text'
                 value={lastName}
-                onChange={(e) => { setLastName(e.target.value); }}
+                onChange={(e) => {
+                  setLastName(e.target.value);
+                }}
                 placeholder='Doe'
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
                 disabled={isLoading}
@@ -124,7 +130,9 @@ export default function SignUpPage() {
                 id='userName'
                 type='text'
                 value={userName}
-                onChange={(e) => { setUserName(e.target.value); }}
+                onChange={(e) => {
+                  setUserName(e.target.value);
+                }}
                 placeholder='johndoe'
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
                 disabled={isLoading}
@@ -143,7 +151,9 @@ export default function SignUpPage() {
                 id='email'
                 type='email'
                 value={email}
-                onChange={(e) => { setEmail(e.target.value); }}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
                 placeholder='student@mtroyal.ca'
                 required
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
@@ -166,7 +176,9 @@ export default function SignUpPage() {
                 id='password'
                 type='password'
                 value={password}
-                onChange={(e) => { setPassword(e.target.value); }}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
                 placeholder='Enter your password'
                 required
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
@@ -187,7 +199,9 @@ export default function SignUpPage() {
                 id='confirmPassword'
                 type='password'
                 value={confirmPassword}
-                onChange={(e) => { setConfirmPassword(e.target.value); }}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                }}
                 placeholder='Confirm your password'
                 required
                 className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'

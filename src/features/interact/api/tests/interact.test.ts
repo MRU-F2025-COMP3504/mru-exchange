@@ -24,7 +24,9 @@ describe('User Interaction', () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         or: vi.fn().mockReturnValue({
-          or: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+          or: vi
+            .fn()
+            .mockResolvedValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });
@@ -40,7 +42,9 @@ describe('User Interaction', () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         or: vi.fn().mockReturnValue({
-          or: vi.fn().mockResolvedValue({ data: new Array<object>(), error: null }),
+          or: vi
+            .fn()
+            .mockResolvedValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });

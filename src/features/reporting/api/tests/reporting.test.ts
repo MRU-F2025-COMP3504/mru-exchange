@@ -7,7 +7,9 @@ describe('User Reporting', () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+          order: vi
+            .fn()
+            .mockReturnValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });
@@ -23,7 +25,9 @@ describe('User Reporting', () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+          order: vi
+            .fn()
+            .mockReturnValue({ data: new Array<object>(), error: null }),
         }),
       }),
     });
@@ -49,14 +53,24 @@ describe('User Reporting', () => {
     const validDescription = 'this is a description';
     const validDescriptionResult = create.description(validDescription);
 
-    expect(validDescriptionResult.ok, 'create.description() invalid').toBe(true);
+    expect(validDescriptionResult.ok, 'create.description() invalid').toBe(
+      true,
+    );
 
     const invalidDescription = '';
     const invalidDescriptionResult = create.description(invalidDescription);
 
-    expect(invalidDescriptionResult.ok, 'create.description() valid').toBe(false);
+    expect(invalidDescriptionResult.ok, 'create.description() valid').toBe(
+      false,
+    );
 
-    const validLinks = ['reports/user1.txt', '/reports/user2.txt', './reports/user3.txt', '../reports/user4.txt', '../../reports/user5.txt'];
+    const validLinks = [
+      'reports/user1.txt',
+      '/reports/user2.txt',
+      './reports/user3.txt',
+      '../reports/user4.txt',
+      '../../reports/user5.txt',
+    ];
 
     for (const link of validLinks) {
       const validLinkResult = create.link(link);
@@ -84,7 +98,9 @@ describe('User Reporting', () => {
       delete: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           in: vi.fn().mockReturnValue({
-            select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+            select: vi
+              .fn()
+              .mockReturnValue({ data: new Array<object>(), error: null }),
           }),
         }),
       }),
@@ -103,7 +119,9 @@ describe('User Reporting', () => {
       update: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           in: vi.fn().mockReturnValue({
-            select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+            select: vi
+              .fn()
+              .mockReturnValue({ data: new Array<object>(), error: null }),
           }),
         }),
       }),
@@ -122,7 +140,9 @@ describe('User Reporting', () => {
       update: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
           in: vi.fn().mockReturnValue({
-            select: vi.fn().mockReturnValue({ data: new Array<object>(), error: null }),
+            select: vi
+              .fn()
+              .mockReturnValue({ data: new Array<object>(), error: null }),
           }),
         }),
       }),
@@ -155,5 +175,5 @@ describe('User Reporting', () => {
     const result = await query;
 
     expect(result.ok, 'setDescription() failed').toBe(true);
-  })
+  });
 });
