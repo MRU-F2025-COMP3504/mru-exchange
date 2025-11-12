@@ -28,22 +28,25 @@ jobs:
     steps:
       - name: Initiate SSH
         run: |
-         mkdir -p ~/.ssh
-         echo "$DEPLOY_KEY" > ~/.ssh/id_ed25519
-         chmod 600 ~/.ssh/id_ed25519
-         ssh-keyscan "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      
       - name: Deploy
         run: |
-         ssh $DEPLOY_USER@$DEPLOY_HOST << ENDSSH
-           cd $DEPLOY_PATH
-           git pull
-           docker stop $DEPLOY_NAME
-           docker system prune -f
-           docker compose up -d --build
-         ENDSSH
-    env:
-      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-      DEPLOY_NAME: ${{ secrets.DEPLOY_NAME }}
+          ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST << 'ENDSSH'
+            cd $DEPLOY_PATH
+            git pull
+            docker stop $DEPLOY_NAME || true
+            docker system prune -f
+            docker compose up -d --build
+          ENDSSH
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_NAME: ${{ secrets.DEPLOY_NAME }}
