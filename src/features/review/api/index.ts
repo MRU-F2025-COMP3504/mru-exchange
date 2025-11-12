@@ -76,7 +76,7 @@ export async function getAverageProductRating(
 
 export async function getAverageSellerRating(
   seller: RequiredColumns<UserProfile, 'supabase_id'>,
-): DatabaseQuery<Review, 'rating'> {
+): DatabaseQuery<Review, 'id' | 'rating'> {
   return query(
     await supabase
       .from('User_Information')
@@ -127,19 +127,21 @@ export function create(
 }
 
 export async function remove(
-  review: RequiredColumns<Review, 'id'>,
-): DatabaseQuery<Review, 'id'> {
+  reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
+  ...reviews: RequiredColumns<Review, 'id'>[]
+): DatabaseQuery<Review[], 'id'> {
   return query(
     await supabase
       .from('Reviews')
       .delete()
-      .eq('id', review.id)
+      .eq('created_by_id', reviewer.supabase_id)
+      .in('id', reviews.map((review) => review.id))
       .select()
-      .single(),
   );
 }
 
 export async function update(
+  reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
   review: RequiredColumns<Review, 'id' | 'rating' | 'description'>,
 ): DatabaseQuery<Review, 'id'> {
   return query(
@@ -147,6 +149,7 @@ export async function update(
       .from('Reviews')
       .update(review)
       .eq('id', review.id)
+      .eq('reviewer', reviewer.supabase_id)
       .select('id')
       .single(),
   );
