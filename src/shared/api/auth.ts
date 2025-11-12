@@ -63,7 +63,7 @@ export async function signUp(
     return verify;
   }
 
-  const result = authenticate(
+  return authenticate(
     await supabase.auth.signUp({
       email,
       password,
@@ -76,26 +76,6 @@ export async function signUp(
       },
     }),
   );
-
-  if (result.ok) {
-    const user = result.data.user;
-
-    if (user.ok) {
-      const response = query(
-        await supabase
-          .from('User_Information')
-          .insert({
-            email: user.data.email,
-          } as UserProfile)
-      ); // TODO: DATABASE TRIGGER?
-
-      if (!response.ok) {
-        console.error(response.error);
-      }
-    }
-  }
-
-  return result;
 }
 
 export async function signIn(
