@@ -1,4 +1,4 @@
-import { err, ok } from '@shared/utils';
+import { err, ok, REGEX_IMAGE_PATH } from '@shared/utils';
 import type {
   DatabaseQuery,
   RequiredColumns,
@@ -179,14 +179,8 @@ function setImage<T>(
   product: Partial<Product>,
   url: string,
 ): Result<T> {
-  try {
-    product.image = new URL(url).toJSON();
-  } catch (error: unknown) {
-    product.image = null;
-
-    if (error instanceof Error) {
-      return err(error);
-    }
+  if (!REGEX_IMAGE_PATH.test(url)) {
+    return err(new Error('Product image path is not specified'));
   }
 
   return ok(controller);

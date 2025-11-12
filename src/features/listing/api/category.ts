@@ -28,14 +28,14 @@ export async function remove(
 }
 
 export async function set(
-  old: RequiredColumns<Category, 'id'>,
+  target: RequiredColumns<Category, 'id'>,
   change: Pick<Partial<Category>, 'name' | 'description'>,
 ): DatabaseQuery<Category, '*'> {
   return query(
     await supabase
       .from('Category_Tags')
       .update(change)
-      .eq('id', old.id)
+      .eq('id', target.id)
       .select('*')
       .single(),
   );
