@@ -38,15 +38,11 @@ jobs:
       
       - name: Deploy
         run: |
-          ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST << 'ENDSSH'
-            cd $DEPLOY_PATH
-            git pull
-            docker stop $DEPLOY_NAME || true
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
+            cd ~/${{ secrets.DEPLOY_PATH }}
+            git pull origin main
+            docker stop ${{ secrets.DEPLOY_NAME }} || true
+            docker rm ${{ secrets.DEPLOY_NAME }} || true
             docker system prune -f
             docker compose up -d --build
           ENDSSH
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_NAME: ${{ secrets.DEPLOY_NAME }}
