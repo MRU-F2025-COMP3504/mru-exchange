@@ -14,7 +14,8 @@ import {
   ProductSearchPage,
   ProductPage,
   MessagingPage,
-  PostProductPage
+  PostProductPage,
+  PreviewPostPage
 } from '@pages/index';
 
 function App() {
@@ -80,7 +81,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+          <Route
+            path='/preview-post'
+            element={
+              <ProtectedRoute>
+                <PreviewPostPage />
+              </ProtectedRoute>
+            }
+          />
           {/* Catch all */}
           <Route path='*' element={<Navigate to='/' replace />} />
         </Routes>
