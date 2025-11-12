@@ -1,34 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { type AuthContextType, AuthProvider, useAuth } from '@shared/contexts';
-import { ok } from '@shared/utils';
-/*import {
-  AuthProvider,
-  useAuth,
-} from '@shared/contexts/auth/AuthContextTest';*/
-
-vi.mock('../../api/supabase', () => ({
-  supabase: {
-    auth: {
-      getUser: vi.fn(() => ok(null)),
-      onAuthStateChange: vi.fn(() => ({
-        data: { subscription: { unsubscribe: vi.fn() } },
-      })),
-      signUp: vi.fn(),
-      signInWithPassword: vi.fn(),
-      signOut: vi.fn(),
-      resend: vi.fn(),
-    },
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: null, error: null })),
-        })),
-      })),
-      insert: vi.fn(() => Promise.resolve({ data: null, error: null })),
-    })),
-  },
-}));
+import { supabase } from '@shared/api';
 
 function getContext(): { current: AuthContextType } {
   const wrapper = ({ children }: { children: React.ReactNode }) => {
@@ -39,9 +12,29 @@ function getContext(): { current: AuthContextType } {
 }
 
 describe('AuthContext', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  vi.spyOn(supabase, 'auth', 'get')
+    .mockReturnValue({
+      getUser: vi.fn().mockReturnValue({ data: {}, error: null }),
+      onAuthStateChange: vi.fn().mockReturnValue({
+        data: {
+          subscription: {
+            unsubscribe: vi.fn(),
+          },
+        },
+      }),
+      signUp: vi.fn(),
+      signInWithPassword: vi.fn(),
+      signOut: vi.fn(),
+      resend: vi.fn(),
+    } as never);
+  vi.spyOn(supabase, 'from')
+    .mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockReturnValue({ data: {}, error: null }),
+        }),
+      }),
+    } as never);
 
   it('should initially set loading to true', () => {
     expect(getContext().current.loading).toBe(true);
