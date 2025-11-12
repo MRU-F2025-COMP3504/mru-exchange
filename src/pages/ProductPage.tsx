@@ -104,6 +104,14 @@ export default function ProductPage() {
                     </section>
                 </section>
 
+                {/* You might also like... */}
+                <section className="p-10">
+                    <h2>You might also like...</h2>
+                    <div>
+                        
+                    </div>
+                </section>
+
                 {/* Reviews */}
                 <section className="p-10">
                     <h2 className="text-2xl">Reviews</h2>
