@@ -28,32 +28,19 @@ jobs:
     steps:
       - name: Initiate SSH
         run: |
-          mkdir -p ~/.ssh
-          echo "$DEPLOY_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-      
+         mkdir -p ~/.ssh
+         echo "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+         chmod 600 ~/.ssh/id_ed25519
+         ssh-keyscan "$DEPLOY_HOST" >> ~/.ssh/known_hosts
       - name: Deploy
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'ENDSSH'
-            cd ~/${{ secrets.DEPLOY_PATH }}
-            git fetch origin
-            git reset --hard origin/main
-            
-            # Stop all docker containers
-            docker compose down || true
-            docker ps -aq | xargs -r docker stop || true
-            docker ps -aq | xargs -r docker rm || true
-            
-            # Kill any process using port 80
-            sudo fuser -k 80/tcp || true
-            
-            # Clean up docker
-            docker system prune -f
-            
-            # Start fresh
-            docker compose up -d --build
-          ENDSSH
+         ssh $DEPLOY_USER@$DEPLOY_HOST << ENDSSH
+           cd $DEPLOY_PATH
+           npm run deploy
+         ENDSSH
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      DEPLOY_NAME: ${{ secrets.DEPLOY_NAME }}
