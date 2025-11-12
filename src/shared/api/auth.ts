@@ -1,5 +1,5 @@
-import { supabase } from '@shared/api';
-import { ok, err } from '@shared/utils';
+import { query, supabase } from '@shared/api';
+import { ok, err, present } from '@shared/utils';
 import {
   type AuthChangeEvent,
   AuthError,
@@ -8,8 +8,7 @@ import {
   type Subscription,
   type User,
 } from '@supabase/supabase-js';
-import type { AuthPromiseResult, UserSession } from '@features/auth/types';
-import type { Result } from '@shared/types';
+import type { AuthPromiseResult, DatabaseQuery, Result, UserProfile, UserSession } from '@shared/types';
 
 export async function getSession(): AuthPromiseResult<Session> {
   const {
@@ -26,7 +25,7 @@ export async function getSession(): AuthPromiseResult<Session> {
   return err(new AuthError('No session found', 401, 'session_not_found'));
 }
 
-export async function getCurrentUser(): AuthPromiseResult<User> {
+export async function getUser(): AuthPromiseResult<User> {
   const { data, error } = await supabase.auth.getUser();
 
   if (error) {
@@ -36,42 +35,102 @@ export async function getCurrentUser(): AuthPromiseResult<User> {
   return ok(data.user);
 }
 
+export async function getUserProfile(): DatabaseQuery<UserProfile, '*'> {
+  const user = await getUser();
+
+  if (user.ok) {
+    return query(
+      await supabase
+        .from('User_Information')
+        .select('*')
+        .eq('supabase_id', user.data.id)
+        .single()
+    )
+  }
+
+  return user;
+}
+
 export async function signUp(
   email: string,
   password: string,
+  firstName: string,
+  lastName: string,
 ): AuthPromiseResult<UserSession> {
-  if (!email.endsWith('@mtroyal.ca')) {
-    return err(
-      new AuthError(
-        'Only @mtroyal.ca email addresses are allowed',
-        401,
-        'email_address_invalid',
-      ),
-    );
+  const verify = verifyEmail(email);
+
+  if (!verify.ok) {
+    return verify;
   }
 
-  return authenticate(
+  const result = authenticate(
     await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/home`,
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+        },
+      },
     }),
   );
+
+  if (result.ok) {
+    const user = result.data.user;
+
+    if (user.ok) {
+      const response = query(
+        await supabase
+          .from('User_Information')
+          .insert({
+            email: user.data.email,
+          } as UserProfile)
+      ); // TODO: DATABASE TRIGGER?
+
+      if (!response.ok) {
+        console.error(response.error);
+      }
+    }
+  }
+
+  return result;
 }
 
 export async function signIn(
   email: string,
   password: string,
 ): AuthPromiseResult<UserSession> {
-  return authenticate(
-    await supabase.auth.signInWithPassword({
-      email,
-      password,
-    }),
-  );
+  const verify = verifyEmail(email);
+
+  if (verify.ok) {
+    return authenticate(
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      }),
+    );
+  }
+
+  return verify;
 }
 
 export async function signOut(): AuthPromiseResult<null> {
   const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    return err(error);
+  }
+
+  return ok(null);
+}
+
+export async function resendEmailVerification(email: string): AuthPromiseResult<null> {
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+  });
 
   if (error) {
     return err(error);
@@ -133,5 +192,22 @@ function authenticate(response: AuthResponse): Result<UserSession, AuthError> {
     return err(error);
   }
 
-  return ok(data);
+  return ok({
+    user: present(data.user),
+    session: present(data.session),
+  });
+}
+
+function verifyEmail(email: string): Result<null, AuthError> {
+  if (!email.endsWith('@mtroyal.ca')) {
+    return err(
+      new AuthError(
+        'Only @mtroyal.ca email addresses are allowed',
+        401,
+        'email_address_invalid',
+      ),
+    );
+  }
+
+  return ok(null);
 }

@@ -18,6 +18,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
+    onConsoleLog(_log: string, type: 'stdout' | 'stderr'): boolean {
+      return type === 'stdout';
+    },
   },
   resolve: {
     alias: {
@@ -25,6 +28,7 @@ export default defineConfig({
       '@pages': path.resolve(__dirname, './src/pages'),
       '@assets': path.resolve(__dirname, './src/assets'),
       '@shared': path.resolve(__dirname, './src/shared'),
+      '@itests': path.resolve(__dirname, './src/tests'),
     },
   },
 } as UserConfigExport);

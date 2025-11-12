@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@shared/contexts/AuthContext.tsx';
+import { useAuth } from '@shared/contexts';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -45,12 +45,12 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   // Redirect to sign in if not authenticated
-  if (!user) {
+  if (!user.ok) {
     return <Navigate to='/signin' replace />;
   }
 
   // Redirect to verify email if not confirmed
-  if (!user.email_confirmed_at) {
+  if (!user.data.email_confirmed_at) {
     return <Navigate to='/verify-email' replace />;
   }
 

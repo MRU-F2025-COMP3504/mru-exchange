@@ -4,7 +4,7 @@ import Header from './Header';
 import { supabase } from '@shared/api';
 
 interface Product {
-    id: number;
+    id?: number;
     title: string | null;
     description: string | null;
     price: number | null;
@@ -12,6 +12,7 @@ interface Product {
     stock_count: number | null;
     isListed: boolean | null;
     isDeleted: boolean | null;
+    category: string | null;
 }
 
 interface Category {
@@ -22,9 +23,19 @@ interface Category {
 
 export default function PostProductPage() {
 
-    const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+    const [product, setProduct] = useState<Product>({
+        title: "",
+        description: "",
+        price: null,
+        image: null,
+        stock_count: null,
+        isListed: null,
+        isDeleted: null,
+        category: null
+    });
+
     
     // Get all categories
     const fetchCategories = async () => {
@@ -44,35 +55,10 @@ export default function PostProductPage() {
         }
     };
 
-    // Get image URL from Supabase
-    const getImageUrl = (imageData: any): string | null => {
-        if (!imageData) return null;
-        
-        try {
-            let imagePath: string | null = null;
-            
-            if (typeof imageData === 'object' && imageData !== null) {
-                imagePath = imageData.image || imageData.path || imageData.url || imageData.filename;
-            } else if (typeof imageData === 'string') {
-                imagePath = imageData;
-            }
-            
-            if (!imagePath) return null;
-            if (imagePath.startsWith('http')) return imagePath;
-            
-            const filename = imagePath.replace('database/images/', '').split('/').pop();
-            if (!filename) return null;
-            
-            const { data } = supabase.storage
-                .from('product-images')
-                .getPublicUrl(filename);
-            
-            return data.publicUrl;
-        } catch (error) {
-            console.error('Error getting image URL:', error);
-            return null;
-        }
-    };
+    const updateProduct = (field: keyof Product, value: any) => {
+        setProduct(prev => ({ ...prev, [field]: value}))
+    }
+
     //const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
         
@@ -98,11 +84,13 @@ export default function PostProductPage() {
                     maxWidth: "1200px",
                     margin: "2rem auto",
                     gap: "2rem",
+                    alignItems: "center"
+                    
                 }}
             >
                 <aside
                     style={{
-                        width: "40rem",
+                        width: "30rem",
                         background: "white",
                         padding: "1rem",
                         borderRadius: "8px",
@@ -112,22 +100,35 @@ export default function PostProductPage() {
                 >
                     <h3></h3>
                     <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem",}}>
-                        <input type="textbox" placeholder="Enter title here..."  />
+                        <input 
+                            type="textbox" 
+                            placeholder="Enter title here..."
+                            onChange={(e) => updateProduct("title", e.target.value)}
+                        />
                     </label>
                     <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
-                        <input type="textbox" placeholder="Enter price here..." /> 
+                        <input 
+                            type="textbox"
+                            placeholder="Enter price here..." 
+                            onChange={(e) => updateProduct("price", e.target.value)}
+                        /> 
                     </label>
                     <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
-                        <input type="dropdown" placeholder="Choose category..." /> 
+                        <input 
+                            type="dropdown" 
+                            placeholder="Choose category..." 
+                            onChange={(e) => updateProduct("category", e.target.value)}
+                        /> 
                     </label>
                     <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
-                        <input type="dropdown" placeholder="Condition" /> 
+                        <input 
+                            type="textbox" 
+                            placeholder="Description" 
+                            onChange={(e) => updateProduct("description", e.target.value)}
+                        /> 
                     </label>
                     <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
-                        <input type="dropdown" placeholder="Enter description here... " /> 
-                    </label>
-                    <label style={{ display: "block", marginBottom: "0.5rem", padding: "1rem", }}>
-                        <input type="file" 
+                        <input type="file"
                         accept="image/*"
                         multiple
                         required
@@ -135,9 +136,92 @@ export default function PostProductPage() {
                         placeholder="Add Photos" 
                         /> 
                     </label>
+                    <button style={{
+                        padding: '0.5rem 1rem',
+                        backgroundColor: '#0F76D7',
+                        color: 'white',
+                        borderRadius: '0.375rem',
+                        border: 'none',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                    }}>
+                        Preview Page
+                    </button>
                 </aside>
-                <main>
-
+                <main 
+                    style={{
+                        flex: 1,
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "flex-start",
+                        paddingRight: "2rem",
+                    }}
+                >
+                    <div 
+                        style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center"
+                    }}>
+                        <h3 
+                            style={{
+                                marginBottom: "1rem",
+                                fontSize: "1.25rem",
+                                fontWeight: 600,
+                                color: "#374151"
+                        }}>
+                            Preview
+                        </h3>
+                        
+                    
+                        <div
+                            
+                            style={{
+                                background: "white",
+                                borderRadius: "12px",
+                                padding: "1rem",
+                                boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                            }}
+                            onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-4px)';
+                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1)';
+                            }}
+                        >
+                            <div
+                                style={{
+                                    width: "340px",
+                                    height: "140px",
+                                    backgroundColor: "#d9d9d9",
+                                    borderRadius: "12px",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    padding: "1rem",
+                                    boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                                    transition: "transform 0.2s, box-shadow 0.2s"
+                                }}
+                            ></div>
+                    
+                            <div 
+                                style={{
+                                    marginTop: "0.5rem",
+                                }}
+                            >
+                                <h4>{product.title}</h4>
+                                <p>
+                                    ${product.price} 
+                                    <br/>
+                                    {product.category}
+                                    <br/>
+                                    {product.description}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </main>
             </div>
         </div>

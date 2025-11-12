@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@shared/contexts/AuthContext';
+import { useAuth } from '@shared/contexts';
 
 export default function VerifyEmailPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { resendVerificationEmail } = useAuth();
+  const { resendEmailVerification } = useAuth();
   const email = location.state?.email || '';
   const [isResending, setIsResending] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
@@ -19,9 +19,9 @@ export default function VerifyEmailPage() {
     setIsResending(true);
     setResendMessage('');
 
-    const { error } = await resendVerificationEmail(email);
+    const result = await resendEmailVerification(email);
 
-    if (error) {
+    if (!result.ok) {
       setResendMessage('Failed to resend link. Please try again.');
     } else {
       setResendMessage('Verification link sent successfully!');
