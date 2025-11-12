@@ -371,6 +371,7 @@ export default function ProductSearchPage() {
                         return (
                             <div
                                 key={product.id}
+                                onClick={() => navigate(`/product/${product.id}`)}
                                 style={{
                                     background: "white",
                                     borderRadius: "12px",

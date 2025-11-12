@@ -221,7 +221,7 @@ export default function HomePage() {
                 return (
                   <div
                     key={product.id}
-                    onClick={() => navigate('/product-search')}
+                    onClick={() => navigate(`/product/${product.id}`)}
                     style={{
                       backgroundColor: 'white',
                       borderRadius: '12px',
