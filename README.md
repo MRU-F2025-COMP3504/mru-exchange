@@ -80,6 +80,7 @@ Any pushed changes to this repository in the `main` branch automatically runs th
 In addition, the workflow does not clone the repositoy.
 
 The production server _must_ clone the repository to automate deployment.
+In addition, the build process (i.e., `npm, run build`) must be successful in order to deploy the application.
 
 ### Clone Repository
 
@@ -105,8 +106,6 @@ The website is accessed using the following URL:
 mruexchange.app
 ```
 
-By default, the DNS record for the website and the path to the SSL certificate are hardcoded.
-The server listens on port `80` and `443` for HTTP and HTTPS, respectively.
 See the [nginx.conf](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/nginx.conf) to configure the reverse proxy for the production server.
 
 ## Daily Operation & Development
@@ -118,14 +117,17 @@ We use the `npm` [(node package manager)](https://www.npmjs.com/) and [docker](h
     - If the host is using the Windows operating system, the host must install and use [Docker Desktop](https://www.docker.com/products/docker-desktop/) to run the application.
     - If using docker is not an option, the application can be run using `vite`. See [below](#development) for more information.
 
-For the host to read (e.g., `git clone`) or make changes to this repository, the host must have [Git](https://git-scm.com/) installed.
-If you are working in a development environment, cloning the repository via HTTPS can be used. Using [SSH](https://en.wikipedia.org/wiki/Secure_Shell) to access the repository is optional.
+We use [Git](https://git-scm.com/) for version control and manage code changes.
+For the host to read (e.g., `git clone`) or make changes to this repository, the host must have Git installed.
+If you are working in a development environment, cloning the repository via HTTPS can be used.
+Using [SSH](https://en.wikipedia.org/wiki/Secure_Shell) to access the repository is optional.
 See [below](#clone-repository-1) for more information.
 
 - The SSH client should be pre-installed on Windows, macOS, and Linux operating systems.
 - See the [attached installation instructions](https://git-scm.com/install/windows) for how to install `git`. 
 
-Git must be configured and linked with a GitHub account. If the host is using SSH to access the repository, it must be configured using public and private keys with the account.
+Git must be configured and linked with a GitHub account. 
+If the host is using SSH to access the repository, Git must be configured using a public and private key linked with the account.
 - See the [attached instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/about-ssh) for how to configure SSH with a GitHub account.
 
 The application offers two environment configurations (i.e., development and production).
@@ -140,7 +142,7 @@ We recommend using the same approach for [deployment](#clone-repository--change-
 $ git clone git@github.com:MRU-F2025-COMP3504/mru-exchange.git && cd mru-exchange
 ```
 
-Alternatively, the host can clone the repository via HTTPS:
+Alternatively, the host can clone the repository via HTTPS, where you will be prompted for GitHub credentials:
 
 ```bash
 $ git clone https://github.com/MRU-F2025-COMP3504/mru-exchange.git && cd mru-exchange
@@ -148,7 +150,6 @@ $ git clone https://github.com/MRU-F2025-COMP3504/mru-exchange.git && cd mru-exc
 
 ### Update
 
-We use Git for version control and manage code changes.
 To update the local repository to the latest upstream changes:
 
 ```bash
@@ -177,15 +178,19 @@ $ npm run build
 ```
 
 This script is automatically executed on deployment via the [CI/CD](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/.github/workflows/cicd.yml) workflow.
+The build process must be successful in order to deploy the application.
+When the build fails, the workflow would be cancelled.
 
 ### Running
 
-We recommend using [docker](https://www.docker.com/) for application behaviour consistency on all environments and deploying to production.
-Depending on the running host that the codebase lives on and how docker is installed, running docker may require **root or administrator priviledges**.
+We recommend using [docker](https://www.docker.com/) for application behaviour consistency that runs in a reproducable environment and deploying to production.
+Depending on the host and how docker is configured, running docker may require **root or administrator priviledges**.
+- See the documentation for [Windows](https://docs.docker.com/desktop/setup/install/windows-permission-requirements/) about permission requirements for more information.
+- See the documentation for [Linux](https://docs.docker.com/engine/install/linux-postinstall/) about root priviledges for more information.
 
 #### Production
 
-The application must be dockerized in order to run the Nginx (reverse proxy) docker image to route and encrypt incoming traffic.
+The application must be dockerized in order to run the Nginx (reverse proxy) docker image to route and encrypt traffic.
 Our Nginx configuration uses [LetsEncrypt](https://letsencrypt.org/) for HTTPS traffic.
 
 - We recommend using [certbot](https://certbot.eff.org/) to install and automate SSL certificate renewal.
@@ -267,7 +272,7 @@ To test for code coverage:
 $ npm run test:coverage
 ```
 
-To test for the user interface:
+To test using the web user interface:
 
 ```bash
 $ npm run test:ui
