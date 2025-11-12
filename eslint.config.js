@@ -41,6 +41,7 @@ export default defineConfig([
           caughtErrors: 'none',
         },
       ],
+      '@typescript-eslint/restrict-template-expressions': 'off',
     },
   },
 ]);
