@@ -30,7 +30,7 @@ export async function getBySeller(seller: RequiredColumns<UserProfile, 'supabase
 export async function getBySearch(
   text: string,
 ): DatabaseQuery<Product[], '*'> {
-  const search = text.replace(/[%_\\]/g, '\\$&');
+  const search = text.replace(/[%_\\]/g, '\\$&'); // prevents sql injection
   return query(
     await supabase
       .from('Product_Information')
@@ -40,15 +40,15 @@ export async function getBySearch(
 }
 
 export function getByFilter(): ProductFilter {
-  const sql = supabase.from('Product_Information').select('id');
-  let categories: number[];
+  let sql = supabase.from('Product_Information').select('id');
+  let categories: number[] = [];
 
   return {
     seller(seller: RequiredColumns<UserProfile, 'supabase_id'>): Result<ProductFilter> {
       if (!seller.supabase_id) {
         return err(new Error('Seller ID is not specified'));
       } else {
-        void sql.eq('user_id', seller.supabase_id);
+        sql = sql.eq('user_id', seller.supabase_id);
       }
 
       return ok(this);
@@ -61,8 +61,8 @@ export function getByFilter(): ProductFilter {
           }),
         );
       } else {
-        void sql.gte('price', Math.min(a, b));
-        void sql.lte('price', Math.max(a, b));
+        sql = sql.gte('price', Math.min(a, b));
+        sql = sql.lte('price', Math.max(a, b));
       }
 
       return ok(this);
@@ -75,8 +75,8 @@ export function getByFilter(): ProductFilter {
           }),
         );
       } else {
-        void sql.gte('stock_count', Math.min(a, b));
-        void sql.lte('stock_count', Math.max(a, b));
+        sql = sql.gte('stock_count', Math.min(a, b));
+        sql = sql.lte('stock_count', Math.max(a, b));
       }
 
       return ok(this);
