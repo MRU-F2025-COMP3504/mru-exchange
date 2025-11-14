@@ -12,6 +12,7 @@ export default defineConfig([
   globalIgnores(['dist']),
   {
     files: ['**/*.{ts,tsx}'],
+    // plugins: ['eslint-plugin-tsdoc'],
     extends: [
       js.configs.recommended,
       tseslint.configs.strictTypeChecked,
@@ -35,6 +36,7 @@ export default defineConfig([
       },
     },
     rules: {
+      // 'tsdoc/syntax': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
