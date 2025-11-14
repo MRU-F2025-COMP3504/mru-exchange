@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { mockQuery } from '@shared/tests';
-import { ProductBookmarking } from '@features/ordering';
+import { ProductBookmarking } from '@features/bookmarking';
 
-describe('Shopping Cart', () => {
-  it('returns the cart of user', async () => {
+describe('Product Bookmarking', () => {
+  it('returns the bookmarker of user', async () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -19,7 +19,7 @@ describe('Shopping Cart', () => {
     expect(result.ok, 'get() failed').toBe(true);
   });
 
-  it('returns the products from cart', async () => {
+  it('returns bookmarked products', async () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -37,7 +37,7 @@ describe('Shopping Cart', () => {
     expect(result.ok, 'getProducts() failed').toBe(true);
   });
 
-  it('registers a new cart for user', async () => {
+  it('registers a bookmarker', async () => {
     mockQuery({
       insert: vi.fn().mockReturnValue({
         select: vi.fn().mockReturnValue({
@@ -53,7 +53,7 @@ describe('Shopping Cart', () => {
     expect(result.ok, 'register() failed').toBe(true);
   });
 
-  it('store products to cart', async () => {
+  it('bookmark products', async () => {
     mockQuery({
       insert: vi.fn().mockReturnValue({
         select: vi
@@ -64,13 +64,13 @@ describe('Shopping Cart', () => {
 
     const cart = { id: 0 };
     const products = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ProductBookmarking.store(cart, ...products);
+    const query = ProductBookmarking.store(cart, products);
     const result = await query;
 
     expect(result.ok, 'store() failed').toBe(true);
   });
 
-  it('remove products from cart', async () => {
+  it('remove bookmarked products', async () => {
     mockQuery({
       delete: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -85,13 +85,13 @@ describe('Shopping Cart', () => {
 
     const cart = { id: 0 };
     const products = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ProductBookmarking.remove(cart, ...products);
+    const query = ProductBookmarking.remove(cart, products);
     const result = await query;
 
     expect(result.ok, 'remove() failed').toBe(true);
   });
 
-  it('clear products from cart', async () => {
+  it('remove all bookmarked products', async () => {
     mockQuery({
       delete: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({

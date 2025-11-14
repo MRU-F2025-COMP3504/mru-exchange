@@ -1,37 +1,91 @@
 import type {
-  DatabaseQuery,
-  DatabaseQueryResult,
-  Product,
-  RequiredColumns,
-  ProductBookmarker,
   BookmarkedProduct,
+  DatabaseQuery,
+  ProductBookmarker,
+  RequiredColumns,
+  Product,
+  DatabaseQueryResult,
   UserProfile,
 } from '@shared/types';
 import { empty, HookUtils } from '@shared/utils';
-import { ProductBookmarking } from '@features/ordering';
-import { useCallback, useEffect, useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { ProductBookmarking } from '@features/bookmarking';
 
 interface UseCartReturn {
+  /**
+   * The current loading state indicates data in transit or processing to completion.
+   *
+   * @returns true, if currently loading
+   */
   loading: boolean;
-  cart: ShoppingCartResult;
+
+  /**
+   * The current bookmarker result state for the user.
+   *
+   * @returns a wrapped query result that may contain the product bookmarker
+   */
+  bookmarker: BookmarkerResult;
+
+  /**
+   * The current collection of bookmarked products from the user.
+   *
+   * @returns an unwrapped query result of bookmarked products
+   */
   products: BookmarkedProduct[];
+
+  /**
+   * Refreshes the current state.
+   *
+   * @returns a wrapped query that may contain the product bookmarker
+   */
   refresh: () => DatabaseQuery<ProductBookmarker, '*'>;
+
+  /**
+   * Bookmarks the given product(s) from the user.
+   *
+   * @param the given product identifier(s)
+   * @returns a wrapped query of stored bookmarked product(s)
+   * @see {@link ProductBookmarking.store}
+   */
   store: (
-    ...array: RequiredColumns<Product, 'id'>[]
+    products: RequiredColumns<Product, 'id'>[],
   ) => DatabaseQuery<BookmarkedProduct[], '*'>;
+
+  /**
+   * Removes bookmarks on the given product(s) from the user.
+   *
+   * @param the given product identifier(s)
+   * @returns a wrapped query of deleted bookmarked product(s)
+   * @see {@link ProductBookmarking.remove()}
+   */
   remove: (
-    ...array: RequiredColumns<Product, 'id'>[]
+    products: RequiredColumns<Product, 'id'>[],
   ) => DatabaseQuery<BookmarkedProduct[], '*'>;
+
+  /**
+   * Removes all bookmarked products from the user.
+   *
+   * @param the given product identifier(s)
+   * @returns a wrapped query of deleted bookmarked product(s)
+   * @see {@link ProductBookmarking.clear()}
+   */
   clear: () => DatabaseQuery<BookmarkedProduct[], 'product_id'>;
 }
 
-type ShoppingCartResult = DatabaseQueryResult<ProductBookmarker, '*'>;
+type BookmarkerResult = DatabaseQueryResult<ProductBookmarker, '*'>;
 
-export default function (
+/**
+ * Hooks product bookmarking functionality to components.
+ *
+ * @see {@link ProductBookmarking} for API documentation
+ * @author Sahil Grewal (SahilGrewalx)
+ * @author Ramos Jacosalem (cjaco906)
+ */
+export function useBookmarker(
   buyer: RequiredColumns<UserProfile, 'supabase_id'>,
 ): UseCartReturn {
   const [loading, setLoading] = useState<boolean>(true);
-  const [cart, setCart] = useState<ShoppingCartResult>(() => empty());
+  const [cart, setCart] = useState<BookmarkerResult>(() => empty());
   const [products, setProducts] = useState<BookmarkedProduct[]>([]);
 
   const refresh = useCallback(async () => {
@@ -47,11 +101,11 @@ export default function (
   }, [buyer]);
 
   const store = useCallback(
-    async (...array: RequiredColumns<Product, 'id'>[]) => {
+    async (array: RequiredColumns<Product, 'id'>[]) => {
       if (cart.ok) {
         return HookUtils.load(
           setLoading,
-          ProductBookmarking.store(cart.data, ...array),
+          ProductBookmarking.store(cart.data, array),
         ).then((result) => {
           if (result.ok) {
             setProducts([...products, ...result.data]);
@@ -67,11 +121,11 @@ export default function (
   );
 
   const remove = useCallback(
-    async (...array: RequiredColumns<Product, 'id'>[]) => {
+    async (array: RequiredColumns<Product, 'id'>[]) => {
       if (cart.ok) {
         return HookUtils.load(
           setLoading,
-          ProductBookmarking.remove(cart.data, ...array),
+          ProductBookmarking.remove(cart.data, array),
         ).then((result) => {
           if (!result.ok) {
             return result;
@@ -122,7 +176,7 @@ export default function (
 
   return {
     loading,
-    cart,
+    bookmarker: cart,
     products,
     refresh,
     store,

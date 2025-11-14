@@ -11,6 +11,7 @@ import { query, supabase } from '@shared/api';
 interface ProductBookmarking {
   /**
    * Retrieves the product bookmarker of the given user.
+   * Selects all columns.
    *
    * @param user the given user's identifier
    * @returns a promise that resolves to the corresponding user's bookmarker
@@ -77,6 +78,25 @@ interface ProductBookmarking {
   ): DatabaseQuery<BookmarkedProduct[], 'product_id'>;
 }
 
+/**
+ * Product bookmarking plays a central role in selecting which products to exchange.
+ * When the buyer navigates to the product page, the buyer is presented with a bookmark button that makes a request for exchange.
+ *
+ * The system provides a representation of a bookmarked product.
+ * When a buyer bookmarks a product, a database row for the corresponding table is created with the columns:
+ * - `created_at`
+ * - `bookmarker_id` (primary key)
+ * - `product_id` (primary key)
+ *
+ * The product bookmarker holds products bookmarked by the buyer.
+ * The bookmarker has the following columns:
+ * - `id` (primary key)
+ * - `created_at`
+ * - `user_id`
+ *
+ * @author Sahil Grewal (SahilGrewalx)
+ * @author Ramos Jacosalem (cjaco906)
+ */
 export const ProductBookmarking: ProductBookmarking = {
   get: async (
     user: RequiredColumns<UserProfile, 'supabase_id'>,

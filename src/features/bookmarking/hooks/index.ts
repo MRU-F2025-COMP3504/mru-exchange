@@ -1,1 +1,0 @@
-export { default as useCart } from '@features/ordering/hooks/useCart';
