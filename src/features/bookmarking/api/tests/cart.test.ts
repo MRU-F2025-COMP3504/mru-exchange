@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { mockQuery } from '@shared/tests';
-import { CartAPI } from '@features/ordering';
+import { ProductBookmarking } from '@features/ordering';
 
 describe('Shopping Cart', () => {
   it('returns the cart of user', async () => {
@@ -13,7 +13,7 @@ describe('Shopping Cart', () => {
     });
 
     const user = { supabase_id: 'abc123' };
-    const query = CartAPI.get(user);
+    const query = ProductBookmarking.get(user);
     const result = await query;
 
     expect(result.ok, 'get() failed').toBe(true);
@@ -31,7 +31,7 @@ describe('Shopping Cart', () => {
     });
 
     const cart = { id: 0 };
-    const query = CartAPI.getProducts(cart);
+    const query = ProductBookmarking.getProducts(cart);
     const result = await query;
 
     expect(result.ok, 'getProducts() failed').toBe(true);
@@ -47,7 +47,7 @@ describe('Shopping Cart', () => {
     });
 
     const user = { supabase_id: 'abc123' };
-    const query = CartAPI.register(user);
+    const query = ProductBookmarking.register(user);
     const result = await query;
 
     expect(result.ok, 'register() failed').toBe(true);
@@ -64,7 +64,7 @@ describe('Shopping Cart', () => {
 
     const cart = { id: 0 };
     const products = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = CartAPI.store(cart, ...products);
+    const query = ProductBookmarking.store(cart, ...products);
     const result = await query;
 
     expect(result.ok, 'store() failed').toBe(true);
@@ -85,7 +85,7 @@ describe('Shopping Cart', () => {
 
     const cart = { id: 0 };
     const products = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = CartAPI.remove(cart, ...products);
+    const query = ProductBookmarking.remove(cart, ...products);
     const result = await query;
 
     expect(result.ok, 'remove() failed').toBe(true);
@@ -103,7 +103,7 @@ describe('Shopping Cart', () => {
     });
 
     const cart = { id: 0 };
-    const query = CartAPI.clear(cart);
+    const query = ProductBookmarking.clear(cart);
     const result = await query;
 
     expect(result.ok, 'clear() failed');

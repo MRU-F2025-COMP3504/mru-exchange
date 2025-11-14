@@ -3,45 +3,47 @@ import type {
   DatabaseQueryResult,
   Product,
   RequiredColumns,
-  ShoppingCart,
-  ShoppingCartProduct,
+  ProductBookmarker,
+  BookmarkedProduct,
   UserProfile,
 } from '@shared/types';
 import { empty, HookUtils } from '@shared/utils';
-import { CartAPI } from '@features/ordering';
+import { ProductBookmarking } from '@features/ordering';
 import { useCallback, useEffect, useState } from 'react';
 
 interface UseCartReturn {
   loading: boolean;
   cart: ShoppingCartResult;
-  products: ShoppingCartProduct[];
-  refresh: () => DatabaseQuery<ShoppingCart, '*'>;
+  products: BookmarkedProduct[];
+  refresh: () => DatabaseQuery<ProductBookmarker, '*'>;
   store: (
     ...array: RequiredColumns<Product, 'id'>[]
-  ) => DatabaseQuery<ShoppingCartProduct[], '*'>;
+  ) => DatabaseQuery<BookmarkedProduct[], '*'>;
   remove: (
     ...array: RequiredColumns<Product, 'id'>[]
-  ) => DatabaseQuery<ShoppingCartProduct[], '*'>;
-  clear: () => DatabaseQuery<ShoppingCartProduct[], 'product_id'>;
+  ) => DatabaseQuery<BookmarkedProduct[], '*'>;
+  clear: () => DatabaseQuery<BookmarkedProduct[], 'product_id'>;
 }
 
-type ShoppingCartResult = DatabaseQueryResult<ShoppingCart, '*'>;
+type ShoppingCartResult = DatabaseQueryResult<ProductBookmarker, '*'>;
 
 export default function (
   buyer: RequiredColumns<UserProfile, 'supabase_id'>,
 ): UseCartReturn {
   const [loading, setLoading] = useState<boolean>(true);
   const [cart, setCart] = useState<ShoppingCartResult>(() => empty());
-  const [products, setProducts] = useState<ShoppingCartProduct[]>([]);
+  const [products, setProducts] = useState<BookmarkedProduct[]>([]);
 
   const refresh = useCallback(async () => {
-    return HookUtils.load(setLoading, CartAPI.get(buyer)).then((result) => {
-      if (result.ok) {
-        setCart(result);
-      }
+    return HookUtils.load(setLoading, ProductBookmarking.get(buyer)).then(
+      (result) => {
+        if (result.ok) {
+          setCart(result);
+        }
 
-      return result;
-    });
+        return result;
+      },
+    );
   }, [buyer]);
 
   const store = useCallback(
@@ -49,7 +51,7 @@ export default function (
       if (cart.ok) {
         return HookUtils.load(
           setLoading,
-          CartAPI.store(cart.data, ...array),
+          ProductBookmarking.store(cart.data, ...array),
         ).then((result) => {
           if (result.ok) {
             setProducts([...products, ...result.data]);
@@ -69,7 +71,7 @@ export default function (
       if (cart.ok) {
         return HookUtils.load(
           setLoading,
-          CartAPI.remove(cart.data, ...array),
+          ProductBookmarking.remove(cart.data, ...array),
         ).then((result) => {
           if (!result.ok) {
             return result;
@@ -93,17 +95,18 @@ export default function (
 
   const clear = useCallback(async () => {
     if (cart.ok) {
-      return HookUtils.load(setLoading, CartAPI.clear(cart.data)).then(
-        (result) => {
-          if (!result.ok) {
-            return result;
-          }
-
-          setProducts([]);
-
+      return HookUtils.load(
+        setLoading,
+        ProductBookmarking.clear(cart.data),
+      ).then((result) => {
+        if (!result.ok) {
           return result;
-        },
-      );
+        }
+
+        setProducts([]);
+
+        return result;
+      });
     }
 
     return cart;
