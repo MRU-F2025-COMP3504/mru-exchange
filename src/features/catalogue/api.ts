@@ -176,8 +176,8 @@ interface ProductCatalogue {
   /**
    * Retrieves products by filters.
    * Uses a filter builder to adjust the query.
-   * See the {@link ProductFilter} for more information.
    *
+   * @see {@link ProductFilter} for more information on its builder features
    * @returns a promise that resolves products passed from the selected filters
    */
   getByFilter: () => ProductFilter;
