@@ -139,11 +139,9 @@ describe('Product Listing', () => {
       '/test/image.jpg',
     ];
 
-    for (const image of validImages) {
-      const validImageResult = register.image(image);
+    const validImageResult = register.image(validImages);
 
-      expect(validImageResult.ok, 'register.image() invalid').toBe(true);
-    }
+    expect(validImageResult.ok, 'register.image() invalid').toBe(true);
 
     const invalidImage = [
       '',
@@ -154,11 +152,9 @@ describe('Product Listing', () => {
       '.jpg',
     ];
 
-    for (const image of invalidImage) {
-      const invalidImageResult = register.image(image);
+    const invalidImageResult = register.image(invalidImage);
 
-      expect(invalidImageResult.ok, 'register.image() valid').toBe(false);
-    }
+    expect(invalidImageResult.ok, 'register.image() valid').toBe(false);
 
     const validPrice = 15;
     const validPriceResult = register.price(validPrice);
