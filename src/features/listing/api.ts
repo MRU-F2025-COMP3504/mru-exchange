@@ -332,8 +332,8 @@ export const ProductListing: ProductListing = {
       description(description: string): Result<ProductAttributeModifier> {
         return setDescription(this, product, description);
       },
-      image(url: string): Result<ProductAttributeModifier> {
-        return setImage(this, product, url);
+      image(paths: string[]): Result<ProductAttributeModifier> {
+        return setImage(this, product, paths);
       },
       async modify(): DatabaseQuery<Product, 'id'> {
         return query(

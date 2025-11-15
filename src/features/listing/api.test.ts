@@ -266,11 +266,9 @@ describe('Product Listing', () => {
       '/test/image.jpg',
     ];
 
-    for (const image of validImages) {
-      const validImageResult = attribute.image(image);
+    const validImageResult = attribute.image(validImages);
 
-      expect(validImageResult.ok, 'attribute.image() invalid').toBe(true);
-    }
+    expect(validImageResult.ok, 'attribute.image() invalid').toBe(true);
 
     const invalidImage = [
       '',
@@ -281,11 +279,9 @@ describe('Product Listing', () => {
       '.jpg',
     ];
 
-    for (const image of invalidImage) {
-      const invalidImageResult = attribute.image(image);
+    const invalidImageResult = attribute.image(invalidImage);
 
-      expect(invalidImageResult.ok, 'attribute.image() valid').toBe(false);
-    }
+    expect(invalidImageResult.ok, 'attribute.image() valid').toBe(false);
 
     const query = attribute.modify();
     const result = await query;

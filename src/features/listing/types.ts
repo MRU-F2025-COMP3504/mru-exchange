@@ -151,10 +151,10 @@ export interface ProductAttributeModifier {
    *
    * @see {@link REGEX_IMAGE_PATH} for more information on the image path validation algorithm
    *
-   * @param url the given product image paths
+   * @param paths the given product image paths
    * @returns a result that validates the given input
    */
-  image: (url: string) => Result<this>;
+  image: (paths: string[]) => Result<this>;
 
   /**
    * Finalizes modification and updates the given product.
