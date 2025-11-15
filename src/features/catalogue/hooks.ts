@@ -15,7 +15,7 @@ import type { ProductFilter } from './types';
 /**
  * The return type for the {@link useCategories()} hook.
  */
-interface UseCategoriesReturn {
+interface UseCategories {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -47,7 +47,7 @@ type UseCategoriesResult = DatabaseQueryResult<Category[], '*'>;
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
  */
-export function useCategories(): UseCategoriesReturn {
+export function useCategories(): UseCategories {
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<UseCategoriesResult>(() => empty());
 
@@ -69,7 +69,7 @@ export function useCategories(): UseCategoriesReturn {
 /**
  * The return type for the {@link useCategorizedProducts()} hook.
  */
-interface UseCategorizedProductsReturn {
+interface UseCategorizedProducts {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -107,13 +107,14 @@ type UseCategorizedProductsResult = DatabaseQueryResult<
  */
 export function useCategorizedProducts(
   category: RequiredColumns<Category, 'id'>,
-): UseCategorizedProductsReturn {
+): UseCategorizedProducts {
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<UseCategorizedProductsResult>(() =>
     empty(),
   );
 
   /**
+   * Loads the categorized products once per invocation.
    * Updates the hook state when its dependencies (i.e., category) changes state.
    */
   useEffect(() => {
@@ -132,7 +133,7 @@ export function useCategorizedProducts(
 /**
  * The return type for the {@link useCategory()} hook.
  */
-interface UseCategoryReturn {
+interface UseCategory {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -167,10 +168,14 @@ type UseCategoryResult = DatabaseQueryResult<Category, '*'>;
  */
 export function useCategory(
   category: RequiredColumns<Category, 'id'>,
-): UseCategoryReturn {
+): UseCategory {
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<UseCategoryResult>(() => empty());
 
+  /**
+   * Loads the category tag once per invocation.
+   * Updates the hook state when its dependencies (i.e., category) changes state.
+   */
   useEffect(() => {
     void HookUtils.load(setLoading, CategoryCatalogue.getTag(category)).then(
       setResult,
@@ -186,7 +191,7 @@ export function useCategory(
 /**
  * The return type for the {@link useProductFilter()} hook.
  */
-interface UseProductFilterReturn {
+interface UseProductFilter {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -221,11 +226,12 @@ type UseProductFilterResult = DatabaseQueryResult<Product[], 'id'>;
  */
 export function useProductFilter(
   run: (filter: ProductFilter) => DatabaseQuery<Product[], 'id'>,
-): UseProductFilterReturn {
+): UseProductFilter {
   const [loading, setLoading] = useState<boolean>(true);
   const [result, setResult] = useState<UseProductFilterResult>(() => empty());
 
   /**
+   * Creates a new product filter once per invocation.
    * Updates the hook state when its dependencies (i.e., run()) changes state.
    */
   useEffect(() => {
@@ -243,7 +249,7 @@ export function useProductFilter(
 /**
  * The return type for the {@link useProductSearch()} hook.
  */
-interface UseProductSearchReturn {
+interface UseProductSearch {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -276,11 +282,12 @@ type UseProductSearchResult = DatabaseQueryResult<Product[], '*'>;
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
  */
-export function useProductSearch(text: string): UseProductSearchReturn {
+export function useProductSearch(text: string): UseProductSearch {
   const [loading, setLoading] = useState<boolean>(true);
   const [result, setResult] = useState<UseProductSearchResult>(() => empty());
 
   /**
+   * Loads the products that matches the search query once per invocation.
    * Updates the hook state when its dependencies (i.e., text) changes state.
    */
   useEffect(() => {
@@ -298,7 +305,7 @@ export function useProductSearch(text: string): UseProductSearchReturn {
 /**
  * The return type for the {@link useProducts()} hook.
  */
-interface UseProductsReturn {
+interface UseProducts {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -333,11 +340,12 @@ type UseProductsResult = DatabaseQueryResult<Product[], '*'>;
  */
 export function useProducts(
   products: RequiredColumns<Product, 'id'>[],
-): UseProductsReturn {
+): UseProducts {
   const [loading, setLoading] = useState<boolean>(true);
   const [result, setResult] = useState<UseProductsResult>(() => empty());
 
   /**
+   * Loads the products once per invocation.
    * Updates the hook state when its dependencies (i.e., products) changes state.
    */
   useEffect(() => {
@@ -355,7 +363,7 @@ export function useProducts(
 /**
  * The return type for the {@link useSellerProducts()} hook.
  */
-interface UseProductsBySellerReturn {
+interface UseProductsBySeller {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -390,13 +398,14 @@ type UseProductsBySellerResult = DatabaseQueryResult<Product[], '*'>;
  */
 export function useSellerProducts(
   seller: RequiredColumns<UserProfile, 'supabase_id'>,
-): UseProductsBySellerReturn {
+): UseProductsBySeller {
   const [loading, setLoading] = useState<boolean>(true);
   const [result, setResult] = useState<UseProductsBySellerResult>(() =>
     empty(),
   );
 
   /**
+   * Loads the seller once per invocation.
    * Updates the hook state when its dependencies (i.e., seller) changes state.
    */
   useEffect(() => {

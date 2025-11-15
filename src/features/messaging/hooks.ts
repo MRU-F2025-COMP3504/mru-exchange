@@ -12,7 +12,7 @@ import { UserMessaging, UserChatting } from '@features/messaging';
 /**
  * The return type for the {@link useChat()} hook.
  */
-interface UseChatReturn {
+interface UseChat {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -79,12 +79,14 @@ interface UseChatReturn {
 export function useChat(
   sender: RequiredColumns<UserProfile, 'supabase_id'>,
   chat: RequiredColumns<UserChat, 'id'>,
-): UseChatReturn {
+): UseChat {
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<UserMessage[]>([]);
 
   /**
-   * @see {@link UseChatReturn.refresh()} for more information
+   * Updates the callback state when its dependencies (i.e., chat) changes state.
+   *
+   * @see {@link UseChat.refresh()} for more information
    */
   const refresh = useCallback(async () => {
     return HookUtils.load(setLoading, UserMessaging.getByChat(chat)).then(
@@ -147,6 +149,7 @@ export function useChat(
   );
 
   /**
+   * Loads the user's messages once per invocation.
    * Updates the hook state when its dependencies (i.e., chat, sender) changes state.
    * The {@link refresh()} callback dependency prevents infinite recursion recall.
    */
@@ -181,7 +184,7 @@ export function useChat(
 /**
  * The return type for the {@link useChats()} hook.
  */
-interface UseChatsReturn {
+interface UseChats {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -235,12 +238,14 @@ interface UseChatsReturn {
  */
 export function useChats(
   sender: RequiredColumns<UserProfile, 'supabase_id'>,
-): UseChatsReturn {
+): UseChats {
   const [loading, setLoading] = useState(true);
   const [chats, setChats] = useState<UserChat[]>([]);
 
   /**
-   * @see {@link UseChatsReturn.refresh()} for more information
+   * Updates the callback state when its dependencies (i.e., sender) changes state.
+   *
+   * @see {@link UseChats.refresh()} for more information
    */
   const refresh = useCallback(async () => {
     return HookUtils.load(setLoading, UserChatting.getByUser(sender)).then(
@@ -286,6 +291,7 @@ export function useChats(
   );
 
   /**
+   * Loads the user chats once per invocation.
    * Updates the hook state when its dependencies (i.e., sender) changes state.
    * The {@link refresh()} callback dependency prevents infinite recursion recall.
    */

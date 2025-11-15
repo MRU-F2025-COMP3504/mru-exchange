@@ -14,7 +14,7 @@ import { ProductBookmarking } from '@features/bookmarking';
 /**
  * The return type for the {@link useBookmarker()} hook.
  */
-interface UseBookmarkerReturn {
+interface UseBookmarker {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -42,7 +42,7 @@ interface UseBookmarkerReturn {
   /**
    * Force refreshes the state to the latest update.
    *
-   ** To handle the query result:
+   * To handle the query result:
    * - The {@link PromiseResult} must be awaited.
    * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
@@ -110,13 +110,15 @@ type BookmarkerResult = DatabaseQueryResult<ProductBookmarker, '*'>;
  */
 export function useBookmarker(
   buyer: RequiredColumns<UserProfile, 'supabase_id'>,
-): UseBookmarkerReturn {
+): UseBookmarker {
   const [loading, setLoading] = useState<boolean>(true);
   const [bookmarker, setBookmarker] = useState<BookmarkerResult>(() => empty());
   const [products, setProducts] = useState<BookmarkedProduct[]>([]);
 
   /**
-   * @see {@link UseBookmarkerReturn.refresh()} for more information
+   * Updates the callback state when its dependencies (i.e., buyer) changes state.
+   *
+   * @see {@link UseBookmarker.refresh()} for more information
    */
   const refresh = useCallback(async () => {
     return HookUtils.load(setLoading, ProductBookmarking.get(buyer)).then(
@@ -215,8 +217,9 @@ export function useBookmarker(
   }, [bookmarker]);
 
   /**
+   * Loads the bookmarker once per invocation.
    * Updates the hook state when its dependencies (i.e., buyer) changes state.
-   * The {@link refresh()} callback dependency prevents infinite recursion recall.
+   * The {@link refresh()} callback dependency prevents infinite recursion re-calls.
    */
   useEffect(() => {
     void refresh().then((result) => {
