@@ -74,7 +74,7 @@ interface CategoryCatalogue {
 }
 
 /**
- * The category catalogue is used to fetch products based on its assigned category tags for search queries and product organization.
+ * The category catalogue feature is used to fetch products based on its assigned category tags for search queries and product organization.
  * Sellers may assign their products with one or more category tags that can be best represented.
  * Category tags influences user recommendations and search queries, enhancing product exposure.
  *
@@ -184,7 +184,7 @@ interface ProductCatalogue {
 }
 
 /**
- * The product catalogue is used to serve registered products to users.
+ * The product catalogue feature is used to serve registered products to users.
  * Buyers may fetch a specific product, search via keywords, or filter to retrieve desired product(s), if avaiable.
  * Sellers must register products for public listing.
  * Only publicly listed products are shown to buyers.

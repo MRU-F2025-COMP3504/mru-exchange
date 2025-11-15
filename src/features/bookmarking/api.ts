@@ -106,7 +106,7 @@ interface ProductBookmarking {
 }
 
 /**
- * Product bookmarking plays a central role in selecting which products to exchange.
+ * The product bookmarking feature plays a central role in selecting which products to exchange.
  * When the buyer navigates to the product page, the buyer is presented with a bookmark button that makes a request for exchange.
  * The product bookmarker holds products bookmarked by the buyer.
  *

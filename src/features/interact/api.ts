@@ -112,9 +112,12 @@ interface UserInteraction {
 }
 
 /**
- * The user interaction is used estalish chat connection and connect a pair that consists of the buyer and the seller.
+ * The user interaction feature is used establish chat connection and connect a pair that consists of the buyer and the seller.
  * When the buyer bookmarks a product, the seller of that product would be notified of the "order" and establish a new (or reuse existing) chat communication.
- * Users can block and mute recipients from receiving and silencing chat message notifications, respectively.
+ * Users may block and mute recipients from receiving and silencing chat message notifications, respectively.
+ *
+ * @see {@link UserChatting} for user chat registration and fetching
+ * @see {@link UserMessaging} for user messaging
  *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
