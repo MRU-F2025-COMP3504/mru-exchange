@@ -1,6 +1,71 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, it, vi, expect } from 'vitest';
 import { mockQuery } from '@shared/tests';
-import { ProductCatalogueAPI } from '@features/catalogue';
+import { CategoryCatalogue, ProductCatalogue } from '@features/catalogue';
+
+describe('Category Tag Catalogue', () => {
+  it('returns all category tags', async () => {
+    mockQuery({
+      select: vi.fn().mockReturnValue({
+        order: vi
+          .fn()
+          .mockResolvedValue({ data: new Array<object>(), error: null }),
+      }),
+    });
+
+    const query = CategoryCatalogue.getTags();
+    const result = await query;
+
+    expect(result.ok, 'getTags()').toBe(true);
+  });
+
+  it('returns a category tag by its id', async () => {
+    mockQuery({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: { id: 0 }, error: null }),
+        }),
+      }),
+    });
+
+    const category = { id: 0 };
+    const query = CategoryCatalogue.getTag(category);
+    const result = await query;
+
+    expect(result.ok, 'getTag()').toBe(true);
+  });
+
+  it('returns products assigned with a category tag', async () => {
+    mockQuery({
+      select: vi.fn().mockReturnValue({
+        eq: vi
+          .fn()
+          .mockResolvedValue({ data: new Array<object>(), error: null }),
+      }),
+    });
+
+    const category = { id: 0 };
+    const query = CategoryCatalogue.getProductsByAssignedTag(category);
+    const result = await query;
+
+    expect(result.ok, 'getProductsByAssignedTag()').toBe(true);
+  });
+
+  it('returns assigned category tags by a given product', async () => {
+    mockQuery({
+      select: vi.fn().mockReturnValue({
+        eq: vi
+          .fn()
+          .mockResolvedValue({ data: new Array<object>(), error: null }),
+      }),
+    });
+
+    const product = { id: 0 };
+    const query = CategoryCatalogue.getAssignedTagsByProduct(product);
+    const result = await query;
+
+    expect(result.ok, 'getAssignedTagsByProduct()').toBe(true);
+  });
+});
 
 describe('Product Catalogue', () => {
   it('returns products', async () => {
@@ -13,7 +78,7 @@ describe('Product Catalogue', () => {
     });
 
     const products = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ProductCatalogueAPI.get(...products);
+    const query = ProductCatalogue.get(products);
     const result = await query;
 
     expect(result.ok, 'get() failed').toBe(true);
@@ -29,7 +94,7 @@ describe('Product Catalogue', () => {
     });
 
     const seller = { supabase_id: 'abc123' };
-    const query = ProductCatalogueAPI.getBySeller(seller);
+    const query = ProductCatalogue.getBySeller(seller);
     const result = await query;
 
     expect(result.ok, 'getBySeller() failed').toBe(true);
@@ -45,7 +110,7 @@ describe('Product Catalogue', () => {
     });
 
     const text = 'abc textbook';
-    const query = ProductCatalogueAPI.getBySearch(text);
+    const query = ProductCatalogue.getBySearch(text);
     const result = await query;
 
     expect(result.ok, 'getBySearch() failed').toBe(true);
@@ -69,7 +134,7 @@ describe('Product Catalogue', () => {
     });
 
     const seller = { supabase_id: 'abc123' };
-    const sellerFilter = ProductCatalogueAPI.getByFilter().seller(seller);
+    const sellerFilter = ProductCatalogue.getByFilter().seller(seller);
 
     if (sellerFilter.ok) {
       const invalidSeller = { supabase_id: '' };
@@ -99,7 +164,8 @@ describe('Product Catalogue', () => {
             'getByFilter.find() invalid',
           ).toBe(true);
 
-          const categoryFilter = stockFilter.data.categories(0, 1, 2, 3, 4, 5);
+          const categories = [{ id: 0 }, { id: 1 }, { id: 2 }];
+          const categoryFilter = stockFilter.data.categories(categories);
 
           if (categoryFilter.ok) {
             mockQuery({
