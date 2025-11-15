@@ -6,13 +6,21 @@ import type {
 } from '@shared/types';
 import { query, supabase } from '@shared/api';
 
+/**
+ * See the implementation below for more information.
+ */
 interface UserInteraction {
   /**
-   * Returns two users interacting from the database by their identifier.
+   * Retrieves two interacting users by their identifier.
+   * Selects all columns.
    *
-   * @param a a user's identifier
-   * @param b a user's identifier
-   * @returns a promise that contains information of two interacting users
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @param a the given user identifier
+   * @param b the given user identifier
+   * @returns a promise that resolves to the corresponding user interaction
    */
   get: (
     a: RequiredColumns<UserProfile, 'supabase_id'>,
@@ -20,20 +28,30 @@ interface UserInteraction {
   ) => DatabaseQuery<InteractingUsers, '*'>;
 
   /**
-   * Returns an interaction from the database by the given user that is currently blocked from the interaction.
+   * Retrieves two interacting users by the given user that is currently blocked from the interaction.
+   * If the query fails, the function returns an error result.
    *
-   * @param user a user's identifier
-   * @returns a promise that contains the interaction identifier
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @param user the given user identifier
+   * @returns a promise that resolves to the corresponding user interaction
    */
   getBlockedOnUser: (
     user: RequiredColumns<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<InteractingUsers[], 'id'>;
 
   /**
-   * Returns an interaction from the database by the given user that is currently muted from the interaction.
+   * Retrieves two interacting users by the given user that is currently muted from the interaction.
+   * If the query fails, the function returns an error result.
    *
-   * @param user a user's authentication identifier
-   * @returns a promise that contains the interaction identifier
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @param user the given user identifier
+   * @returns a promise that resolves to the corresponding user interaction
    */
   getMutedOnUser: (
     user: RequiredColumns<UserProfile, 'supabase_id'>,
@@ -41,10 +59,15 @@ interface UserInteraction {
 
   /**
    * Establishes an interaction between two users.
+   * Selects all columns.
    *
-   * @param a a user's identifier
-   * @param b a user's identifier
-   * @returns a promise that contains information of two interacting users.
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @param a the given user identifier
+   * @param b the given user identifier
+   * @returns a promise that resolves to the corresponding user interaction.
    */
   create: (
     a: RequiredColumns<UserProfile, 'supabase_id'>,
@@ -53,10 +76,15 @@ interface UserInteraction {
 
   /**
    * Blocks the user target by the blocker from the interaction.
+   * If the query fails, the function returns an error result.
    *
-   * @param blocker the blocker's user identifier
-   * @param target the target's user identifier
-   * @returns a promise that contains the interaction identifier
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @param blocker the given user identifier
+   * @param target the given user identifier
+   * @returns a promise that resolves to the corresponding user interaction
    */
   block: (
     blocker: RequiredColumns<UserProfile, 'supabase_id'>,
@@ -66,10 +94,15 @@ interface UserInteraction {
 
   /**
    * Mutes the user target by the muter from the interaction.
+   * If the query fails, the function returns an error result.
    *
-   * @param blocker the muter's user identifier
-   * @param target the target's user identifier
-   * @returns a promise that contains the interaction identifier
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @param blocker the given user identifier
+   * @param target the given user identifier
+   * @returns a promise that resolves to the corresponding user interaction
    */
   mute(
     muter: RequiredColumns<UserProfile, 'supabase_id'>,
@@ -78,6 +111,14 @@ interface UserInteraction {
   ): DatabaseQuery<InteractingUsers, 'id'>;
 }
 
+/**
+ * The user interaction is used estalish chat connection and connect a pair that consists of the buyer and the seller.
+ * When the buyer bookmarks a product, the seller of that product would be notified of the "order" and establish a new (or reuse existing) chat communication.
+ * Users can block and mute recipients from receiving and silencing chat message notifications, respectively.
+ *
+ * @author Sahil Grewal (SahilGrewalx)
+ * @author Ramos Jacosalem (cjaco906)
+ */
 export const UserInteraction: UserInteraction = {
   get: async (
     a: RequiredColumns<UserProfile, 'supabase_id'>,
@@ -168,6 +209,15 @@ export const UserInteraction: UserInteraction = {
   },
 };
 
+/**
+ * Modifies the given user interaction.
+ *
+ * @internal
+ * @param interaction the given interaction identifier
+ * @param field the given interaction property
+ * @param flag the given modifier
+ * @returns a promise that resolves to the corresponding user interaction
+ */
 async function set(
   interaction: RequiredColumns<InteractingUsers, 'id'>,
   field: string,
