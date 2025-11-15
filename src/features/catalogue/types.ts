@@ -11,7 +11,7 @@ import type {
  * Filters products based on the selection of product properties.
  * Selection may happen during runtime (e.g., category selection on search query).
  *
- * @see {@link ProductListing.getByFilter()}
+ * @see {@link ProductCategory.getByFilter()}
  * @see {@link useProductFilter()}
  */
 export interface ProductFilter {
@@ -68,7 +68,7 @@ export interface ProductFilter {
   /**
    * Finalizes the filter and queries for matching product(s).
    *
-   * To handle the validation result:
+   * To handle the query result:
    * - The {@link PromiseResult} must be awaited.
    * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
