@@ -11,7 +11,10 @@ import { empty, HookUtils } from '@shared/utils';
 import { useState, useCallback, useEffect } from 'react';
 import { ProductBookmarking } from '@features/bookmarking';
 
-interface UseCartReturn {
+/**
+ * The return type for the {@link useBookmarker()} hook.
+ */
+interface UseBookmarkerReturn {
   /**
    * The current loading state indicates data in transit or processing to completion.
    *
@@ -20,7 +23,7 @@ interface UseCartReturn {
   loading: boolean;
 
   /**
-   * The current bookmarker result state for the user.
+   * The current bookmarker state from the user.
    *
    * @returns a wrapped query result that may contain the product bookmarker
    */
@@ -34,7 +37,7 @@ interface UseCartReturn {
   products: BookmarkedProduct[];
 
   /**
-   * Refreshes the current state.
+   * Force refreshes the state to the latest update.
    *
    * @returns a wrapped query that may contain the product bookmarker
    */
@@ -72,27 +75,35 @@ interface UseCartReturn {
   clear: () => DatabaseQuery<BookmarkedProduct[], 'product_id'>;
 }
 
+/**
+ * An alias for the product bookmarker query result.
+ */
 type BookmarkerResult = DatabaseQueryResult<ProductBookmarker, '*'>;
 
 /**
- * Hooks product bookmarking functionality to components.
+ * Hooks product bookmarking functionality.
+ * The hook state updates when its dependency states changes.
  *
- * @see {@link ProductBookmarking} for API documentation
+ * @see {@link ProductBookmarking} for more information
+ *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useBookmarker(
   buyer: RequiredColumns<UserProfile, 'supabase_id'>,
-): UseCartReturn {
+): UseBookmarkerReturn {
   const [loading, setLoading] = useState<boolean>(true);
-  const [cart, setCart] = useState<BookmarkerResult>(() => empty());
+  const [bookmarker, setBookmarker] = useState<BookmarkerResult>(() => empty());
   const [products, setProducts] = useState<BookmarkedProduct[]>([]);
 
+  /**
+   * @see {@link UseBookmarkerReturn.refresh()} for more information
+   */
   const refresh = useCallback(async () => {
     return HookUtils.load(setLoading, ProductBookmarking.get(buyer)).then(
       (result) => {
         if (result.ok) {
-          setCart(result);
+          setBookmarker(result);
         }
 
         return result;
@@ -100,12 +111,18 @@ export function useBookmarker(
     );
   }, [buyer]);
 
+  /**
+   * Hooks the store() functionality.
+   * Updates the callback state when its dependencies (i.e., bookmarker and product) changes state.
+   *
+   * @see {@link ProductBookmarking.store()}
+   */
   const store = useCallback(
     async (array: RequiredColumns<Product, 'id'>[]) => {
-      if (cart.ok) {
+      if (bookmarker.ok) {
         return HookUtils.load(
           setLoading,
-          ProductBookmarking.store(cart.data, array),
+          ProductBookmarking.store(bookmarker.data, array),
         ).then((result) => {
           if (result.ok) {
             setProducts([...products, ...result.data]);
@@ -115,17 +132,23 @@ export function useBookmarker(
         });
       }
 
-      return cart;
+      return bookmarker;
     },
-    [cart, products],
+    [bookmarker, products],
   );
 
+  /**
+   * Hooks the remove() functionality.
+   * Updates the callback state when its dependencies (i.e., bookmarker and products) changes state.
+   *
+   * @see {@link ProductBookmarking.remove()}
+   */
   const remove = useCallback(
     async (array: RequiredColumns<Product, 'id'>[]) => {
-      if (cart.ok) {
+      if (bookmarker.ok) {
         return HookUtils.load(
           setLoading,
-          ProductBookmarking.remove(cart.data, array),
+          ProductBookmarking.remove(bookmarker.data, array),
         ).then((result) => {
           if (!result.ok) {
             return result;
@@ -142,16 +165,22 @@ export function useBookmarker(
         });
       }
 
-      return cart;
+      return bookmarker;
     },
-    [cart, products],
+    [bookmarker, products],
   );
 
+  /**
+   * Hooks the clear() functionality.
+   * Updates the callback state when its dependencies (i.e., bookmarker) changes state.
+   *
+   * @see {@link ProductBookmarking.clear()}
+   */
   const clear = useCallback(async () => {
-    if (cart.ok) {
+    if (bookmarker.ok) {
       return HookUtils.load(
         setLoading,
-        ProductBookmarking.clear(cart.data),
+        ProductBookmarking.clear(bookmarker.data),
       ).then((result) => {
         if (!result.ok) {
           return result;
@@ -163,9 +192,13 @@ export function useBookmarker(
       });
     }
 
-    return cart;
-  }, [cart]);
+    return bookmarker;
+  }, [bookmarker]);
 
+  /**
+   * Updates the hook state when its dependencies (i.e., buyer) changes state.
+   * The {@link refresh()} callback dependency prevents infinite recursion recall.
+   */
   useEffect(() => {
     void refresh().then((result) => {
       if (!result.ok) {
@@ -176,7 +209,7 @@ export function useBookmarker(
 
   return {
     loading,
-    bookmarker: cart,
+    bookmarker,
     products,
     refresh,
     store,
