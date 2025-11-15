@@ -82,7 +82,7 @@ interface CategoryListing {
 }
 
 /**
- * The category listing is used to assign products for product organization and exposure.
+ * The category listing feature is used to assign products for product organization and exposure.
  * Sellers may assign their products with one or more category tags that can be best represented.
  * Sellers may register for one or more new category tags and modify them.
  *
@@ -220,7 +220,7 @@ interface ProductListing {
 }
 
 /**
- * The product listing is used to put a seller's product up for sale.
+ * The product listing feature is used to put a seller's product up for sale.
  * Sellers must only register products that does not yet exist in the database.
  * Sellers may choose to show, hide, or unlist products from the public.
  * Only publicly listed products are shown to buyers.
