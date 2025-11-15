@@ -108,7 +108,7 @@ describe('User Reporting', () => {
 
     const reporter = { supabase_id: 'abc123' };
     const reports = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = UserReporting.remove(reporter, ...reports);
+    const query = UserReporting.remove(reporter, reports);
     const result = await query;
 
     expect(result.ok, 'remove() failed').toBe(true);
@@ -129,7 +129,7 @@ describe('User Reporting', () => {
 
     const reporter = { supabase_id: 'abc123' };
     const reports = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = UserReporting.close(reporter, ...reports);
+    const query = UserReporting.close(reporter, reports);
     const result = await query;
 
     expect(result.ok, 'close() failed').toBe(true);
@@ -150,7 +150,7 @@ describe('User Reporting', () => {
 
     const reporter = { supabase_id: 'abc123' };
     const reports = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = UserReporting.open(reporter, ...reports);
+    const query = UserReporting.open(reporter, reports);
     const result = await query;
 
     expect(result.ok, 'open() failed').toBe(true);
