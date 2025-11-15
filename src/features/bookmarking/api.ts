@@ -8,6 +8,10 @@ import type {
 } from '@shared/types';
 import { query, supabase } from '@shared/api';
 
+/**
+ * Abstraction of product bookmarking.
+ * See the implementation below for more information.
+ */
 interface ProductBookmarking {
   /**
    * Retrieves the product bookmarker of the given user.
