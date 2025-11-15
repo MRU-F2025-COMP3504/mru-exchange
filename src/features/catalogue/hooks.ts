@@ -49,7 +49,7 @@ export function useCategories(): UseCategoriesReturn {
   const [result, setResult] = useState<UseCategoriesResult>(() => empty());
 
   /**
-   *Loads the category tags once.
+   * Loads the category tags once per invocation.
    */
   useEffect(() => {
     void HookUtils.load(setLoading, CategoryCatalogue.getTags()).then(
