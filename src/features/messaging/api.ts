@@ -12,11 +12,14 @@ import {
   type RealtimePostgresInsertPayload,
 } from '@supabase/supabase-js';
 
+/**
+ * See the implementation below for more information.
+ */
 interface UserChatting {
   /**
    * Subscribes to the user's chat.
    *
-   * @param user the given user's identifier
+   * @param user the given user identifier
    * @param callback the callback function to handle chat information
    * @returns the established channel
    */
@@ -27,6 +30,11 @@ interface UserChatting {
 
   /**
    * Retrieves the given chat by its identifier.
+   * Selects all columns.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param chat the given chat identifier
    * @returns a promise that resolves to the corresponding chat
@@ -35,8 +43,13 @@ interface UserChatting {
 
   /**
    * Retrieves chat that involves the given user.
+   * Selects all columns.
    *
-   * @param user the given user's identifier
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @param user the given user identifier
    * @returns a promise that resolves to the corresponding chat
    */
   getByUser: (
@@ -45,6 +58,10 @@ interface UserChatting {
 
   /**
    * Modifies the visibility of the given chat.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param visible the visibility flag
    * @param chats the given chat identifier(s)
@@ -59,6 +76,10 @@ interface UserChatting {
    * Establishes chat connection between two users.
    * Only one connection per two given users are allowed.
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param a a user's identifier
    * @param b a user's identifier
    * @returns a promise that resolves to chat registration
@@ -69,6 +90,21 @@ interface UserChatting {
   ) => DatabaseQuery<UserChat, 'id'>;
 }
 
+/**
+ * The user chatting feature is used to establish chat connection and fetch existing user chats.
+ * Both the sender and receiver, and vice versa, is the buyer and the seller, respectively.
+ * Only one chat per buyer-seller pair must exist.
+ * - To initiate a new chat, the chat must be registered.
+ * - Users must subscribe to a registered chat channel to send and receive messages.
+ * - Users may show or hide one or more chats.
+ *
+ * @see {@link UserInteraction} for user interaction registration and fetching
+ * @see {@link UserMessaging} for user messaging
+ *
+ * @author Sahil Grewal (SahilGrewalx)
+ * @author Ramos Jacosalem (cjaco906)
+ * @author Andrew Krawiec (AndrewTries)
+ */
 export const UserChatting: UserChatting = {
   subscribe: (
     user: RequiredColumns<UserProfile, 'supabase_id'>,
@@ -140,6 +176,9 @@ export const UserChatting: UserChatting = {
   },
 };
 
+/**
+ * See the implementation below for more information.
+ */
 interface UserMessaging {
   /**
    * Subscribes to user messages by the given chat.
@@ -155,6 +194,10 @@ interface UserMessaging {
   /**
    * Retrieves user messages from the given chat.
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param chat the given chat identifier
    * @returns a promise that resolves to the corresponding user messages
    */
@@ -164,6 +207,10 @@ interface UserMessaging {
 
   /**
    * Sends the given user message from the given chat.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param chat the given chat identifier
    * @param user the given user linked to the given chat
@@ -178,6 +225,10 @@ interface UserMessaging {
 
   /**
    * Modifies the visibility of the given user message(s) from the given chat.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param chat the given chat identifier
    * @param user the given user identifier linked to the given chat
@@ -195,6 +246,10 @@ interface UserMessaging {
   /**
    * Removes the given user message(s) from the given chat.
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param chat the given chat identifier
    * @param user the given user identifier
    * @param messages the given user message identifier(s) from the given chat
@@ -207,6 +262,20 @@ interface UserMessaging {
   ) => DatabaseQuery<UserMessage[], 'id'>;
 }
 
+/**
+ * The user messaging feature is used to send and receive user messages from users.
+ * Both the sender and receiver, and vice versa, is the buyer and the seller, respectively.
+ * - Users must subscribe to a registered chat channel to send and receive messages.
+ * - Users may show or hide one or more user messages.
+ * - Messages may be removed for special reasons (e.g., reporting, banning).
+ *
+ * @see {@link UserInteraction} for user interaction registration and fetching
+ * @see {@link UserChatting} for user user chatting registration and fetching
+ *
+ * @author Sahil Grewal (SahilGrewalx)
+ * @author Ramos Jacosalem (cjaco906)
+ * @author Andrew Krawiec (AndrewTries)
+ */
 export const UserMessaging: UserMessaging = {
   subscribe: (
     chat: RequiredColumns<UserChat, 'id'>,

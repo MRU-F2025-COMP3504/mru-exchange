@@ -1,27 +1,80 @@
-import { useState, useEffect, useCallback } from 'react';
-import { UserMessaging } from '@features/messaging';
 import type {
-  UserChat,
+  UserMessage,
   DatabaseQuery,
   RequiredColumns,
-  UserMessage,
   UserProfile,
+  UserChat,
 } from '@shared/types';
 import { HookUtils } from '@shared/utils';
+import { useState, useCallback, useEffect } from 'react';
+import { UserMessaging, UserChatting } from '@features/messaging';
 
+/**
+ * The return type for the {@link useChat()} hook.
+ */
 interface UseChatReturn {
+  /**
+   * The current loading state indicates data in transit or processing to completion.
+   *
+   * @returns true, if currently loading
+   */
   loading: boolean;
+
+  /**
+   * The current collection of user messages from the user chat.
+   *
+   * @returns an unwrapped query result of user messages
+   */
   messages: UserMessage[];
+
+  /**
+   * Force refreshes the state to the latest update.
+   *
+   ** To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @returns a wrapped query that may contain a collection of user messages
+   */
   refresh: () => DatabaseQuery<UserMessage[], '*'>;
+
+  /**
+   * Modifies the visibility of the given user message(s) from the user's chat.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @param visible the visibility flag
+   * @param messages the given user message identifier(s) from the user's chat
+   * @returns a promise that resolves to the corresponding modified user message(s)
+   */
   show: (
     flag: boolean,
-    ...messages: RequiredColumns<UserMessage, 'id'>[]
+    messages: RequiredColumns<UserMessage, 'id'>[],
   ) => DatabaseQuery<UserMessage[], 'id'>;
+
+  /**
+   * Sends the given user message from the user's chat.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @param message the given user message data
+   * @returns a promise that resolves to the corresponding sent user message
+   */
   send: (message: string) => DatabaseQuery<UserMessage, 'id'>;
 }
 
 /**
- * Hook to manage a chat and its messages
+ * Hooks user messaging functionality.
+ * The hook state updates when its dependency states changes.
+ *
+ * @see {@link UserMessaging} for more information
+ *
+ * @author Sahil Grewal (SahilGrewalx)
+ * @author Ramos Jacosalem (cjaco906)
  */
 export function useChat(
   sender: RequiredColumns<UserProfile, 'supabase_id'>,
@@ -30,6 +83,9 @@ export function useChat(
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<UserMessage[]>([]);
 
+  /**
+   * @see {@link UseChatReturn.refresh()} for more information
+   */
   const refresh = useCallback(async () => {
     return HookUtils.load(setLoading, UserMessaging.getByChat(chat)).then(
       (result) => {
@@ -44,11 +100,17 @@ export function useChat(
     );
   }, [chat]);
 
+  /**
+   * Hooks the show() functionality.
+   * Updates the callback state when its dependencies (i.e., chat, sender, messages, refresh) changes state.
+   *
+   * @see {@link UserMessaging.show()}
+   */
   const show = useCallback(
-    async (flag: boolean, ...array: RequiredColumns<UserMessage, 'id'>[]) => {
+    async (flag: boolean, array: RequiredColumns<UserMessage, 'id'>[]) => {
       return HookUtils.load(
         setLoading,
-        UserMessaging.show(chat, sender, flag, ...array),
+        UserMessaging.show(chat, sender, flag, array),
       ).then((result) => {
         if (!result.ok) {
           return result;
@@ -68,6 +130,12 @@ export function useChat(
     [chat, sender, messages, refresh],
   );
 
+  /**
+   * Hooks the send() functionality.
+   * Updates the callback state when its dependencies (i.e., chat, sender) changes state.
+   *
+   * @see {@link UserMessaging.send()}
+   */
   const send = useCallback(
     async (message: string) => {
       return HookUtils.load(
@@ -78,6 +146,10 @@ export function useChat(
     [chat, sender],
   );
 
+  /**
+   * Updates the hook state when its dependencies (i.e., chat, sender) changes state.
+   * The {@link refresh()} callback dependency prevents infinite recursion recall.
+   */
   useEffect(() => {
     void refresh().then((result) => {
       if (!result.ok) {
@@ -85,6 +157,9 @@ export function useChat(
       }
     });
 
+    /**
+     * Adds new messages when received in real time.
+     */
     const subscription = UserMessaging.subscribe(chat, (payload) => {
       setMessages((previous) => [...previous, payload.new]);
     });
@@ -103,27 +178,72 @@ export function useChat(
   };
 }
 
-interface UseMessagesReturn {
+/**
+ * The return type for the {@link useChats()} hook.
+ */
+interface UseChatsReturn {
+  /**
+   * The current loading state indicates data in transit or processing to completion.
+   *
+   * @returns true, if currently loading
+   */
   loading: boolean;
+
+  /**
+   * The current collection of user chats from the user.
+   *
+   * @returns an unwrapped query result of user chats
+   */
   chats: UserChat[];
+
+  /**
+   * Force refreshes the state to the latest update.
+   *
+   ** To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @returns a wrapped query that may contain a collection of user chats
+   */
   refresh: () => DatabaseQuery<UserChat[], '*'>;
+
+  /**
+   * Modifies the visibility the given user chat from the user.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
+   * @param visible the visibility flag
+   * @param chats the given chat identifier(s)
+   * @returns a promise that resolves to the corresponding chat(s)
+   */
   show: (
     flag: boolean,
-    ...chats: RequiredColumns<UserChat, 'id'>[]
+    chats: RequiredColumns<UserChat, 'id'>[],
   ) => DatabaseQuery<UserChat[], 'id'>;
 }
 
 /**
- * Hook to get all chats for a user
+ * Hooks user chatting functionality.
+ * The hook state updates when its dependency state changes.
+ *
+ * @see {@link UserChatting} for more information
+ *
+ * @author Sahil Grewal (SahilGrewalx)
+ * @author Ramos Jacosalem (cjaco906)
  */
-export function UseMessagesReturn(
+export function useChats(
   sender: RequiredColumns<UserProfile, 'supabase_id'>,
-): UseMessagesReturn {
+): UseChatsReturn {
   const [loading, setLoading] = useState(true);
   const [chats, setChats] = useState<UserChat[]>([]);
 
+  /**
+   * @see {@link UseChatsReturn.refresh()} for more information
+   */
   const refresh = useCallback(async () => {
-    return HookUtils.load(setLoading, UserChat.getByUser(sender)).then(
+    return HookUtils.load(setLoading, UserChatting.getByUser(sender)).then(
       (result) => {
         if (result.ok) {
           setChats(result.data);
@@ -136,9 +256,15 @@ export function UseMessagesReturn(
     );
   }, [sender]);
 
+  /**
+   * Hooks the show() functionality.
+   * Updates the callback state when its dependencies (i.e., chats, refresh) changes state.
+   *
+   * @see {@link UserChatting.show()}
+   */
   const show = useCallback(
-    async (flag: boolean, ...array: RequiredColumns<UserChat, 'id'>[]) => {
-      return HookUtils.load(setLoading, UserChat.show(flag, ...chats)).then(
+    async (flag: boolean, array: RequiredColumns<UserChat, 'id'>[]) => {
+      return HookUtils.load(setLoading, UserChatting.show(flag, chats)).then(
         (result) => {
           if (!result.ok) {
             return result;
@@ -159,6 +285,10 @@ export function UseMessagesReturn(
     [chats, refresh],
   );
 
+  /**
+   * Updates the hook state when its dependencies (i.e., sender) changes state.
+   * The {@link refresh()} callback dependency prevents infinite recursion recall.
+   */
   useEffect(() => {
     void refresh().then((result) => {
       if (!result.ok) {
@@ -166,7 +296,10 @@ export function UseMessagesReturn(
       }
     });
 
-    const subscription = UserChat.subscribe(sender, (payload) => {
+    /**
+     * Adds newly registered user chat from the user in real time.
+     */
+    const subscription = UserChatting.subscribe(sender, (payload) => {
       setChats((previous) => [...previous, payload.new]);
     });
 
