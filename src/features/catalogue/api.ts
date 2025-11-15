@@ -74,12 +74,15 @@ interface CategoryCatalogue {
 }
 
 /**
- * The category catalogue is used to assign products for search queries and product organization.
- * Sellers can assign their products with one or more category tags that can be best represented.
+ * The category catalogue is used to fetch products based on its assigned category tags for search queries and product organization.
+ * Sellers may assign their products with one or more category tags that can be best represented.
  * Category tags influences user recommendations and search queries, enhancing product exposure.
+ *
+ * @see {@link CategoryListing} for registering and modifying existing category tags
  *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @author Andrew Krawiec (AndrewTries)
  */
 export const CategoryCatalogue: CategoryCatalogue = {
   getTags: async (): DatabaseQuery<Category[], '*'> => {
@@ -194,6 +197,7 @@ interface ProductCatalogue {
  *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @author Andrew Krawiec (AndrewTries)
  */
 export const ProductCatalogue: ProductCatalogue = {
   get: async (

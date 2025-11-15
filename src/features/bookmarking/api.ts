@@ -112,6 +112,7 @@ interface ProductBookmarking {
  *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @author Andrew Krawiec (AndrewTries)
  */
 export const ProductBookmarking: ProductBookmarking = {
   get: async (
