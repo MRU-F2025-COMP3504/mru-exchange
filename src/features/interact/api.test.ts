@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { mockQuery } from '@shared/tests';
-import { UserInteractionAPI } from '@features/interact';
+import { UserInteraction } from '@features/interact';
 
 describe('User Interaction', () => {
   it('returns users interacting', async () => {
@@ -14,7 +14,7 @@ describe('User Interaction', () => {
 
     const userA = { supabase_id: 'abc123' };
     const userB = { supabase_id: '123zxcv' };
-    const query = UserInteractionAPI.get(userA, userB);
+    const query = UserInteraction.get(userA, userB);
     const result = await query;
 
     expect(result.ok, 'get() failed').toBe(true);
@@ -32,7 +32,7 @@ describe('User Interaction', () => {
     });
 
     const user = { supabase_id: 'abc123' };
-    const query = UserInteractionAPI.getBlockedOnUser(user);
+    const query = UserInteraction.getBlockedOnUser(user);
     const result = await query;
 
     expect(result.ok, 'getBlockedOnUser() failed').toBe(true);
@@ -50,7 +50,7 @@ describe('User Interaction', () => {
     });
 
     const user = { supabase_id: 'abc123' };
-    const query = UserInteractionAPI.getMutedOnUser(user);
+    const query = UserInteraction.getMutedOnUser(user);
     const result = await query;
 
     expect(result.ok, 'getMutedOnUser() failed').toBe(true);
@@ -67,7 +67,7 @@ describe('User Interaction', () => {
 
     const userA = { supabase_id: 'abc123' };
     const userB = { supabase_id: '123zxcv' };
-    const query = UserInteractionAPI.create(userA, userB);
+    const query = UserInteraction.create(userA, userB);
     const result = await query;
 
     expect(result.ok, 'create() failed').toBe(true);
@@ -91,7 +91,7 @@ describe('User Interaction', () => {
 
     const blocker = { supabase_id: 'abc123' };
     const target = { supabase_id: '123zxcv' };
-    const query = UserInteractionAPI.block(blocker, target);
+    const query = UserInteraction.block(blocker, target, true);
     const result = await query;
 
     expect(result.ok, 'block() failed').toBe(true);
@@ -115,7 +115,7 @@ describe('User Interaction', () => {
 
     const muter = { supabase_id: 'abc123' };
     const target = { supabase_id: '123zxcv' };
-    const query = UserInteractionAPI.mute(muter, target);
+    const query = UserInteraction.mute(muter, target, true);
     const result = await query;
 
     expect(result.ok, 'mute() failed').toBe(true);
