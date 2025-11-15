@@ -12,13 +12,16 @@ import { err, ok } from '@shared/utils';
 import type { ProductFilter } from '@features/catalogue';
 
 /**
- * Abstraction of the category catalogue.
  * See the implementation below for more information.
  */
 interface CategoryCatalogue {
   /**
    * Retrieves all category tags.
    * Selects all columns.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @returns a promise that resolves to a collection of category tags
    */
@@ -27,6 +30,10 @@ interface CategoryCatalogue {
   /**
    * Retrieves the given category tag.
    * Selects all columns.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param tag the given category tag identifier
    * @returns a promise that resolves to the corresponding category tag that corresponds to the identifier
@@ -39,6 +46,10 @@ interface CategoryCatalogue {
    * Retrieves products by the given category tag that is assigned.
    * Selects all columns.
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param tag the given category tag identifier
    * @returns a promise that resolves to the corresponding products with the given category
    */
@@ -49,6 +60,10 @@ interface CategoryCatalogue {
   /**
    * Retrieves category tags that are assigned to the given product.
    * Selects all columns.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param product the given product identifier
    * @returns a promise that corresponds category tags with the given product
@@ -109,13 +124,16 @@ export const CategoryCatalogue: CategoryCatalogue = {
 };
 
 /**
- * Abstraction of the product catalogue.
  * See the implementation below for more information.
  */
 interface ProductCatalogue {
   /**
    * Retrieves products by the given product identifier(s).
    * Selects all columns.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param products the given product identifier(s)
    * @returns a promise that resolves to the corresponding product(s)
@@ -128,6 +146,10 @@ interface ProductCatalogue {
    * Retrieves products listed by the given seller.
    * Selects all columns.
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param seller the given user identifier
    * @returns a promise that resolves to the corresponding products
    */
@@ -139,6 +161,10 @@ interface ProductCatalogue {
    * Retrieves products by the given search query.
    * Selects all columns.
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param text the given search query
    * @returns a promise that resolves the corresponding products
    */
@@ -148,6 +174,10 @@ interface ProductCatalogue {
    * Retrieves products by filters.
    * Uses a filter builder to adjust the query.
    * See the {@link ProductFilter} for more information.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @returns a promise that resolves products passed from the selected filters
    */

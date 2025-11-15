@@ -26,6 +26,9 @@ interface UseCategoriesReturn {
   /**
    * The current query result state.
    *
+   * To handle the query result:
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @returns a wrapped query result that may contain all category tags
    */
   result: UseCategoriesResult;
@@ -76,6 +79,9 @@ interface UseCategorizedProductsReturn {
 
   /**
    * The current query result state.
+   *
+   * To handle the query result:
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @returns a wrapped query result that may contain the specified categorized product(s)
    */
@@ -137,6 +143,9 @@ interface UseCategoryReturn {
   /**
    * The current query result state.
    *
+   * To handle the query result:
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @returns a wrapped query result that may contain the specified category tag
    */
   result: UseCategoryResult;
@@ -187,6 +196,9 @@ interface UseProductFilterReturn {
 
   /**
    * The current query result state.
+   *
+   * To handle the query result:
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @returns a wrapped query result that may contain product(s) that passed the filters
    */
@@ -242,6 +254,9 @@ interface UseProductSearchReturn {
   /**
    * The current query result state.
    *
+   * To handle the query result:
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @returns a wrapped query result that may contain searched product(s)
    */
   result: UseProductSearchResult;
@@ -293,6 +308,9 @@ interface UseProductsReturn {
 
   /**
    * The current query result state.
+   *
+   * To handle the query result:
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @returns a wrapped query result that may contain the given product(s)
    */
@@ -347,6 +365,9 @@ interface UseProductsBySellerReturn {
 
   /**
    * The current query result state.
+   *
+   * To handle the query result:
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @returns a wrapped query result that may contain the given seller's product(s)
    */
