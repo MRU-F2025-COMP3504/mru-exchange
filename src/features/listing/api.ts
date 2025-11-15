@@ -253,8 +253,8 @@ export const ProductListing: ProductListing = {
       description(description: string): Result<ProductBuilder> {
         return setDescription(this, product, description);
       },
-      image(url: string): Result<ProductBuilder> {
-        return setImage(this, product, url);
+      image(paths: string[]): Result<ProductBuilder> {
+        return setImage(this, product, paths);
       },
       price(price: number): Result<ProductBuilder> {
         if (price < 0) {
@@ -427,13 +427,16 @@ function setDescription<T>(
 function setImage<T>(
   controller: T,
   product: Partial<Product>,
-  url: string,
+  paths: string[],
 ): Result<T> {
-  if (!REGEX_IMAGE_PATH.test(url)) {
-    return err(new Error('Product image path is not specified'));
-  } else {
-    product.image = url;
+  for (const path of paths) {
+    if (!REGEX_IMAGE_PATH.test(path)) {
+      return err(new Error('Product image path is invalid', { cause: path }));
+    }
   }
+
+  // TODO: Accept multiple image paths from the database
+  // product.image = url;
 
   return ok(controller);
 }
