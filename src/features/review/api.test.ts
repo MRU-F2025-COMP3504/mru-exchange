@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { mockQuery } from '@shared/tests';
-import { ReviewAPI } from '@features/review';
+import { UserReviewing } from '@features/review';
 
 describe('Review Creation/Modification', () => {
   it('creates a review', async () => {
@@ -13,7 +13,7 @@ describe('Review Creation/Modification', () => {
     });
 
     const reviewer = { supabase_id: 'abc123' };
-    const create = ReviewAPI.create(reviewer);
+    const create = UserReviewing.create(reviewer);
 
     const validDescription = 'this is a description';
     const validDescriptionResult = create.description(validDescription);
@@ -65,7 +65,7 @@ describe('Review Creation/Modification', () => {
 
     const reviewer = { supabase_id: 'abc123' };
     const reviews = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ReviewAPI.remove(reviewer, ...reviews);
+    const query = UserReviewing.remove(reviewer, ...reviews);
     const result = await query;
 
     expect(result.ok, 'remove() failed').toBe(true);
@@ -89,7 +89,7 @@ describe('Review Creation/Modification', () => {
       description: 'this is good',
     };
 
-    const query = ReviewAPI.remove(reviewer, review);
+    const query = UserReviewing.remove(reviewer, review);
     const result = await query;
 
     expect(result.ok, 'update() failed').toBe(true);
@@ -109,7 +109,7 @@ describe('Product Review', () => {
     });
 
     const product = { id: 0 };
-    const query = ReviewAPI.getProductReviews(product);
+    const query = UserReviewing.getProductReviews(product);
     const result = await query;
 
     expect(result.ok, 'getProductReviews() failed').toBe(true);
@@ -130,7 +130,7 @@ describe('Product Review', () => {
 
     const reviewer = { supabase_id: 'abc123' };
     const product = { id: 0 };
-    const query = ReviewAPI.getProductReviewsByReviewer(reviewer, product);
+    const query = UserReviewing.getProductReviewByReviewer(reviewer, product);
     const result = await query;
 
     expect(result.ok, 'getProductReviewsByReviewer() failed').toBe(true);
@@ -146,7 +146,7 @@ describe('Product Review', () => {
     });
 
     const product = { id: 0 };
-    const query = ReviewAPI.getAverageProductRating(product);
+    const query = UserReviewing.getAverageProductRating(product);
     const result = await query;
 
     expect(result.ok, 'getAverageProductRating() failed').toBe(true);
@@ -166,7 +166,7 @@ describe('Seller Review', () => {
     });
 
     const seller = { supabase_id: 'abc123' };
-    const query = ReviewAPI.getSellerReviews(seller);
+    const query = UserReviewing.getSellerReviews(seller);
     const result = await query;
 
     expect(result.ok, 'getSellerReviews() failed').toBe(true);
@@ -187,7 +187,7 @@ describe('Seller Review', () => {
 
     const reviewer = { supabase_id: 'abc123' };
     const seller = { supabase_id: '123zxcv' };
-    const query = ReviewAPI.getSellerReviewsByReviewer(reviewer, seller);
+    const query = UserReviewing.getSellerReviewByReviewer(reviewer, seller);
     const result = await query;
 
     expect(result.ok, 'getSellerReviewsByReviewer() failed').toBe(true);
@@ -203,7 +203,7 @@ describe('Seller Review', () => {
     });
 
     const seller = { supabase_id: 'abc123' };
-    const query = ReviewAPI.getAverageSellerRating(seller);
+    const query = UserReviewing.getAverageSellerRating(seller);
     const result = await query;
 
     expect(result.ok, 'getAverageSellerRating() failed').toBe(true);
