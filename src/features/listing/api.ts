@@ -14,10 +14,17 @@ import type {
   ProductAttributeModifier,
 } from '@features/listing';
 
+/**
+ * See the implementation below for more information.
+ */
 interface CategoryListing {
   /**
    * Registers the category tag.
-   * All columns are selected.
+   * Selects all columns.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param category the given category tag to register
    * @returns a promise that resolves the registered category tag
@@ -29,6 +36,10 @@ interface CategoryListing {
   /**
    * Removes the given category tag(s).
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param categories the given category tag identifier(s) to remove
    * @returns a promise that resolves the deleted category tag(s)
    */
@@ -38,7 +49,11 @@ interface CategoryListing {
 
   /**
    * Modifies the name and/or description of the given category tag.
-   * All columns are selected.
+   * Selects all columns.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param target the given category tag identifier to modify
    * @param change the new name and/or description
@@ -51,7 +66,11 @@ interface CategoryListing {
 
   /**
    * Assigns the given product with the given category tag(s).
-   * All columns are selected.
+   * Selects all columns.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param product the given product identifier
    * @param categories the given category tag identifier(s) to modify
@@ -62,6 +81,17 @@ interface CategoryListing {
   ) => DatabaseQuery<CategorizedProduct[], '*'>;
 }
 
+/**
+ * The category listing is used to assign products for product organization and exposure.
+ * Sellers may assign their products with one or more category tags that can be best represented.
+ * Sellers may register for one or more new category tags and modify them.
+ *
+ * @see {@link CategoryCatalogue} for fetching existing category tags
+ *
+ * @author Sahil Grewal (SahilGrewalx)
+ * @author Ramos Jacosalem (cjaco906)
+ * @author Andrew Krawiec (AndrewTries)
+ */
 export const CategoryListing: CategoryListing = {
   register: async (
     category: RequiredColumns<Category, 'name' | 'description'>,
@@ -119,16 +149,24 @@ export const CategoryListing: CategoryListing = {
   },
 };
 
+/**
+ * See the implementation below for more information.
+ */
 interface ProductListing {
   /**
    * Builds and registers a product.
    *
+   * @see {@link ProductBuilder} for more information on its builder features
    * @returns the product builder
    */
   register: () => ProductBuilder;
 
   /**
    * Specifies the listing visibility of the given product.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param isListed the visibility flag
    * @param products the given product identifier(s)
@@ -142,6 +180,10 @@ interface ProductListing {
   /**
    * Removes the given product(s).
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param products the given product identifier(s) to remove
    * @returns a promise that resolves the deleted product(s)
    */
@@ -153,6 +195,8 @@ interface ProductListing {
    * Modifies the attributes of the given product.
    * Attributes, such as the title, description, and images are specified.
    *
+   * @see {@link ProductAttributeModifier} for more information on its builder features
+   *
    * @param the given product identifier to modify its attributes
    * @returns a promise that resolves the modified product
    */
@@ -161,6 +205,10 @@ interface ProductListing {
   /**
    * Modifies the stock of the given product.
    * The stock amount must be greater than or equal to zero (0).
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param product the given product identifier to modify its stock
    * @return a promise that resolves the modified product
@@ -171,6 +219,18 @@ interface ProductListing {
   ): DatabaseQuery<Product, 'id'>;
 }
 
+/**
+ * The product listing is used to put a seller's product up for sale.
+ * Sellers must only register products that does not yet exist in the database.
+ * Sellers may choose to show, hide, or unlist products from the public.
+ * Only publicly listed products are shown to buyers.
+ *
+ * @see {@link ProductCatalogue} for fetching existing products
+ *
+ * @author Sahil Grewal (SahilGrewalx)
+ * @author Ramos Jacosalem (cjaco906)
+ * @author Andrew Krawiec (AndrewTries)
+ */
 export const ProductListing: ProductListing = {
   register: (): ProductBuilder => {
     const product: Partial<Product> = {};
@@ -304,6 +364,16 @@ export const ProductListing: ProductListing = {
   },
 };
 
+/**
+ * Modifies the product title.
+ * If the given title is empty, the function returns an error.
+ *
+ * @internal
+ * @param controller the given product attribute modifier
+ * @param product the given incomplete product modification
+ * @param title the given new product title
+ * @returns a wrapped result that may contain the product attribute modifier
+ */
 function setTitle<T>(
   controller: T,
   product: Partial<Product>,
@@ -318,6 +388,16 @@ function setTitle<T>(
   return ok(controller);
 }
 
+/**
+ * Modifies the product description.
+ * If the given description is empty, the function returns an error.
+ *
+ * @internal
+ * @param controller the given product attribute modifier
+ * @param product the given incomplete product modification
+ * @param title the given new product description
+ * @returns a wrapped result that may contain the product attribute modifier
+ */
 function setDescription<T>(
   controller: T,
   product: Partial<Product>,
@@ -332,6 +412,18 @@ function setDescription<T>(
   return ok(controller);
 }
 
+/**
+ * Modifies the product image.
+ * If the given image is invalid, the function returns an error.
+ *
+ * @see {@link REGEX_IMAGE_PATH} for more information on the image path validation algorithm
+ *
+ * @internal
+ * @param controller the given product attribute modifier
+ * @param product the given incomplete product modification
+ * @param title the given new product description
+ * @returns a wrapped result that may contain the product attribute modifier
+ */
 function setImage<T>(
   controller: T,
   product: Partial<Product>,
