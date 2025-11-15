@@ -17,6 +17,7 @@ import type {
 export interface ProductFilter {
   /**
    * Passes the given seller from the filter.
+   * If the given seller does not have a `supabase_id` property, the function returns an error.
    *
    * To handle the validation result:
    * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
@@ -28,6 +29,7 @@ export interface ProductFilter {
 
   /**
    * Passes the given minimum and maximum price value from the filter.
+   * If the given price values exceeds the minimum (0) bounds, the function returns an error.
    *
    * To handle the validation result:
    * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
@@ -40,6 +42,7 @@ export interface ProductFilter {
 
   /**
    * Passes the given minimum and maximum stock value from the filter.
+   * If the given stock values exceeds the minimum (0) bounds, the function returns an error.
    *
    * To handle the validation result:
    * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
@@ -52,6 +55,7 @@ export interface ProductFilter {
 
   /**
    * Passes the given category tag(s) from the filter.
+   * If the given category tag(s) does not have an identifier (`id`), the function returns an error.
    *
    * To handle the validation result:
    * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.

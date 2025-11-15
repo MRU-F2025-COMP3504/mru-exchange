@@ -185,7 +185,7 @@ interface ProductCatalogue {
 
 /**
  * The product catalogue is used to serve registered products to users.
- * Buyers can fetch a specific product, search via keywords, or filter to retrieve desired product(s), if avaiable.
+ * Buyers may fetch a specific product, search via keywords, or filter to retrieve desired product(s), if avaiable.
  * Sellers must register products for public listing.
  * Only publicly listed products are shown to buyers.
  *
@@ -275,6 +275,16 @@ export const ProductCatalogue: ProductCatalogue = {
       categories(
         values: RequiredColumns<Category, 'id'>[],
       ): Result<ProductFilter> {
+        for (const category of values) {
+          if (!Object.hasOwn(category, 'id')) {
+            return err(
+              new Error('The category tag identifier is not specified', {
+                cause: category,
+              }),
+            );
+          }
+        }
+
         categories = values;
 
         return ok(this);
