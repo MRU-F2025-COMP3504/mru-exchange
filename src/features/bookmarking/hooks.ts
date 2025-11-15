@@ -25,6 +25,9 @@ interface UseBookmarkerReturn {
   /**
    * The current bookmarker state from the user.
    *
+   * To handle the query result:
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @returns a wrapped query result that may contain the product bookmarker
    */
   bookmarker: BookmarkerResult;
@@ -39,12 +42,20 @@ interface UseBookmarkerReturn {
   /**
    * Force refreshes the state to the latest update.
    *
+   ** To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @returns a wrapped query that may contain the product bookmarker
    */
   refresh: () => DatabaseQuery<ProductBookmarker, '*'>;
 
   /**
    * Bookmarks the given product(s) from the user.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param the given product identifier(s)
    * @returns a wrapped query of stored bookmarked product(s)
@@ -57,6 +68,10 @@ interface UseBookmarkerReturn {
   /**
    * Removes bookmarks on the given product(s) from the user.
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param the given product identifier(s)
    * @returns a wrapped query of deleted bookmarked product(s)
    * @see {@link ProductBookmarking.remove()}
@@ -67,6 +82,10 @@ interface UseBookmarkerReturn {
 
   /**
    * Removes all bookmarked products from the user.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param the given product identifier(s)
    * @returns a wrapped query of deleted bookmarked product(s)

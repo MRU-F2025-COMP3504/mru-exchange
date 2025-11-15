@@ -9,13 +9,16 @@ import type {
 import { query, supabase } from '@shared/api';
 
 /**
- * Abstraction of product bookmarking.
  * See the implementation below for more information.
  */
 interface ProductBookmarking {
   /**
    * Retrieves the product bookmarker of the given user.
    * Selects all columns.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param user the given user's identifier
    * @returns a promise that resolves to the corresponding user's bookmarker
@@ -28,6 +31,10 @@ interface ProductBookmarking {
    * Retrieves products bookmarked by the given user.
    * Selects all columns.
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param bookmarker the given bookmarker identifier
    * @returns a promise that resolves to the corresponding products bookmarked by the given user
    */
@@ -37,6 +44,10 @@ interface ProductBookmarking {
 
   /**
    * Registers the user with a bookmarker.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param user the given user's identifier
    * @returns a promise that resolves to the corresponding user's bookmarker
@@ -48,6 +59,10 @@ interface ProductBookmarking {
   /**
    * Bookmarks the given product(s) for the given user (bookmarker).
    * Selects all columns.
+   *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param bookmarker the given bookmarker identifier
    * @param products the given product identifier(s)
@@ -62,6 +77,10 @@ interface ProductBookmarking {
    * Removes the given bookmarked products from the given user (bookmarker).
    * Selects all columns.
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param bookmarker the given bookmarker identifier
    * @param products the given product identifier(s)
    * @returns a promise that resolves to the corresponding product(s) bookmarked by the given user
@@ -74,6 +93,10 @@ interface ProductBookmarking {
   /**
    * Removes the entire bookmarked products from the user (bookmarker).
    *
+   * To handle the query result:
+   * - The {@link PromiseResult} must be awaited.
+   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   *
    * @param bookmarker the bookmarker identifier
    * @returns a promise that resolves to the corresponding product(s) bookmarked by the given user
    */
@@ -85,18 +108,7 @@ interface ProductBookmarking {
 /**
  * Product bookmarking plays a central role in selecting which products to exchange.
  * When the buyer navigates to the product page, the buyer is presented with a bookmark button that makes a request for exchange.
- *
- * The system provides a representation of a bookmarked product.
- * When a buyer bookmarks a product, a database row for the corresponding table is created with the columns:
- * - `created_at`
- * - `bookmarker_id` (primary key)
- * - `product_id` (primary key)
- *
  * The product bookmarker holds products bookmarked by the buyer.
- * The bookmarker has the following columns:
- * - `id` (primary key)
- * - `created_at`
- * - `user_id`
  *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
