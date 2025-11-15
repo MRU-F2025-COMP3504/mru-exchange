@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { mockQuery } from '@shared/tests';
-import { ReportAPI } from '@features/reporting';
+import { UserReporting } from '@features/reporting';
 
 describe('User Reporting', () => {
   it('return user reports from reporter', async () => {
@@ -15,7 +15,7 @@ describe('User Reporting', () => {
     });
 
     const reporter = { supabase_id: 'abc123' };
-    const query = ReportAPI.getByReporter(reporter);
+    const query = UserReporting.getByReporter(reporter);
     const result = await query;
 
     expect(result.ok, 'getByReporter() failed').toBe(true);
@@ -33,7 +33,7 @@ describe('User Reporting', () => {
     });
 
     const reported = { supabase_id: 'abc123' };
-    const query = ReportAPI.getByReported(reported);
+    const query = UserReporting.getByReported(reported);
     const result = await query;
 
     expect(result.ok, 'getByReported() failed').toBe(true);
@@ -48,7 +48,7 @@ describe('User Reporting', () => {
       }),
     });
 
-    const create = ReportAPI.create();
+    const create = UserReporting.create();
 
     const validDescription = 'this is a description';
     const validDescriptionResult = create.description(validDescription);
@@ -108,7 +108,7 @@ describe('User Reporting', () => {
 
     const reporter = { supabase_id: 'abc123' };
     const reports = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ReportAPI.remove(reporter, ...reports);
+    const query = UserReporting.remove(reporter, ...reports);
     const result = await query;
 
     expect(result.ok, 'remove() failed').toBe(true);
@@ -129,7 +129,7 @@ describe('User Reporting', () => {
 
     const reporter = { supabase_id: 'abc123' };
     const reports = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ReportAPI.close(reporter, ...reports);
+    const query = UserReporting.close(reporter, ...reports);
     const result = await query;
 
     expect(result.ok, 'close() failed').toBe(true);
@@ -150,7 +150,7 @@ describe('User Reporting', () => {
 
     const reporter = { supabase_id: 'abc123' };
     const reports = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ReportAPI.open(reporter, ...reports);
+    const query = UserReporting.open(reporter, ...reports);
     const result = await query;
 
     expect(result.ok, 'open() failed').toBe(true);
@@ -171,7 +171,7 @@ describe('User Reporting', () => {
       id: 0,
       description: 'this is a description',
     };
-    const query = ReportAPI.setDescription(report);
+    const query = UserReporting.modify(report);
     const result = await query;
 
     expect(result.ok, 'setDescription() failed').toBe(true);
