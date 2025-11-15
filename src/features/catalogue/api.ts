@@ -178,10 +178,6 @@ interface ProductCatalogue {
    * Uses a filter builder to adjust the query.
    * See the {@link ProductFilter} for more information.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @returns a promise that resolves products passed from the selected filters
    */
   getByFilter: () => ProductFilter;
