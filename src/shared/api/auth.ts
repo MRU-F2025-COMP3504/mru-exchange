@@ -1,5 +1,5 @@
-import { query, supabase } from '@shared/api';
-import { ok, err, present } from '@shared/utils';
+import { supabase } from '@shared/api';
+import { ok, err, present, query } from '@shared/utils';
 import {
   type AuthChangeEvent,
   AuthError,
