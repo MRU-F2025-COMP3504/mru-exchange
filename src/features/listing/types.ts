@@ -1,13 +1,13 @@
 import type {
   DatabaseQuery,
   Product,
-  RequiredColumns,
+  RequireProperty,
   Result,
   UserProfile,
 } from '@shared/types';
 
 /**
- * Builds products based on the given initialized inputs for selected product properties.
+ * Builds a product based on the given initialized inputs for selected product properties.
  * Selection may happen during runtime (e.g., initializing product image property).
  *
  * @see {@link ProductListing.register()}
@@ -25,7 +25,7 @@ export interface ProductBuilder {
    * @param seller the given user identifier
    * @returns a result that validates the given input
    */
-  seller: (id: RequiredColumns<UserProfile, 'supabase_id'>) => Result<this>;
+  seller: (id: RequireProperty<UserProfile, 'supabase_id'>) => Result<this>;
 
   /**
    * Initializes the title property.
@@ -112,7 +112,7 @@ export interface ProductBuilder {
 }
 
 /**
- * Modifies product attributes based on the selection of product properties.
+ * Modifies a product attribute based on the selection of product properties.
  * Selection may happen during runtime (e.g., modifing product title property).
  *
  * @see {@likn ProductListing.attribute()}

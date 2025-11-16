@@ -1,13 +1,13 @@
 import type {
   DatabaseQuery,
-  RequiredColumns,
+  RequireProperty,
   Result,
   UserProfile,
   UserReport,
 } from '@shared/types';
-import { query, supabase } from '@shared/api';
+import { supabase } from '@shared/api';
 import type { UserReporter } from '@features/reporting';
-import { err, ok, REGEX_TEXT_PATH } from '@shared/utils';
+import { err, ok, query, REGEX_TEXT_PATH } from '@shared/utils';
 
 /**
  * See the implementation below for more information.
@@ -25,7 +25,7 @@ interface UserReporting {
    * @returns a promise that resolves to the corresponding user reports from the given user
    */
   getByReporter: (
-    reporter: RequiredColumns<UserProfile, 'supabase_id'>,
+    reporter: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<UserReport[], '*'>;
 
   /**
@@ -40,7 +40,7 @@ interface UserReporting {
    * @returns a promise that resolves to the corresponding user reports against the given user
    */
   getByReported: (
-    reported: RequiredColumns<UserProfile, 'supabase_id'>,
+    reported: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<UserReport[], '*'>;
 
   /**
@@ -63,8 +63,8 @@ interface UserReporting {
    * @returns a promise that resolves to the corresponding deleted user reports from the given user
    */
   remove: (
-    reporter: RequiredColumns<UserProfile, 'supabase_id'>,
-    reports: RequiredColumns<UserReport, 'id'>[],
+    reporter: RequireProperty<UserProfile, 'supabase_id'>,
+    reports: RequireProperty<UserReport, 'id'>[],
   ) => DatabaseQuery<UserReport[], 'id'>;
 
   /**
@@ -79,8 +79,8 @@ interface UserReporting {
    * @returns a promise that resolves to the corresponding closed user reports from the given user
    */
   close: (
-    reporter: RequiredColumns<UserProfile, 'supabase_id'>,
-    reports: RequiredColumns<UserReport, 'id'>[],
+    reporter: RequireProperty<UserProfile, 'supabase_id'>,
+    reports: RequireProperty<UserReport, 'id'>[],
   ) => DatabaseQuery<UserReport[], 'id'>;
 
   /**
@@ -95,8 +95,8 @@ interface UserReporting {
    * @returns a promise that resolves to the corresponding reopened user reports from the given user
    */
   open: (
-    reporter: RequiredColumns<UserProfile, 'supabase_id'>,
-    reports: RequiredColumns<UserReport, 'id'>[],
+    reporter: RequireProperty<UserProfile, 'supabase_id'>,
+    reports: RequireProperty<UserReport, 'id'>[],
   ) => DatabaseQuery<UserReport[], 'id'>;
 
   /**
@@ -109,7 +109,7 @@ interface UserReporting {
    * @returns a promise that resolves to the corresponding modified user report
    */
   modify: (
-    report: RequiredColumns<UserReport, 'id' | 'description'>,
+    report: RequireProperty<UserReport, 'id' | 'description'>,
   ) => DatabaseQuery<UserReport, 'id'>;
 }
 
@@ -124,7 +124,7 @@ interface UserReporting {
  */
 export const UserReporting: UserReporting = {
   getByReporter: async (
-    reporter: RequiredColumns<UserProfile, 'supabase_id'>,
+    reporter: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<UserReport[], '*'> => {
     return query(
       await supabase
@@ -135,7 +135,7 @@ export const UserReporting: UserReporting = {
     );
   },
   getByReported: async (
-    reported: RequiredColumns<UserProfile, 'supabase_id'>,
+    reported: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<UserReport[], '*'> => {
     return query(
       await supabase
@@ -166,7 +166,7 @@ export const UserReporting: UserReporting = {
         return ok(this);
       },
       async report(
-        target: RequiredColumns<UserProfile, 'supabase_id'>,
+        target: RequireProperty<UserProfile, 'supabase_id'>,
       ): DatabaseQuery<UserReport, 'id'> {
         return query(
           await supabase
@@ -182,8 +182,8 @@ export const UserReporting: UserReporting = {
     };
   },
   remove: async (
-    reporter: RequiredColumns<UserProfile, 'supabase_id'>,
-    reports: RequiredColumns<UserReport, 'id'>[],
+    reporter: RequireProperty<UserProfile, 'supabase_id'>,
+    reports: RequireProperty<UserReport, 'id'>[],
   ): DatabaseQuery<UserReport[], 'id'> => {
     return query(
       await supabase
@@ -198,8 +198,8 @@ export const UserReporting: UserReporting = {
     );
   },
   close: async (
-    reporter: RequiredColumns<UserProfile, 'supabase_id'>,
-    reports: RequiredColumns<UserReport, 'id'>[],
+    reporter: RequireProperty<UserProfile, 'supabase_id'>,
+    reports: RequireProperty<UserReport, 'id'>[],
   ): DatabaseQuery<UserReport[], 'id'> => {
     return query(
       await supabase
@@ -217,8 +217,8 @@ export const UserReporting: UserReporting = {
     );
   },
   open: async (
-    reporter: RequiredColumns<UserProfile, 'supabase_id'>,
-    reports: RequiredColumns<UserReport, 'id'>[],
+    reporter: RequireProperty<UserProfile, 'supabase_id'>,
+    reports: RequireProperty<UserReport, 'id'>[],
   ): DatabaseQuery<UserReport[], 'id'> => {
     return query(
       await supabase
@@ -236,7 +236,7 @@ export const UserReporting: UserReporting = {
     );
   },
   modify: async (
-    report: RequiredColumns<UserReport, 'id' | 'description'>,
+    report: RequireProperty<UserReport, 'id' | 'description'>,
   ): DatabaseQuery<UserReport, 'id'> => {
     return query(
       await supabase

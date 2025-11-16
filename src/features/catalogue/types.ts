@@ -2,7 +2,7 @@ import type {
   Category,
   DatabaseQuery,
   Product,
-  RequiredColumns,
+  RequireProperty,
   Result,
   UserProfile,
 } from '@shared/types';
@@ -25,7 +25,7 @@ export interface ProductFilter {
    * @param seller the given user identifier
    * @returns a result that validates the given input
    */
-  seller: (seller: RequiredColumns<UserProfile, 'supabase_id'>) => Result<this>;
+  seller: (seller: RequireProperty<UserProfile, 'supabase_id'>) => Result<this>;
 
   /**
    * Passes the given minimum and maximum price value from the filter.
@@ -63,7 +63,7 @@ export interface ProductFilter {
    * @param categories the given category tag identifier(s)
    * @returns a result that validates the given input
    */
-  categories: (categories: RequiredColumns<Category, 'id'>[]) => Result<this>;
+  categories: (categories: RequireProperty<Category, 'id'>[]) => Result<this>;
 
   /**
    * Finalizes the filter and queries for matching product(s).

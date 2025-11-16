@@ -1,13 +1,13 @@
 import type {
   DatabaseQuery,
-  RequiredColumns,
+  RequireProperty,
   Result,
   UserProfile,
   UserReport,
 } from '@shared/types';
 
 /**
- * Builds reports based on the given initialized inputs for selected user report properties.
+ * Builds a user report based on the given initialized inputs for selected user report properties.
  * Selection may happen during runtime (e.g., initializing report link property).
  *
  * @see {@link UserReporting.create()}
@@ -51,6 +51,6 @@ export interface UserReporter {
    * @returns a promise that resolves to the corresponding new user report
    */
   report: (
-    target: RequiredColumns<UserProfile, 'supabase_id'>,
+    target: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<UserReport, 'id'>;
 }

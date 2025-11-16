@@ -2,7 +2,7 @@ import type {
   BookmarkedProduct,
   DatabaseQuery,
   ProductBookmarker,
-  RequiredColumns,
+  RequireProperty,
   Product,
   DatabaseQueryResult,
   UserProfile,
@@ -62,7 +62,7 @@ interface UseBookmarker {
    * @see {@link ProductBookmarking.store}
    */
   store: (
-    products: RequiredColumns<Product, 'id'>[],
+    products: RequireProperty<Product, 'id'>[],
   ) => DatabaseQuery<BookmarkedProduct[], '*'>;
 
   /**
@@ -77,7 +77,7 @@ interface UseBookmarker {
    * @see {@link ProductBookmarking.remove()}
    */
   remove: (
-    products: RequiredColumns<Product, 'id'>[],
+    products: RequireProperty<Product, 'id'>[],
   ) => DatabaseQuery<BookmarkedProduct[], '*'>;
 
   /**
@@ -109,7 +109,7 @@ type BookmarkerResult = DatabaseQueryResult<ProductBookmarker, '*'>;
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useBookmarker(
-  buyer: RequiredColumns<UserProfile, 'supabase_id'>,
+  buyer: RequireProperty<UserProfile, 'supabase_id'>,
 ): UseBookmarker {
   const [loading, setLoading] = useState<boolean>(true);
   const [bookmarker, setBookmarker] = useState<BookmarkerResult>(() => empty());
@@ -139,7 +139,7 @@ export function useBookmarker(
    * @see {@link ProductBookmarking.store()}
    */
   const store = useCallback(
-    async (array: RequiredColumns<Product, 'id'>[]) => {
+    async (array: RequireProperty<Product, 'id'>[]) => {
       if (bookmarker.ok) {
         return HookUtils.load(
           setLoading,
@@ -165,7 +165,7 @@ export function useBookmarker(
    * @see {@link ProductBookmarking.remove()}
    */
   const remove = useCallback(
-    async (array: RequiredColumns<Product, 'id'>[]) => {
+    async (array: RequireProperty<Product, 'id'>[]) => {
       if (bookmarker.ok) {
         return HookUtils.load(
           setLoading,

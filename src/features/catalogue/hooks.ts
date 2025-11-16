@@ -2,7 +2,7 @@ import type {
   DatabaseQueryResult,
   Category,
   CategorizedProduct,
-  RequiredColumns,
+  RequireProperty,
   DatabaseQuery,
   Product,
   UserProfile,
@@ -106,7 +106,7 @@ type UseCategorizedProductsResult = DatabaseQueryResult<
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useCategorizedProducts(
-  category: RequiredColumns<Category, 'id'>,
+  category: RequireProperty<Category, 'id'>,
 ): UseCategorizedProducts {
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<UseCategorizedProductsResult>(() =>
@@ -167,7 +167,7 @@ type UseCategoryResult = DatabaseQueryResult<Category, '*'>;
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useCategory(
-  category: RequiredColumns<Category, 'id'>,
+  category: RequireProperty<Category, 'id'>,
 ): UseCategory {
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<UseCategoryResult>(() => empty());
@@ -339,7 +339,7 @@ type UseProductsResult = DatabaseQueryResult<Product[], '*'>;
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useProducts(
-  products: RequiredColumns<Product, 'id'>[],
+  products: RequireProperty<Product, 'id'>[],
 ): UseProducts {
   const [loading, setLoading] = useState<boolean>(true);
   const [result, setResult] = useState<UseProductsResult>(() => empty());
@@ -397,7 +397,7 @@ type UseProductsBySellerResult = DatabaseQueryResult<Product[], '*'>;
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useSellerProducts(
-  seller: RequiredColumns<UserProfile, 'supabase_id'>,
+  seller: RequireProperty<UserProfile, 'supabase_id'>,
 ): UseProductsBySeller {
   const [loading, setLoading] = useState<boolean>(true);
   const [result, setResult] = useState<UseProductsBySellerResult>(() =>

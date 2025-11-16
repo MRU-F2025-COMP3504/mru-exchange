@@ -1,14 +1,14 @@
-import { query, supabase } from '@shared/api';
+import { supabase } from '@shared/api';
 import type {
   DatabaseQuery,
   Category,
-  RequiredColumns,
+  RequireProperty,
   CategorizedProduct,
   Product,
   UserProfile,
   Result,
 } from '@shared/types';
-import { err, ok } from '@shared/utils';
+import { err, ok, query } from '@shared/utils';
 import type { ProductFilter } from '@features/catalogue';
 
 /**
@@ -39,7 +39,7 @@ interface CategoryCatalogue {
    * @returns a promise that resolves to the corresponding category tag that corresponds to the identifier
    */
   getTag: (
-    tag: RequiredColumns<Category, 'id'>,
+    tag: RequireProperty<Category, 'id'>,
   ) => DatabaseQuery<Category, '*'>;
 
   /**
@@ -54,7 +54,7 @@ interface CategoryCatalogue {
    * @returns a promise that resolves to the corresponding products with the given category
    */
   getProductsByAssignedTag: (
-    tag: RequiredColumns<Category, 'id'>,
+    tag: RequireProperty<Category, 'id'>,
   ) => DatabaseQuery<CategorizedProduct[], '*'>;
 
   /**
@@ -69,7 +69,7 @@ interface CategoryCatalogue {
    * @returns a promise that corresponds category tags with the given product
    */
   getAssignedTagsByProduct: (
-    product: RequiredColumns<Product, 'id'>,
+    product: RequireProperty<Product, 'id'>,
   ) => DatabaseQuery<CategorizedProduct[], '*'>;
 }
 
@@ -94,7 +94,7 @@ export const CategoryCatalogue: CategoryCatalogue = {
     );
   },
   getTag: async (
-    tag: RequiredColumns<Category, 'id'>,
+    tag: RequireProperty<Category, 'id'>,
   ): DatabaseQuery<Category, '*'> => {
     return query(
       await supabase
@@ -105,7 +105,7 @@ export const CategoryCatalogue: CategoryCatalogue = {
     );
   },
   getProductsByAssignedTag: async (
-    tag: RequiredColumns<Category, 'id'>,
+    tag: RequireProperty<Category, 'id'>,
   ): DatabaseQuery<CategorizedProduct[], '*'> => {
     return query(
       await supabase
@@ -115,7 +115,7 @@ export const CategoryCatalogue: CategoryCatalogue = {
     );
   },
   getAssignedTagsByProduct: async (
-    product: RequiredColumns<Product, 'id'>,
+    product: RequireProperty<Product, 'id'>,
   ): DatabaseQuery<CategorizedProduct[], '*'> => {
     return query(
       await supabase
@@ -142,7 +142,7 @@ interface ProductCatalogue {
    * @returns a promise that resolves to the corresponding product(s)
    */
   get: (
-    products: RequiredColumns<Product, 'id'>[],
+    products: RequireProperty<Product, 'id'>[],
   ) => DatabaseQuery<Product[], '*'>;
 
   /**
@@ -157,7 +157,7 @@ interface ProductCatalogue {
    * @returns a promise that resolves to the corresponding products
    */
   getBySeller: (
-    seller: RequiredColumns<UserProfile, 'supabase_id'>,
+    seller: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<Product[], '*'>;
 
   /**
@@ -197,7 +197,7 @@ interface ProductCatalogue {
  */
 export const ProductCatalogue: ProductCatalogue = {
   get: async (
-    products: RequiredColumns<Product, 'id'>[],
+    products: RequireProperty<Product, 'id'>[],
   ): DatabaseQuery<Product[], '*'> => {
     return query(
       await supabase
@@ -210,7 +210,7 @@ export const ProductCatalogue: ProductCatalogue = {
     );
   },
   getBySeller: async (
-    seller: RequiredColumns<UserProfile, 'supabase_id'>,
+    seller: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<Product[], '*'> => {
     return query(
       await supabase
@@ -230,11 +230,11 @@ export const ProductCatalogue: ProductCatalogue = {
   },
   getByFilter: (): ProductFilter => {
     let sql = supabase.from('Product_Information').select('id');
-    let categories: RequiredColumns<Category, 'id'>[] = [];
+    let categories: RequireProperty<Category, 'id'>[] = [];
 
     return {
       seller(
-        seller: RequiredColumns<UserProfile, 'supabase_id'>,
+        seller: RequireProperty<UserProfile, 'supabase_id'>,
       ): Result<ProductFilter> {
         if (!seller.supabase_id) {
           return err(new Error('Seller ID is not specified'));
@@ -273,7 +273,7 @@ export const ProductCatalogue: ProductCatalogue = {
         return ok(this);
       },
       categories(
-        values: RequiredColumns<Category, 'id'>[],
+        values: RequireProperty<Category, 'id'>[],
       ): Result<ProductFilter> {
         for (const category of values) {
           if (!Object.hasOwn(category, 'id')) {

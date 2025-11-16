@@ -1,10 +1,11 @@
 import type {
   DatabaseQuery,
-  RequiredColumns,
+  RequireProperty,
   InteractingUsers,
   UserProfile,
 } from '@shared/types';
-import { query, supabase } from '@shared/api';
+import { supabase } from '@shared/api';
+import { query } from '@shared/utils';
 
 /**
  * See the implementation below for more information.
@@ -23,8 +24,8 @@ interface UserInteraction {
    * @returns a promise that resolves to the corresponding user interaction
    */
   get: (
-    a: RequiredColumns<UserProfile, 'supabase_id'>,
-    b: RequiredColumns<UserProfile, 'supabase_id'>,
+    a: RequireProperty<UserProfile, 'supabase_id'>,
+    b: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<InteractingUsers, '*'>;
 
   /**
@@ -39,7 +40,7 @@ interface UserInteraction {
    * @returns a promise that resolves to the corresponding user interaction
    */
   getBlockedOnUser: (
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<InteractingUsers[], 'id'>;
 
   /**
@@ -54,7 +55,7 @@ interface UserInteraction {
    * @returns a promise that resolves to the corresponding user interaction
    */
   getMutedOnUser: (
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<InteractingUsers[], 'id'>;
 
   /**
@@ -70,8 +71,8 @@ interface UserInteraction {
    * @returns a promise that resolves to the corresponding user interaction.
    */
   create: (
-    a: RequiredColumns<UserProfile, 'supabase_id'>,
-    b: RequiredColumns<UserProfile, 'supabase_id'>,
+    a: RequireProperty<UserProfile, 'supabase_id'>,
+    b: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<InteractingUsers, '*'>;
 
   /**
@@ -87,8 +88,8 @@ interface UserInteraction {
    * @returns a promise that resolves to the corresponding user interaction
    */
   block: (
-    blocker: RequiredColumns<UserProfile, 'supabase_id'>,
-    target: RequiredColumns<UserProfile, 'supabase_id'>,
+    blocker: RequireProperty<UserProfile, 'supabase_id'>,
+    target: RequireProperty<UserProfile, 'supabase_id'>,
     flag: boolean,
   ) => DatabaseQuery<InteractingUsers, 'id'>;
 
@@ -105,8 +106,8 @@ interface UserInteraction {
    * @returns a promise that resolves to the corresponding user interaction
    */
   mute(
-    muter: RequiredColumns<UserProfile, 'supabase_id'>,
-    target: RequiredColumns<UserProfile, 'supabase_id'>,
+    muter: RequireProperty<UserProfile, 'supabase_id'>,
+    target: RequireProperty<UserProfile, 'supabase_id'>,
     flag: boolean,
   ): DatabaseQuery<InteractingUsers, 'id'>;
 }
@@ -125,8 +126,8 @@ interface UserInteraction {
  */
 export const UserInteraction: UserInteraction = {
   get: async (
-    a: RequiredColumns<UserProfile, 'supabase_id'>,
-    b: RequiredColumns<UserProfile, 'supabase_id'>,
+    a: RequireProperty<UserProfile, 'supabase_id'>,
+    b: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<InteractingUsers, '*'> => {
     return query(
       await supabase
@@ -139,7 +140,7 @@ export const UserInteraction: UserInteraction = {
     );
   },
   getBlockedOnUser: async (
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<InteractingUsers[], 'id'> => {
     return query(
       await supabase
@@ -150,7 +151,7 @@ export const UserInteraction: UserInteraction = {
     );
   },
   getMutedOnUser: async (
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<InteractingUsers[], 'id'> => {
     return query(
       await supabase
@@ -161,8 +162,8 @@ export const UserInteraction: UserInteraction = {
     );
   },
   create: async (
-    a: RequiredColumns<UserProfile, 'supabase_id'>,
-    b: RequiredColumns<UserProfile, 'supabase_id'>,
+    a: RequireProperty<UserProfile, 'supabase_id'>,
+    b: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<InteractingUsers, '*'> => {
     return query(
       await supabase
@@ -176,8 +177,8 @@ export const UserInteraction: UserInteraction = {
     );
   },
   block: async (
-    blocker: RequiredColumns<UserProfile, 'supabase_id'>,
-    target: RequiredColumns<UserProfile, 'supabase_id'>,
+    blocker: RequireProperty<UserProfile, 'supabase_id'>,
+    target: RequireProperty<UserProfile, 'supabase_id'>,
     flag = true,
   ): DatabaseQuery<InteractingUsers, 'id'> => {
     const interaction = await UserInteraction.get(blocker, target);
@@ -194,8 +195,8 @@ export const UserInteraction: UserInteraction = {
     return set(data, update, flag);
   },
   mute: async (
-    muter: RequiredColumns<UserProfile, 'supabase_id'>,
-    target: RequiredColumns<UserProfile, 'supabase_id'>,
+    muter: RequireProperty<UserProfile, 'supabase_id'>,
+    target: RequireProperty<UserProfile, 'supabase_id'>,
     flag = true,
   ): DatabaseQuery<InteractingUsers, 'id'> => {
     const interaction = await UserInteraction.get(muter, target);
@@ -223,7 +224,7 @@ export const UserInteraction: UserInteraction = {
  * @returns a promise that resolves to the corresponding user interaction
  */
 async function set(
-  interaction: RequiredColumns<InteractingUsers, 'id'>,
+  interaction: RequireProperty<InteractingUsers, 'id'>,
   field: string,
   flag: boolean,
 ): DatabaseQuery<InteractingUsers, 'id'> {

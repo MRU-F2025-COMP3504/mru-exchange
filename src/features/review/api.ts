@@ -1,14 +1,14 @@
 import type {
   DatabaseQuery,
   Product,
-  RequiredColumns,
+  RequireProperty,
   Result,
   Review,
   UserProfile,
 } from '@shared/types';
-import { query, supabase } from '@shared/api';
+import { supabase } from '@shared/api';
 import type { ReviewPublisher } from '@features/review';
-import { err, ok } from '@shared/utils';
+import { err, ok, query } from '@shared/utils';
 
 /**
  * See the implementation below for more information.
@@ -26,7 +26,7 @@ interface UserReviewing {
    * @returns a promise that resolves to the corresponding product reviews
    */
   getProductReviews: (
-    product: RequiredColumns<Product, 'id'>,
+    product: RequireProperty<Product, 'id'>,
   ) => DatabaseQuery<Review[], '*'>;
 
   /**
@@ -42,8 +42,8 @@ interface UserReviewing {
    * @returns a promise that resolves to the corresponding product reviews
    */
   getProductReviewByReviewer: (
-    reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-    product: RequiredColumns<Product, 'id'>,
+    reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+    product: RequireProperty<Product, 'id'>,
   ) => DatabaseQuery<Review[], '*'>;
 
   /**
@@ -58,7 +58,7 @@ interface UserReviewing {
    * @returns a promise that resolves to the corresponding seller reviews
    */
   getSellerReviews: (
-    seller: RequiredColumns<UserProfile, 'supabase_id'>,
+    seller: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<Review[], '*'>;
 
   /**
@@ -74,8 +74,8 @@ interface UserReviewing {
    * @returns a promise that resolves to the corresponding seller reviews
    */
   getSellerReviewByReviewer: (
-    reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-    seller: RequiredColumns<UserProfile, 'supabase_id'>,
+    reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+    seller: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<Review[], '*'>;
 
   /**
@@ -89,7 +89,7 @@ interface UserReviewing {
    * @returns a promise that resolves to the corresponding product rating
    */
   getAverageProductRating: (
-    product: RequiredColumns<Product, 'id'>,
+    product: RequireProperty<Product, 'id'>,
   ) => DatabaseQuery<Review, 'id' | 'rating'>;
 
   /**
@@ -103,7 +103,7 @@ interface UserReviewing {
    * @returns a promise that resolves to the corresponding seller rating
    */
   getAverageSellerRating: (
-    seller: RequiredColumns<UserProfile, 'supabase_id'>,
+    seller: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<Review, 'id' | 'rating'>;
 
   /**
@@ -115,7 +115,7 @@ interface UserReviewing {
    * @returns the review publisher
    */
   create: (
-    reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
+    reviewer: RequireProperty<UserProfile, 'supabase_id'>,
   ) => ReviewPublisher;
 
   /**
@@ -130,8 +130,8 @@ interface UserReviewing {
    * @returns a promise that resolves to the corresponding deleted reviews
    */
   remove: (
-    reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-    reviews: RequiredColumns<Review, 'id'>[],
+    reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+    reviews: RequireProperty<Review, 'id'>[],
   ) => DatabaseQuery<Review[], 'id'>;
 
   /**
@@ -146,8 +146,8 @@ interface UserReviewing {
    * @returns a promise that resolves to the corresponding modified reviews
    */
   modify: (
-    reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-    review: RequiredColumns<Review, 'id' | 'rating' | 'description'>,
+    reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+    review: RequireProperty<Review, 'id' | 'rating' | 'description'>,
   ) => DatabaseQuery<Review, 'id'>;
 }
 
@@ -162,7 +162,7 @@ interface UserReviewing {
  */
 export const UserReviewing: UserReviewing = {
   getProductReviews: async (
-    product: RequiredColumns<Product, 'id'>,
+    product: RequireProperty<Product, 'id'>,
   ): DatabaseQuery<Review[], '*'> => {
     return query(
       await supabase
@@ -173,8 +173,8 @@ export const UserReviewing: UserReviewing = {
     );
   },
   getProductReviewByReviewer: async (
-    reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-    product: RequiredColumns<Product, 'id'>,
+    reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+    product: RequireProperty<Product, 'id'>,
   ): DatabaseQuery<Review[], '*'> => {
     return query(
       await supabase
@@ -187,7 +187,7 @@ export const UserReviewing: UserReviewing = {
     );
   },
   getSellerReviews: async (
-    seller: RequiredColumns<UserProfile, 'supabase_id'>,
+    seller: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<Review[], '*'> => {
     return query(
       await supabase
@@ -198,8 +198,8 @@ export const UserReviewing: UserReviewing = {
     );
   },
   getSellerReviewByReviewer: async (
-    reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-    seller: RequiredColumns<UserProfile, 'supabase_id'>,
+    reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+    seller: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<Review[], '*'> => {
     return query(
       await supabase
@@ -212,7 +212,7 @@ export const UserReviewing: UserReviewing = {
     );
   },
   getAverageProductRating: async (
-    product: RequiredColumns<Product, 'id'>,
+    product: RequireProperty<Product, 'id'>,
   ): DatabaseQuery<Review, 'id' | 'rating'> => {
     return query(
       await supabase
@@ -223,7 +223,7 @@ export const UserReviewing: UserReviewing = {
     );
   },
   getAverageSellerRating: async (
-    seller: RequiredColumns<UserProfile, 'supabase_id'>,
+    seller: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<Review, 'id' | 'rating'> => {
     return query(
       await supabase
@@ -234,16 +234,12 @@ export const UserReviewing: UserReviewing = {
     );
   },
   create: (
-    reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
+    reviewer: RequireProperty<UserProfile, 'supabase_id'>,
   ): ReviewPublisher => {
     const review: Partial<Review> = {};
     return {
       description(description: string): Result<ReviewPublisher> {
-        if (!description) {
-          return err(new Error('Review description is not specified'));
-        } else {
-          review.description = description;
-        }
+        review.description = description;
 
         return ok(this);
       },
@@ -273,8 +269,8 @@ export const UserReviewing: UserReviewing = {
     };
   },
   remove: async (
-    reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-    reviews: RequiredColumns<Review, 'id'>[],
+    reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+    reviews: RequireProperty<Review, 'id'>[],
   ): DatabaseQuery<Review[], 'id'> => {
     return query(
       await supabase
@@ -289,8 +285,8 @@ export const UserReviewing: UserReviewing = {
     );
   },
   modify: async (
-    reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-    review: RequiredColumns<Review, 'id' | 'rating' | 'description'>,
+    reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+    review: RequireProperty<Review, 'id' | 'rating' | 'description'>,
   ): DatabaseQuery<Review, 'id'> => {
     return query(
       await supabase

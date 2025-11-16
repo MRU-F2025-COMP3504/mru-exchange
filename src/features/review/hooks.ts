@@ -2,7 +2,7 @@ import type {
   DatabaseQuery,
   Product,
   PromiseResult,
-  RequiredColumns,
+  RequireProperty,
   Review,
   UserProfile,
 } from '@shared/types';
@@ -53,8 +53,8 @@ interface UseProductReviewers {
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useProductReviewers(
-  reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-  product: RequiredColumns<Product, 'id'>,
+  reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+  product: RequireProperty<Product, 'id'>,
 ): UseProductReviewers {
   const [loading, setLoading] = useState<boolean>(true);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -141,7 +141,7 @@ interface UseProductReviews {
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useProductReviews(
-  product: RequiredColumns<Product, 'id'>,
+  product: RequireProperty<Product, 'id'>,
 ): UseProductReviews {
   const [loading, setLoading] = useState<boolean>(true);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -264,8 +264,8 @@ interface UseSellerReviewers {
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useSellerReviewers(
-  reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-  seller: RequiredColumns<UserProfile, 'supabase_id'>,
+  reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+  seller: RequireProperty<UserProfile, 'supabase_id'>,
 ): UseSellerReviewers {
   const [loading, setLoading] = useState<boolean>(true);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -354,8 +354,8 @@ interface UseSellerReviews {
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useSellerReviews(
-  reviewer: RequiredColumns<UserProfile, 'supabase_id'>,
-  seller: RequiredColumns<UserProfile, 'supabase_id'>,
+  reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+  seller: RequireProperty<UserProfile, 'supabase_id'>,
 ): UseSellerReviews {
   const [loading, setLoading] = useState<boolean>(true);
   const [reviews, setReviews] = useState<Review[]>([]);

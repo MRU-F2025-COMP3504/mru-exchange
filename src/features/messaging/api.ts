@@ -1,16 +1,17 @@
 import type {
   UserChat,
   DatabaseQuery,
-  RequiredColumns,
+  RequireProperty,
   UserMessage,
   UserProfile,
 } from '@shared/types';
-import { query, supabase } from '@shared/api';
+import { supabase } from '@shared/api';
 import {
   REALTIME_LISTEN_TYPES,
   type RealtimeChannel,
   type RealtimePostgresInsertPayload,
 } from '@supabase/supabase-js';
+import type { query } from '@shared/utils';
 
 /**
  * See the implementation below for more information.
@@ -24,7 +25,7 @@ interface UserChatting {
    * @returns the established channel
    */
   subscribe: (
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
     callback: (payload: RealtimePostgresInsertPayload<UserChat>) => void,
   ) => RealtimeChannel;
 
@@ -39,7 +40,7 @@ interface UserChatting {
    * @param chat the given chat identifier
    * @returns a promise that resolves to the corresponding chat
    */
-  get: (chat: RequiredColumns<UserChat, 'id'>) => DatabaseQuery<UserChat, '*'>;
+  get: (chat: RequireProperty<UserChat, 'id'>) => DatabaseQuery<UserChat, '*'>;
 
   /**
    * Retrieves chat that involves the given user.
@@ -53,7 +54,7 @@ interface UserChatting {
    * @returns a promise that resolves to the corresponding chat
    */
   getByUser: (
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<UserChat[], '*'>;
 
   /**
@@ -69,7 +70,7 @@ interface UserChatting {
    */
   show: (
     visible: boolean,
-    chats: RequiredColumns<UserChat, 'id'>[],
+    chats: RequireProperty<UserChat, 'id'>[],
   ) => DatabaseQuery<UserChat[], 'id'>;
 
   /**
@@ -85,8 +86,8 @@ interface UserChatting {
    * @returns a promise that resolves to chat registration
    */
   register: (
-    a: RequiredColumns<UserProfile, 'supabase_id'>,
-    b: RequiredColumns<UserProfile, 'supabase_id'>,
+    a: RequireProperty<UserProfile, 'supabase_id'>,
+    b: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<UserChat, 'id'>;
 }
 
@@ -107,7 +108,7 @@ interface UserChatting {
  */
 export const UserChatting: UserChatting = {
   subscribe: (
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
     callback: (payload: RealtimePostgresInsertPayload<UserChat>) => void,
   ): RealtimeChannel => {
     const id = user.supabase_id;
@@ -126,14 +127,14 @@ export const UserChatting: UserChatting = {
       .subscribe();
   },
   get: async (
-    chat: RequiredColumns<UserChat, 'id'>,
+    chat: RequireProperty<UserChat, 'id'>,
   ): DatabaseQuery<UserChat, '*'> => {
     return query(
       await supabase.from('Chats').select('*').eq('id', chat.id).single(),
     );
   },
   getByUser: async (
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<UserChat[], '*'> => {
     const id = user.supabase_id;
     return query(
@@ -146,7 +147,7 @@ export const UserChatting: UserChatting = {
   },
   show: async (
     visible: boolean,
-    chats: RequiredColumns<UserChat, 'id'>[],
+    chats: RequireProperty<UserChat, 'id'>[],
   ): DatabaseQuery<UserChat[], 'id'> => {
     return query(
       await supabase
@@ -160,8 +161,8 @@ export const UserChatting: UserChatting = {
     );
   },
   register: async (
-    a: RequiredColumns<UserProfile, 'supabase_id'>,
-    b: RequiredColumns<UserProfile, 'supabase_id'>,
+    a: RequireProperty<UserProfile, 'supabase_id'>,
+    b: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<UserChat, 'id'> => {
     return query(
       await supabase
@@ -187,7 +188,7 @@ interface UserMessaging {
    * @param callback the callback function to handle incoming user messages
    */
   subscribe: (
-    chat: RequiredColumns<UserChat, 'id'>,
+    chat: RequireProperty<UserChat, 'id'>,
     callback: (payload: RealtimePostgresInsertPayload<UserMessage>) => void,
   ) => RealtimeChannel;
 
@@ -202,7 +203,7 @@ interface UserMessaging {
    * @returns a promise that resolves to the corresponding user messages
    */
   getByChat: (
-    chat: RequiredColumns<UserChat, 'id'>,
+    chat: RequireProperty<UserChat, 'id'>,
   ) => DatabaseQuery<UserMessage[], '*'>;
 
   /**
@@ -218,8 +219,8 @@ interface UserMessaging {
    * @returns a promise that resolves to the corresponding sent user message
    */
   send: (
-    chat: RequiredColumns<UserChat, 'id'>,
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    chat: RequireProperty<UserChat, 'id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
     message: string,
   ) => DatabaseQuery<UserMessage, 'id'>;
 
@@ -237,10 +238,10 @@ interface UserMessaging {
    * @returns a promise that resolves to the corresponding modified user message(s)
    */
   show: (
-    chat: RequiredColumns<UserChat, 'id'>,
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    chat: RequireProperty<UserChat, 'id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
     visible: boolean,
-    messages: RequiredColumns<UserMessage, 'id'>[],
+    messages: RequireProperty<UserMessage, 'id'>[],
   ) => DatabaseQuery<UserMessage[], 'id'>;
 
   /**
@@ -256,9 +257,9 @@ interface UserMessaging {
    * @returns a promise that resolves to the corresponding deleted user message(s)
    */
   remove: (
-    chat: RequiredColumns<UserChat, 'id'>,
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
-    messages: RequiredColumns<UserMessage, 'id'>[],
+    chat: RequireProperty<UserChat, 'id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
+    messages: RequireProperty<UserMessage, 'id'>[],
   ) => DatabaseQuery<UserMessage[], 'id'>;
 }
 
@@ -278,7 +279,7 @@ interface UserMessaging {
  */
 export const UserMessaging: UserMessaging = {
   subscribe: (
-    chat: RequiredColumns<UserChat, 'id'>,
+    chat: RequireProperty<UserChat, 'id'>,
     callback: (payload: RealtimePostgresInsertPayload<UserMessage>) => void,
   ): RealtimeChannel => {
     const id = chat.id.toString();
@@ -297,7 +298,7 @@ export const UserMessaging: UserMessaging = {
       .subscribe();
   },
   getByChat: async (
-    chat: RequiredColumns<UserChat, 'id'>,
+    chat: RequireProperty<UserChat, 'id'>,
   ): DatabaseQuery<UserMessage[], '*'> => {
     return query(
       await supabase
@@ -309,8 +310,8 @@ export const UserMessaging: UserMessaging = {
     );
   },
   send: async (
-    chat: RequiredColumns<UserChat, 'id'>,
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    chat: RequireProperty<UserChat, 'id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
     message: string,
   ): DatabaseQuery<UserMessage, 'id'> => {
     return query(
@@ -326,10 +327,10 @@ export const UserMessaging: UserMessaging = {
     );
   },
   show: async (
-    chat: RequiredColumns<UserChat, 'id'>,
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    chat: RequireProperty<UserChat, 'id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
     visible: boolean,
-    messages: RequiredColumns<UserMessage, 'id'>[],
+    messages: RequireProperty<UserMessage, 'id'>[],
   ): DatabaseQuery<UserMessage[], 'id'> => {
     return query(
       await supabase
@@ -345,9 +346,9 @@ export const UserMessaging: UserMessaging = {
     );
   },
   remove: async (
-    chat: RequiredColumns<UserChat, 'id'>,
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
-    messages: RequiredColumns<UserMessage, 'id'>[],
+    chat: RequireProperty<UserChat, 'id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
+    messages: RequireProperty<UserMessage, 'id'>[],
   ): DatabaseQuery<UserMessage[], 'id'> => {
     return query(
       await supabase

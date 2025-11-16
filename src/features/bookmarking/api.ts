@@ -1,12 +1,13 @@
 import type {
   DatabaseQuery,
   Product,
-  RequiredColumns,
+  RequireProperty,
   ProductBookmarker,
   BookmarkedProduct,
   UserProfile,
 } from '@shared/types';
-import { query, supabase } from '@shared/api';
+import { supabase } from '@shared/api';
+import { query } from '@shared/utils';
 
 /**
  * See the implementation below for more information.
@@ -24,7 +25,7 @@ interface ProductBookmarking {
    * @returns a promise that resolves to the corresponding user's bookmarker
    */
   get(
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<ProductBookmarker, '*'>;
 
   /**
@@ -39,7 +40,7 @@ interface ProductBookmarking {
    * @returns a promise that resolves to the corresponding products bookmarked by the given user
    */
   getProducts(
-    bookmarker: RequiredColumns<ProductBookmarker, 'id'>,
+    bookmarker: RequireProperty<ProductBookmarker, 'id'>,
   ): DatabaseQuery<BookmarkedProduct[], '*'>;
 
   /**
@@ -53,7 +54,7 @@ interface ProductBookmarking {
    * @returns a promise that resolves to the corresponding user's bookmarker
    */
   register(
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<ProductBookmarker, 'id'>;
 
   /**
@@ -69,8 +70,8 @@ interface ProductBookmarking {
    * @returns a promise that resolves to the corresponding product(s) bookmarked by the given user
    */
   store(
-    bookmarker: RequiredColumns<ProductBookmarker, 'id'>,
-    products: RequiredColumns<Product, 'id'>[],
+    bookmarker: RequireProperty<ProductBookmarker, 'id'>,
+    products: RequireProperty<Product, 'id'>[],
   ): DatabaseQuery<BookmarkedProduct[], '*'>;
 
   /**
@@ -86,8 +87,8 @@ interface ProductBookmarking {
    * @returns a promise that resolves to the corresponding product(s) bookmarked by the given user
    */
   remove(
-    bookmarker: RequiredColumns<ProductBookmarker, 'id'>,
-    products: RequiredColumns<Product, 'id'>[],
+    bookmarker: RequireProperty<ProductBookmarker, 'id'>,
+    products: RequireProperty<Product, 'id'>[],
   ): DatabaseQuery<BookmarkedProduct[], '*'>;
 
   /**
@@ -101,7 +102,7 @@ interface ProductBookmarking {
    * @returns a promise that resolves to the corresponding product(s) bookmarked by the given user
    */
   clear(
-    bookmarker: RequiredColumns<ProductBookmarker, 'id'>,
+    bookmarker: RequireProperty<ProductBookmarker, 'id'>,
   ): DatabaseQuery<BookmarkedProduct[], 'product_id'>;
 }
 
@@ -116,7 +117,7 @@ interface ProductBookmarking {
  */
 export const ProductBookmarking: ProductBookmarking = {
   get: async (
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<ProductBookmarker, '*'> => {
     return query(
       await supabase
@@ -127,7 +128,7 @@ export const ProductBookmarking: ProductBookmarking = {
     );
   },
   getProducts: async (
-    cart: RequiredColumns<ProductBookmarker, 'id'>,
+    cart: RequireProperty<ProductBookmarker, 'id'>,
   ): DatabaseQuery<BookmarkedProduct[], '*'> => {
     return query(
       await supabase
@@ -138,7 +139,7 @@ export const ProductBookmarking: ProductBookmarking = {
     );
   },
   register: async (
-    user: RequiredColumns<UserProfile, 'supabase_id'>,
+    user: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<ProductBookmarker, 'id'> => {
     return query(
       await supabase
@@ -151,8 +152,8 @@ export const ProductBookmarking: ProductBookmarking = {
     );
   },
   store: async (
-    cart: RequiredColumns<ProductBookmarker, 'id'>,
-    products: RequiredColumns<Product, 'id'>[],
+    cart: RequireProperty<ProductBookmarker, 'id'>,
+    products: RequireProperty<Product, 'id'>[],
   ): DatabaseQuery<BookmarkedProduct[], '*'> => {
     const id = cart.id;
     return query(
@@ -168,8 +169,8 @@ export const ProductBookmarking: ProductBookmarking = {
     );
   },
   remove: async (
-    cart: RequiredColumns<ProductBookmarker, 'id'>,
-    products: RequiredColumns<Product, 'id'>[],
+    cart: RequireProperty<ProductBookmarker, 'id'>,
+    products: RequireProperty<Product, 'id'>[],
   ): DatabaseQuery<BookmarkedProduct[], '*'> => {
     return query(
       await supabase
@@ -184,7 +185,7 @@ export const ProductBookmarking: ProductBookmarking = {
     );
   },
   clear: async (
-    cart: RequiredColumns<ProductBookmarker, 'id'>,
+    cart: RequireProperty<ProductBookmarker, 'id'>,
   ): DatabaseQuery<BookmarkedProduct[], 'product_id'> => {
     return query(
       await supabase

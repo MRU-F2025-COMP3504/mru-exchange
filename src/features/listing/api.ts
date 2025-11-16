@@ -2,13 +2,13 @@ import type {
   CategorizedProduct,
   Category,
   DatabaseQuery,
-  RequiredColumns,
+  RequireProperty,
   Product,
   Result,
   UserProfile,
 } from '@shared/types';
-import { query, supabase } from '@shared/api';
-import { err, ok, REGEX_IMAGE_PATH } from '@shared/utils';
+import { supabase } from '@shared/api';
+import { err, ok, query, REGEX_IMAGE_PATH } from '@shared/utils';
 import type {
   ProductBuilder,
   ProductAttributeModifier,
@@ -30,7 +30,7 @@ interface CategoryListing {
    * @returns a promise that resolves the registered category tag
    */
   register: (
-    category: RequiredColumns<Category, 'name' | 'description'>,
+    category: RequireProperty<Category, 'name' | 'description'>,
   ) => DatabaseQuery<Category, '*'>;
 
   /**
@@ -44,7 +44,7 @@ interface CategoryListing {
    * @returns a promise that resolves the deleted category tag(s)
    */
   remove: (
-    categories: RequiredColumns<Category, 'id'>[],
+    categories: RequireProperty<Category, 'id'>[],
   ) => DatabaseQuery<Category[], 'id'>;
 
   /**
@@ -60,7 +60,7 @@ interface CategoryListing {
    * @returns a promise that resolves the modified category tag
    */
   modify: (
-    target: RequiredColumns<Category, 'id'>,
+    target: RequireProperty<Category, 'id'>,
     change: Pick<Partial<Category>, 'name' | 'description'>,
   ) => DatabaseQuery<Category, '*'>;
 
@@ -76,8 +76,8 @@ interface CategoryListing {
    * @param categories the given category tag identifier(s) to modify
    */
   tag: (
-    product: RequiredColumns<Product, 'id'>,
-    categories: RequiredColumns<Category, 'id'>[],
+    product: RequireProperty<Product, 'id'>,
+    categories: RequireProperty<Category, 'id'>[],
   ) => DatabaseQuery<CategorizedProduct[], '*'>;
 }
 
@@ -94,7 +94,7 @@ interface CategoryListing {
  */
 export const CategoryListing: CategoryListing = {
   register: async (
-    category: RequiredColumns<Category, 'name' | 'description'>,
+    category: RequireProperty<Category, 'name' | 'description'>,
   ): DatabaseQuery<Category, '*'> => {
     return query(
       await supabase
@@ -105,7 +105,7 @@ export const CategoryListing: CategoryListing = {
     );
   },
   remove: async (
-    categories: RequiredColumns<Category, 'id'>[],
+    categories: RequireProperty<Category, 'id'>[],
   ): DatabaseQuery<Category[], 'id'> => {
     return query(
       await supabase
@@ -119,7 +119,7 @@ export const CategoryListing: CategoryListing = {
     );
   },
   modify: async (
-    target: RequiredColumns<Category, 'id'>,
+    target: RequireProperty<Category, 'id'>,
     change: Pick<Partial<Category>, 'name' | 'description'>,
   ): DatabaseQuery<Category, '*'> => {
     return query(
@@ -132,8 +132,8 @@ export const CategoryListing: CategoryListing = {
     );
   },
   tag: async (
-    product: RequiredColumns<Product, 'id'>,
-    categories: RequiredColumns<Category, 'id'>[],
+    product: RequireProperty<Product, 'id'>,
+    categories: RequireProperty<Category, 'id'>[],
   ): DatabaseQuery<CategorizedProduct[], '*'> => {
     return query(
       await supabase
@@ -174,7 +174,7 @@ interface ProductListing {
    */
   list: (
     isListed: boolean,
-    products: RequiredColumns<Product, 'id'>[],
+    products: RequireProperty<Product, 'id'>[],
   ) => DatabaseQuery<Product[], 'id'>;
 
   /**
@@ -188,7 +188,7 @@ interface ProductListing {
    * @returns a promise that resolves the deleted product(s)
    */
   remove: (
-    products: RequiredColumns<Product, 'id'>[],
+    products: RequireProperty<Product, 'id'>[],
   ) => DatabaseQuery<Product[], 'id'>;
 
   /**
@@ -200,7 +200,7 @@ interface ProductListing {
    * @param the given product identifier to modify its attributes
    * @returns a promise that resolves the modified product
    */
-  attribute(product: RequiredColumns<Product, 'id'>): ProductAttributeModifier;
+  attribute(product: RequireProperty<Product, 'id'>): ProductAttributeModifier;
 
   /**
    * Modifies the stock of the given product.
@@ -214,7 +214,7 @@ interface ProductListing {
    * @return a promise that resolves the modified product
    */
   stock(
-    product: RequiredColumns<Product, 'id'>,
+    product: RequireProperty<Product, 'id'>,
     stock: number,
   ): DatabaseQuery<Product, 'id'>;
 }
@@ -237,7 +237,7 @@ export const ProductListing: ProductListing = {
 
     return {
       seller(
-        seller: RequiredColumns<UserProfile, 'supabase_id'>,
+        seller: RequireProperty<UserProfile, 'supabase_id'>,
       ): Result<ProductBuilder> {
         if (!seller.supabase_id) {
           return err(new Error('Product ID is not specified'));
@@ -291,7 +291,7 @@ export const ProductListing: ProductListing = {
   },
   list: async (
     isListed: boolean,
-    products: RequiredColumns<Product, 'id'>[],
+    products: RequireProperty<Product, 'id'>[],
   ): DatabaseQuery<Product[], 'id'> => {
     return query(
       await supabase
@@ -307,7 +307,7 @@ export const ProductListing: ProductListing = {
     );
   },
   remove: async (
-    products: RequiredColumns<Product, 'id'>[],
+    products: RequireProperty<Product, 'id'>[],
   ): DatabaseQuery<Product[], 'id'> => {
     return query(
       await supabase
@@ -321,7 +321,7 @@ export const ProductListing: ProductListing = {
     );
   },
   attribute: (
-    product: RequiredColumns<Product, 'id'>,
+    product: RequireProperty<Product, 'id'>,
   ): ProductAttributeModifier => {
     const change: Partial<Product> = {};
 
@@ -348,7 +348,7 @@ export const ProductListing: ProductListing = {
     };
   },
   stock: async (
-    product: RequiredColumns<Product, 'id'>,
+    product: RequireProperty<Product, 'id'>,
     stock: number,
   ): DatabaseQuery<Product, 'id'> => {
     return query(

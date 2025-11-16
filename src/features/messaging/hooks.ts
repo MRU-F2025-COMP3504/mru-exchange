@@ -1,7 +1,7 @@
 import type {
   UserMessage,
   DatabaseQuery,
-  RequiredColumns,
+  RequireProperty,
   UserProfile,
   UserChat,
 } from '@shared/types';
@@ -51,7 +51,7 @@ interface UseChat {
    */
   show: (
     flag: boolean,
-    messages: RequiredColumns<UserMessage, 'id'>[],
+    messages: RequireProperty<UserMessage, 'id'>[],
   ) => DatabaseQuery<UserMessage[], 'id'>;
 
   /**
@@ -77,8 +77,8 @@ interface UseChat {
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useChat(
-  sender: RequiredColumns<UserProfile, 'supabase_id'>,
-  chat: RequiredColumns<UserChat, 'id'>,
+  sender: RequireProperty<UserProfile, 'supabase_id'>,
+  chat: RequireProperty<UserChat, 'id'>,
 ): UseChat {
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<UserMessage[]>([]);
@@ -109,7 +109,7 @@ export function useChat(
    * @see {@link UserMessaging.show()}
    */
   const show = useCallback(
-    async (flag: boolean, array: RequiredColumns<UserMessage, 'id'>[]) => {
+    async (flag: boolean, array: RequireProperty<UserMessage, 'id'>[]) => {
       return HookUtils.load(
         setLoading,
         UserMessaging.show(chat, sender, flag, array),
@@ -223,7 +223,7 @@ interface UseChats {
    */
   show: (
     flag: boolean,
-    chats: RequiredColumns<UserChat, 'id'>[],
+    chats: RequireProperty<UserChat, 'id'>[],
   ) => DatabaseQuery<UserChat[], 'id'>;
 }
 
@@ -237,7 +237,7 @@ interface UseChats {
  * @author Ramos Jacosalem (cjaco906)
  */
 export function useChats(
-  sender: RequiredColumns<UserProfile, 'supabase_id'>,
+  sender: RequireProperty<UserProfile, 'supabase_id'>,
 ): UseChats {
   const [loading, setLoading] = useState(true);
   const [chats, setChats] = useState<UserChat[]>([]);
@@ -268,7 +268,7 @@ export function useChats(
    * @see {@link UserChatting.show()}
    */
   const show = useCallback(
-    async (flag: boolean, array: RequiredColumns<UserChat, 'id'>[]) => {
+    async (flag: boolean, array: RequireProperty<UserChat, 'id'>[]) => {
       return HookUtils.load(setLoading, UserChatting.show(flag, chats)).then(
         (result) => {
           if (!result.ok) {
