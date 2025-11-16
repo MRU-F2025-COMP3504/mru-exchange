@@ -392,9 +392,9 @@ export default function ProductPage() {
   };
 
   const displayStars = (rating: number): string => {
-    const fullStar: string = '★';
-    const emptyStar: string = '☆';
-    let result: string = '';
+    const fullStar = '★';
+    const emptyStar = '☆';
+    let result = '';
 
     for (let i = 1; i <= 5; i++) {
       result += i <= rating ? fullStar : emptyStar;
