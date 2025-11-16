@@ -2,7 +2,6 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import { supabase } from '@shared/api';
-import { getTags } from '../features/catalogue/api/category';
 
 interface Product {
   id?: number;
@@ -43,9 +42,15 @@ export default function PostProductPage() {
   // Get all categories
   const fetchCategories = async () => {
     try {
-      const { data } = (await getTags()) as {
-        data: Category[] | null;
-      };
+      const { data, error: fetchError } = await supabase
+        .from('Category_Tags')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
       setCategories(data || []);
     } catch (err: any) {
       console.error('Error fetching categories:', err);
@@ -312,7 +317,7 @@ export default function PostProductPage() {
             {(product.image?.length || 0) < 10 && (
               <input
                 type='file'
-                accept='jpg/*'
+                accept='image/*'
                 multiple
                 required
                 onChange={handleFileChange}
