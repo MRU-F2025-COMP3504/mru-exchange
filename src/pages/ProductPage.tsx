@@ -341,10 +341,10 @@ export default function ProductPage() {
     };
 
     /**
-     * Fetches all images for a product from the database.
+     * Fetches all images for a product from the database. <Note> If this works, this function is actually unnecessary.
      * @param imageData An object passed from the database containing image info.
-     *  image: string[] The arry containing image paths.
-     * @returns 
+     *  image: string[] The array containing image paths.
+     * @returns An array of the image urls.
      */
     // function getImageUrls(imageData: { image: string[] }): string[] | null {
 
