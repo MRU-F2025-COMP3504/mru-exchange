@@ -1,6 +1,7 @@
 import type {
   DatabaseQuery,
   Product,
+  ProductImage,
   RequireProperty,
   Result,
   UserProfile,
@@ -66,10 +67,10 @@ export interface ProductBuilder {
    *
    * @see {@link REGEX_IMAGE_PATH} for more information on the image path validation algorithm
    *
-   * @param paths the given product image paths
+   * @param paths the given product images
    * @returns a result that validates the given input
    */
-  image: (paths: string[]) => Result<this>;
+  image: (image: ProductImage[]) => Result<this>;
 
   /**
    * Initializes the price property.
@@ -151,10 +152,10 @@ export interface ProductAttributeModifier {
    *
    * @see {@link REGEX_IMAGE_PATH} for more information on the image path validation algorithm
    *
-   * @param paths the given product image paths
+   * @param paths the given product images
    * @returns a result that validates the given input
    */
-  image: (paths: string[]) => Result<this>;
+  image: (paths: ProductImage[]) => Result<this>;
 
   /**
    * Finalizes modification and updates the given product.

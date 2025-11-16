@@ -2,9 +2,12 @@ import type {
   ExtractArrayType,
   DatabaseQueryResult,
   Result,
+  ProductImage,
 } from '@shared/types';
 import type { PostgrestSingleResponse } from '@supabase/supabase-js';
-import { ok, err } from './result';
+import { ok, err, REGEX_IMAGE_PATH } from '@shared/utils';
+import { supabase } from '@shared/api';
+import path from 'path';
 
 /**
  * A utility function for validating database query responses.
@@ -39,4 +42,21 @@ export function query<
   }
 
   return result as DatabaseQueryResult<Table, Columns>;
+}
+
+// TODO: rework
+export function images(paths: string[]): Result<string[]> {
+  const changes: string[] = [];
+  for (const path of paths) {
+    if (!REGEX_IMAGE_PATH.test(path)) {
+      return err(new Error('Product image path is invalid', { cause: path }));
+    }
+
+    const change = path.replace('database/images/', '').split('/').pop();
+    if (change) {
+      changes.push(change);
+    }
+  }
+
+  return ok(changes);
 }
