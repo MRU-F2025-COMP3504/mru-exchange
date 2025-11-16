@@ -1,24 +1,27 @@
 import { createContext } from 'react';
-import type { Result } from '@shared/types';
 import type { User } from '@supabase/supabase-js';
-import type { AuthPromiseResult, UserSession } from '@shared/types';
+import type { Result } from '@shared/types';
 
+/**
+ * Represents the authentication context.
+ *
+ * @see {@link AuthProvider}
+ */
 export interface AuthContextType {
-  user: Result<User>;
+  /**
+   * The current loading state indicates data in transit or processing to completion.
+   */
   loading: boolean;
-  signUp: (
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-  ) => AuthPromiseResult<UserSession>;
-  signIn: (email: string, password: string) => AuthPromiseResult<UserSession>;
-  signOut: () => AuthPromiseResult<null>;
-  resendEmailVerification: (email: string) => AuthPromiseResult<null>;
-  resetPassword: (email: string) => AuthPromiseResult<null>;
-  updatePassword: (password: string) => AuthPromiseResult<User>;
+
+  /**
+   * The current user result state.
+   */
+  user: Result<User>;
 }
 
+/**
+ * The current reference to the authentication context instance.
+ */
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined,
 );
