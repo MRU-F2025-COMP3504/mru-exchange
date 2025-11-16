@@ -1,8 +1,8 @@
-import type { Tables } from '@shared/types/database/schema';
+import type { Tables } from '@shared/types';
 
 export type UserProfile = Tables<'User_Information'>;
 export type Product = Tables<'Product_Information'>;
-export type Chat = Tables<'Chats'>;
+export type UserChat = Tables<'Chats'>;
 export type UserMessage = Tables<'Messages'>;
 export type Category = Tables<'Category_Tags'>;
 export type CategorizedProduct = Tables<'Category_Assigned_Products'>;
