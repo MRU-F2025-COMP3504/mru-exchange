@@ -5,36 +5,34 @@ import { supabase } from '@shared/api';
 
 function getContext(): { current: AuthContextType } {
   const wrapper = ({ children }: { children: React.ReactNode }) => {
-    return (<AuthProvider>{children}</AuthProvider>);
+    return <AuthProvider>{children}</AuthProvider>;
   };
 
   return renderHook(() => useAuth(), { wrapper }).result;
 }
 
 describe('AuthContext', () => {
-  vi.spyOn(supabase, 'auth', 'get')
-    .mockReturnValue({
-      getUser: vi.fn().mockReturnValue({ data: {}, error: null }),
-      onAuthStateChange: vi.fn().mockReturnValue({
-        data: {
-          subscription: {
-            unsubscribe: vi.fn(),
-          },
+  vi.spyOn(supabase, 'auth', 'get').mockReturnValue({
+    getUser: vi.fn().mockReturnValue({ data: {}, error: null }),
+    onAuthStateChange: vi.fn().mockReturnValue({
+      data: {
+        subscription: {
+          unsubscribe: vi.fn(),
         },
+      },
+    }),
+    signUp: vi.fn(),
+    signInWithPassword: vi.fn(),
+    signOut: vi.fn(),
+    resend: vi.fn(),
+  } as never);
+  vi.spyOn(supabase, 'from').mockReturnValue({
+    select: vi.fn().mockReturnValue({
+      eq: vi.fn().mockReturnValue({
+        single: vi.fn().mockReturnValue({ data: {}, error: null }),
       }),
-      signUp: vi.fn(),
-      signInWithPassword: vi.fn(),
-      signOut: vi.fn(),
-      resend: vi.fn(),
-    } as never);
-  vi.spyOn(supabase, 'from')
-    .mockReturnValue({
-      select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          single: vi.fn().mockReturnValue({ data: {}, error: null }),
-        }),
-      }),
-    } as never);
+    }),
+  } as never);
 
   it('should initially set loading to true', () => {
     expect(getContext().current.loading).toBe(true);

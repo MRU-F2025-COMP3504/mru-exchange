@@ -15,7 +15,7 @@ import {
   ProductPage,
   MessagingPage,
   PostProductPage,
-  PreviewPostPage
+  PreviewPostPage,
 } from '@pages/index';
 
 function App() {
@@ -31,7 +31,7 @@ function App() {
           <Route path='/reset-password' element={<ResetPasswordPage />} />
           <Route path='/sign-up' element={<SignUpPage />} />
           <Route path='/contact-us' element={<ContactUsPage />} />
-          
+
           {/* Protected routes */}
           <Route
             path='/home'

@@ -31,7 +31,7 @@
       "@pages/*": ["./pages/*"],
       "@assets/*": ["./assets/*"],
       "@shared/*": ["./shared/*"],
-      "@itests/*": ["./tests/*"],
+      "@itests/*": ["./tests/*"]
     }
   },
   "include": ["vite.config.ts", "src"]

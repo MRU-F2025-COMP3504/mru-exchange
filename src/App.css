@@ -1,12 +1,12 @@
 /* Remove default styles that might interfere */
 
 .link-item {
-  color: #2563EB;
+  color: #2563eb;
   text-decoration: underline;
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .link-item:hover {
-  color: #1E3A8A;
+  color: #1e3a8a;
 }

@@ -3,15 +3,15 @@ import { useAuth } from '@shared/contexts';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@shared/api';
 import Header from './Header';
-import Footer from './Footer'
+import Footer from './Footer';
 
 interface Product {
-    id: number;
-    title: string | null;
-    description: string | null;
-    price: number | null;
-    image: any | null;
-    stock_count: number | null;
+  id: number;
+  title: string | null;
+  description: string | null;
+  price: number | null;
+  image: any | null;
+  stock_count: number | null;
 }
 
 export default function HomePage() {
@@ -69,26 +69,33 @@ export default function HomePage() {
   // Get image URL from Supabase
   const getImageUrl = (imageData: any): string | null => {
     if (!imageData) return null;
-    
+
     try {
       let imagePath: string | null = null;
-      
+
       if (typeof imageData === 'object' && imageData !== null) {
-        imagePath = imageData.image || imageData.path || imageData.url || imageData.filename;
+        imagePath =
+          imageData.image ||
+          imageData.path ||
+          imageData.url ||
+          imageData.filename;
       } else if (typeof imageData === 'string') {
         imagePath = imageData;
       }
-      
+
       if (!imagePath) return null;
       if (imagePath.startsWith('http')) return imagePath;
-      
-      const filename = imagePath.replace('database/images/', '').split('/').pop();
+
+      const filename = imagePath
+        .replace('database/images/', '')
+        .split('/')
+        .pop();
       if (!filename) return null;
-      
+
       const { data } = supabase.storage
         .from('product-images')
         .getPublicUrl(filename);
-      
+
       return data.publicUrl;
     } catch (error) {
       return null;
@@ -97,25 +104,29 @@ export default function HomePage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F9FAFB' }}>
-      <Header/>
+      <Header />
 
       <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <h1 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 'bold', 
-            color: '#111827',
-            marginBottom: '2rem'
-          }}>
+          <h1
+            style={{
+              fontSize: '2.5rem',
+              fontWeight: 'bold',
+              color: '#111827',
+              marginBottom: '2rem',
+            }}
+          >
             Welcome to MRU Exchange{firstName ? `, ${firstName}` : ''}! 🎉
           </h1>
 
-          <div style={{ 
-            display: 'flex', 
-            gap: '1.5rem', 
-            justifyContent: 'center',
-            marginTop: '2rem'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '1.5rem',
+              justifyContent: 'center',
+              marginTop: '2rem',
+            }}
+          >
             <button
               onClick={() => navigate('/product-search')}
               style={{
@@ -125,7 +136,7 @@ export default function HomePage() {
                 borderRadius: '12px',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                minWidth: '200px'
+                minWidth: '200px',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = '#007FB5';
@@ -139,10 +150,22 @@ export default function HomePage() {
               }}
             >
               <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📚</div>
-              <div style={{ fontSize: '1.1rem', fontWeight: '600', color: '#111827' }}>
+              <div
+                style={{
+                  fontSize: '1.1rem',
+                  fontWeight: '600',
+                  color: '#111827',
+                }}
+              >
                 Browse Products
               </div>
-              <div style={{ fontSize: '0.875rem', color: '#6B7280', marginTop: '0.25rem' }}>
+              <div
+                style={{
+                  fontSize: '0.875rem',
+                  color: '#6B7280',
+                  marginTop: '0.25rem',
+                }}
+              >
                 Find what you need
               </div>
             </button>
@@ -156,7 +179,7 @@ export default function HomePage() {
                 borderRadius: '12px',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                minWidth: '200px'
+                minWidth: '200px',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = '#007FB5';
@@ -170,10 +193,22 @@ export default function HomePage() {
               }}
             >
               <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>➕</div>
-              <div style={{ fontSize: '1.1rem', fontWeight: '600', color: '#111827' }}>
+              <div
+                style={{
+                  fontSize: '1.1rem',
+                  fontWeight: '600',
+                  color: '#111827',
+                }}
+              >
                 Sell Something
               </div>
-              <div style={{ fontSize: '0.875rem', color: '#6B7280', marginTop: '0.25rem' }}>
+              <div
+                style={{
+                  fontSize: '0.875rem',
+                  color: '#6B7280',
+                  marginTop: '0.25rem',
+                }}
+              >
                 List your items
               </div>
             </button>
@@ -181,28 +216,40 @@ export default function HomePage() {
         </div>
 
         <div style={{ marginTop: '4rem' }}>
-          <h2 style={{ 
-            fontSize: '1.75rem', 
-            fontWeight: 'bold', 
-            color: '#111827',
-            marginBottom: '1.5rem'
-          }}>
+          <h2
+            style={{
+              fontSize: '1.75rem',
+              fontWeight: 'bold',
+              color: '#111827',
+              marginBottom: '1.5rem',
+            }}
+          >
             Recently Listed
           </h2>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#6B7280' }}>
+            <div
+              style={{ textAlign: 'center', padding: '3rem', color: '#6B7280' }}
+            >
               Loading products...
             </div>
           ) : recentProducts.length === 0 ? (
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '3rem',
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              border: '2px dashed #E5E7EB'
-            }}>
-              <p style={{ fontSize: '1.1rem', color: '#6B7280', marginBottom: '0.5rem' }}>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '3rem',
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                border: '2px dashed #E5E7EB',
+              }}
+            >
+              <p
+                style={{
+                  fontSize: '1.1rem',
+                  color: '#6B7280',
+                  marginBottom: '0.5rem',
+                }}
+              >
                 No products listed yet
               </p>
               <p style={{ fontSize: '0.9rem', color: '#9CA3AF' }}>
@@ -210,14 +257,16 @@ export default function HomePage() {
               </p>
             </div>
           ) : (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-              gap: '1.5rem'
-            }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                gap: '1.5rem',
+              }}
+            >
               {recentProducts.map((product) => {
                 const imageUrl = getImageUrl(product.image);
-                
+
                 return (
                   <div
                     key={product.id}
@@ -228,62 +277,74 @@ export default function HomePage() {
                       padding: '1rem',
                       boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
                       cursor: 'pointer',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'translateY(-4px)';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                      e.currentTarget.style.boxShadow =
+                        '0 4px 12px rgba(0,0,0,0.15)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1)';
+                      e.currentTarget.style.boxShadow =
+                        '0 1px 4px rgba(0,0,0,0.1)';
                     }}
                   >
-                    <div style={{
-                      width: '100%',
-                      height: '160px',
-                      backgroundColor: '#E5E7EB',
-                      borderRadius: '8px',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: '0.75rem'
-                    }}>
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '160px',
+                        backgroundColor: '#E5E7EB',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: '0.75rem',
+                      }}
+                    >
                       {imageUrl ? (
-                        <img 
+                        <img
                           src={imageUrl}
-                          alt={product.title || 'Product'} 
-                          style={{ 
-                            width: '100%', 
-                            height: '100%', 
-                            objectFit: 'cover' 
+                          alt={product.title || 'Product'}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
                           }}
                         />
                       ) : (
-                        <span style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>No Image</span>
+                        <span
+                          style={{ color: '#9CA3AF', fontSize: '0.875rem' }}
+                        >
+                          No Image
+                        </span>
                       )}
                     </div>
 
-                    <h4 style={{ 
-                      fontSize: '1rem', 
-                      fontWeight: '600',
-                      color: '#111827',
-                      marginBottom: '0.5rem',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
-                    }}>
+                    <h4
+                      style={{
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        color: '#111827',
+                        marginBottom: '0.5rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
                       {product.title || 'Untitled Product'}
                     </h4>
-                    
+
                     {product.price !== null && (
-                      <p style={{ 
-                        fontSize: '1.25rem',
-                        fontWeight: 'bold',
-                        color: '#007FB5',
-                        margin: 0
-                      }}>
+                      <p
+                        style={{
+                          fontSize: '1.25rem',
+                          fontWeight: 'bold',
+                          color: '#007FB5',
+                          margin: 0,
+                        }}
+                      >
                         ${product.price.toFixed(2)}
                       </p>
                     )}
@@ -294,7 +355,7 @@ export default function HomePage() {
           )}
         </div>
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

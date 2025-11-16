@@ -1,5 +1,5 @@
-import { query, supabase } from '@shared/api';
-import { ok, err, present } from '@shared/utils';
+import { supabase } from '@shared/api';
+import { ok, err, present, query } from '@shared/utils';
 import {
   type AuthChangeEvent,
   AuthError,
@@ -8,7 +8,13 @@ import {
   type Subscription,
   type User,
 } from '@supabase/supabase-js';
-import type { AuthPromiseResult, DatabaseQuery, Result, UserProfile, UserSession } from '@shared/types';
+import type {
+  AuthPromiseResult,
+  DatabaseQuery,
+  Result,
+  UserProfile,
+  UserSession,
+} from '@shared/types';
 
 export async function getSession(): AuthPromiseResult<Session> {
   const {
@@ -44,8 +50,8 @@ export async function getUserProfile(): DatabaseQuery<UserProfile, '*'> {
         .from('User_Information')
         .select('*')
         .eq('supabase_id', user.data.id)
-        .single()
-    )
+        .single(),
+    );
   }
 
   return user;
@@ -106,7 +112,9 @@ export async function signOut(): AuthPromiseResult<null> {
   return ok(null);
 }
 
-export async function resendEmailVerification(email: string): AuthPromiseResult<null> {
+export async function resendEmailVerification(
+  email: string,
+): AuthPromiseResult<null> {
   const { error } = await supabase.auth.resend({
     type: 'signup',
     email,

@@ -21,6 +21,8 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm test
+      - name: Test build
+        run: npm run build
   deploy:
     needs: test
     runs-on: ubuntu-latest
@@ -28,16 +30,16 @@ jobs:
     steps:
       - name: Initiate SSH
         run: |
-         mkdir -p ~/.ssh
-         echo "$DEPLOY_KEY" > ~/.ssh/id_ed25519
-         chmod 600 ~/.ssh/id_ed25519
-         ssh-keyscan "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan "$DEPLOY_HOST" >> ~/.ssh/known_hosts
       - name: Deploy
         run: |
-         ssh $DEPLOY_USER@$DEPLOY_HOST << ENDSSH
-           cd $DEPLOY_PATH
-           npm run deploy
-         ENDSSH
+          ssh $DEPLOY_USER@$DEPLOY_HOST << ENDSSH
+            cd $DEPLOY_PATH
+            npm run deploy
+          ENDSSH
     env:
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
