@@ -1,7 +1,7 @@
 import Header from './Header';
 import Footer from './Footer';
 import { useLocation } from 'react-router-dom';
-import { register } from '../features/listing/api/product';
+import { ProductListing } from '../features/listing/api.ts;
 import { ok, err } from '../shared/utils';
 import { supabase } from '@shared/api';
 import { useEffect, useState } from 'react';
@@ -18,13 +18,16 @@ interface SellerInfo {
 }
 
 // System Variables
-type Product = {
-  title: string;
-  category: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-};
+interface Product {
+  id?: number;
+  title: string | null;
+  description: string | null;
+  price: number | null;
+  image: File[] | null;
+  imageURLs: string[] | null;
+  stock_count: number | null;
+  category: string | null;
+}
 
 export default function PreviewPostPage() {
   const { user } = useAuth();
@@ -68,8 +71,8 @@ export default function PreviewPostPage() {
       result = result.data.description(product.description)
       if (result.ok === false) throw result.error;
 
-      result = result.data.image(URL.createObjectURL(product.image[0]))
-      if (result.ok === false) throw result.error;
+      //result = result.data.image(URL.createObjectURL(product.image[0]))
+      //if (result.ok === false) throw result.error;
 
       result = result.data.price(product.price)
       if (result.ok === false) throw result.error;
