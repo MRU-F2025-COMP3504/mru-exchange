@@ -8,7 +8,7 @@
 export const REGEX_IMAGE_PATH = /^(\w|\.|\/[a-z_\-\s0-9.]+)+\.(png|jpg)$/i;
 
 /**
- * Validates the given text file path with the following regular expression.
+ * Validates the given text file path.
  * Use {@link RegExp.test()} to match the given text file path.
  *
  * @see {@link https://regex101.com/r/ZaU81J/1} (Submitter: Anonymous)
@@ -24,3 +24,21 @@ export const REGEX_TEXT_PATH = /^(\w|\.|\/[a-z_\-\s0-9.]+)+\.(txt)$/i;
  * @returns the {@link RegExp} object
  */
 export const REGEX_EMAIL = /^([\w-]+(?:\.[\w-]+)*)@(mtroyal\.ca)$/i;
+
+/**
+ * Validates the given username.
+ * Use {@link RegExp.test()} to match the given username.
+ *
+ * @see {@link https://regex101.com/r/pG2xV4/1} (Submitter: Anonymous)
+ * @returns the {@link RegExp} object
+ */
+export const REGEX_USERNAME = /^(?=.*?[A-Za-z])[A-Za-z+]+$/;
+
+/**
+ * Validates the given letters.
+ * Use {@link RegExp.test()} to match the given letters.
+ *
+ * @see {@link https://regex101.com/r/uH9aA7/1} (Submitter: Anonymous)
+ * @returns the {@link RegExp} object
+ */
+export const REGEX_LETTERS_ONLY = /^(?=.*?[A-Za-z])[A-Za-z+]+$/;
