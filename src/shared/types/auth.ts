@@ -22,3 +22,9 @@ export interface UserSession {
    */
   session: Result<Session>;
 }
+
+export interface UserCredentialsBuilder {
+  email: (email: string) => Result<this>;
+  password: (password: string) => Result<this>;
+  name: (first: string, last: string) => Result<this>;
+}

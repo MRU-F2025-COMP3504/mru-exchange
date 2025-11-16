@@ -6,6 +6,7 @@ import type {
   Product,
   Result,
   UserProfile,
+  ProductImage,
 } from '@shared/types';
 import { supabase } from '@shared/api';
 import { err, ok, query, REGEX_IMAGE_PATH } from '@shared/utils';
@@ -234,6 +235,7 @@ interface ProductListing {
 export const ProductListing: ProductListing = {
   register: (): ProductBuilder => {
     const product: Partial<Product> = {};
+    let images: ProductImage[];
 
     return {
       seller(
@@ -253,8 +255,14 @@ export const ProductListing: ProductListing = {
       description(description: string): Result<ProductBuilder> {
         return setDescription(this, product, description);
       },
-      image(paths: string[]): Result<ProductBuilder> {
-        return setImage(this, product, paths);
+      image(files: ProductImage[]): Result<ProductBuilder> {
+        const result = setImage(this, product, files);
+
+        if (result.ok) {
+          images = files;
+        }
+
+        return result;
       },
       price(price: number): Result<ProductBuilder> {
         if (price < 0) {
@@ -279,6 +287,12 @@ export const ProductListing: ProductListing = {
         return ok(this);
       },
       async build(): DatabaseQuery<Product, 'id'> {
+        for (const image of images) {
+          await supabase.storage
+            .from('product-images')
+            .upload(image.path, image.body);
+        }
+
         return query(
           await supabase
             .from('Product_Information')
@@ -324,6 +338,7 @@ export const ProductListing: ProductListing = {
     product: RequireProperty<Product, 'id'>,
   ): ProductAttributeModifier => {
     const change: Partial<Product> = {};
+    let images: ProductImage[];
 
     return {
       title(title: string): Result<ProductAttributeModifier> {
@@ -332,10 +347,22 @@ export const ProductListing: ProductListing = {
       description(description: string): Result<ProductAttributeModifier> {
         return setDescription(this, product, description);
       },
-      image(paths: string[]): Result<ProductAttributeModifier> {
-        return setImage(this, product, paths);
+      image(files: ProductImage[]): Result<ProductAttributeModifier> {
+        const result = setImage(this, product, files);
+
+        if (result.ok) {
+          images = files;
+        }
+
+        return result;
       },
       async modify(): DatabaseQuery<Product, 'id'> {
+        for (const image of images) {
+          await supabase.storage
+            .from('product-images')
+            .upload(image.path, image.body, { upsert: true });
+        }
+
         return query(
           await supabase
             .from('Product_Information')
@@ -427,16 +454,17 @@ function setDescription<T>(
 function setImage<T>(
   controller: T,
   product: Partial<Product>,
-  paths: string[],
+  images: ProductImage[],
 ): Result<T> {
-  for (const path of paths) {
+  for (const image of images) {
+    const path = image.path;
+
     if (!REGEX_IMAGE_PATH.test(path)) {
       return err(new Error('Product image path is invalid', { cause: path }));
     }
   }
 
-  // TODO: Accept multiple image paths from the database
-  // product.image = url;
+  product.image = { images: images.map((image) => image.path) };
 
   return ok(controller);
 }
