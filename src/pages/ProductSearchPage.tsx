@@ -264,6 +264,7 @@ export default function ProductSearchPage() {
             border: 'none',
             cursor: 'pointer',
             fontWeight: 'bold',
+            whiteSpace: 'nowrap',
           }}
         >
           Post Ad
