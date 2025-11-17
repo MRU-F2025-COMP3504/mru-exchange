@@ -382,3 +382,6 @@ $ npm run test:watch
 - [React Documentation](https://react.dev/)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Vite Documentation](https://vitejs.dev/)
+
+### Beta release with guide
+- Tag: v0.1.0-beta.2
