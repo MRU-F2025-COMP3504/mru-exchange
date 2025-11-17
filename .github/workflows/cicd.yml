@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, stable]
   pull_request:
-    branches: [main, develop]
+    branches: [main, stable]
 
 jobs:
   test:
@@ -26,7 +26,7 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/stable'
     steps:
       - name: Initiate SSH
         run: |
