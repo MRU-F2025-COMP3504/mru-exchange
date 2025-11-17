@@ -376,7 +376,7 @@ export default function ProfilePage() {
                 e.stopPropagation();
                 handleRemoveBookmark(product.id);
               }}
-              className='absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors'
+              className='absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors w-10 h-10'
               title='Remove bookmark'
             >
               ✕
