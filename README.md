@@ -258,6 +258,13 @@ Otherwise, the system can be run on `vite` directly using:
 ```bash
 $ npm run dev
 ```
+### Build Releases
+
+For updating the repository to include new changes to the files, use the main [main](https://github.com/MRU-F2025-COMP3504/mru-exchange/tree/main)
+
+Every time a feature is rolled out and confirmed to be working, merge the branch from main [Stable](https://github.com/MRU-F2025-COMP3504/mru-exchange/tree/Stable) 
+
+**DO NOT PUSH DIRECTLY INTO STABLE BRANCH**
 
 ### Testing
 
