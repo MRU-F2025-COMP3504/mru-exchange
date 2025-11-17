@@ -308,9 +308,19 @@ $ npm run test:watch
 
 ### Adding Bugs 
 
+- Go into Issues and click the 'New issue' button
+
+- Click on'Bug report'
+
+- Follow the starred (**) guidelines within the input box
+
+- Include a link to the repository version with this syntax:
+  `[example bug](https://github.com/example-bug)`
 
 
 ### Current Bugs
+
+- [Product not posting](https://github.com/MRU-F2025-COMP3504/mru-exchange/issues/113)
 
 ### 📖 Additional Resources
 
