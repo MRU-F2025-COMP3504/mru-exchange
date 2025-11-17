@@ -278,6 +278,7 @@ Static assets, including the React logo
 
 #### 3.2 features
 Organizes APIs and related modules by functional area.
+Contains backend code for implementing various features across the site. Each feature has test.ts, and .ts files.
 
 Each feature folder typically includes:
 - api.test.ts
@@ -303,7 +304,7 @@ Feature categories:
   - Review-related functionality  
 
 #### 3.3 pages
-All font end React pages in .tsx format
+All front end React pages in .tsx format. Also has a __test__ folder for any frontend tests the page needs to run.
 
 #### 3.4 shared
 - Shared utilities, components, hooks, and configuration  
