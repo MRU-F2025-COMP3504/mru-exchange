@@ -258,6 +258,59 @@ Otherwise, the system can be run on `vite` directly using:
 ```bash
 $ npm run dev
 ```
+
+## Directory Sturcure 
+
+### 1. database
+- Database schema source code  
+- Row-Level Security (RLS) policies and associated functions  
+- Initial test user–data generation scripts  
+- Additional functions, triggers, views, and indexes  
+
+### 2. public
+Site-wide assets such as logos  
+
+### 3. src
+Contains the main application source code.
+
+#### 3.1 assets
+Static assets, including the React logo  
+
+#### 3.2 features
+Organizes APIs and related modules by functional area.
+
+Each feature folder typically includes:
+- api.test.ts
+- components.ts
+- hooks.ts
+- index.ts
+- types.ts
+
+Feature categories:
+- **bookmarking**
+  - Logic for retrieving and modifying bookmarked products  
+- **catalogue**
+  - Logic for retrieving, linking, and modifying product categories  
+- **interact**
+  - Logic for retrieving and modifying user interactions (e.g., muting, blocking)  
+- **listing**
+  - Logic for posting product listings  
+- **messaging**
+  - Logic for retrieving and modifying messages  
+- **reporting**
+  - Reporting-related functionality  
+- **review**
+  - Review-related functionality  
+
+#### 3.3 pages
+All font end React pages in .tsx format
+
+#### 3.4 shared
+- Shared utilities, components, hooks, and configuration  
+
+#### 3.5 test
+- Project-wide testing utilities and configuration 
+
 ### Build Releases
 
 For updating the repository to include new changes to the files, use the [main](https://github.com/MRU-F2025-COMP3504/mru-exchange/tree/main)

@@ -118,6 +118,105 @@ def generateChatData():
         seen.add(chat)
         Chats.append(chat)
         
+def genMessage(message_type):
+    hour = random.randint(1, 12)
+    meridiem = random.choice(['am', 'pm'])
+    
+    message_map = {
+        'greeting_sender': greeting_sender, 
+        'greeting_responses': greeting_responses, 
+        'availability_sender': availability_sender, 
+        'availability_responses': availability_responses, 
+        'negotiation_sender': negotiation_sender, 
+        'negotiation_responses': negotiation_responses, 
+        'meetup_sender': meetup_sender, 
+        'meetup_responses': meetup_responses, 
+        'closing_sender': closing_sender, 
+        'closing_responses': closing_responses,
+    }
+    
+    greeting_sender = [
+        "Hello!",
+        "Hi there!",
+        "Hey, how’s it going?",
+        "Hi, I saw your post about the item.",
+        "Hey! I’m interested in something you’re selling."
+    ]
+
+    greeting_responses = [
+        "Hi! How can I help you?",
+        "Hey! Yes, what’s up?",
+        "Hi there, which item are you looking at?",
+        "Hello! Thanks for reaching out.",
+        "Hey, good to hear from you!"
+    ]
+    
+    availability_sender = [
+        "Is this product still available?",
+        "Do you still have this for sale?",
+        "Are you still selling this item?",
+        "Hey, just checking if this is still up for grabs.",
+        "Do you happen to have any extras of this?"
+    ]
+
+    availability_responses = [
+        "Yes, it’s still available!",
+        "I’ve got one left!",
+        "Sorry, it just sold earlier today.",
+        "Yeah, it’s still up for sale.",
+        "I only have one more available."
+    ]
+
+    negotiation_sender = [
+        "I’m really interested, but could you do a bit cheaper?",
+        "Would you take $5 less?",
+        "Could you do $10 off if I pick it up today?",
+        "Is the price negotiable?",
+        "That’s a bit expensive for me, can we work something out?"
+    ]
+
+    negotiation_responses = [
+        "Hmm, I can do a small discount, maybe $5 off.",
+        "Sorry, the price is firm.",
+        "If you pick it up today, I can lower it a little.",
+        "Let’s say $5 less — deal?",
+        "I’ve already dropped the price quite a bit, sorry!"
+    ]
+
+    meetup_sender = [
+        "Where should we meet up?",
+        "What times are you free to meet?",
+        "Can we meet on campus?",
+        "Would tomorrow afternoon work?",
+        f"Does {hour}{meridiem} work for you?",
+    ]
+
+    meetup_responses = [
+        "I can meet near the library.",
+        "Let’s do outside the student center?",
+        "I’m free after 3pm today.",
+        "Tomorrow works great, what time?",
+        f"{hour}{meridiem} sounds good to me!",
+    ]
+
+    closing_sender = [
+        "Perfect, see you then!",
+        "Thanks so much!",
+        "Sounds good, I’ll message when I’m there.",
+        "Alright, I’ll bring cash.",
+        "Appreciate it!"
+    ]
+
+    closing_responses = [
+        "See you soon!",
+        "No problem, thanks!",
+        "Okay, looking forward to it.",
+        "Awesome, have a good one!",
+        "Great, thanks again!"
+    ]
+    
+    return message_map(message_type)
+    
 def generateMessagesData():
     Messages.append(['chat_id', 'sender_id', 'logged_message', 'created_at'])
     hour = random.randint(1, 12)
@@ -276,102 +375,22 @@ def generateMessagesData():
         "Have a good one!"
     ]
     
-    greeting_sender = [
-        "Hello!",
-        "Hi there!",
-        "Hey, how’s it going?",
-        "Hi, I saw your post about the item.",
-        "Hey! I’m interested in something you’re selling."
-    ]
-
-    greeting_responses = [
-        "Hi! How can I help you?",
-        "Hey! Yes, what’s up?",
-        "Hi there, which item are you looking at?",
-        "Hello! Thanks for reaching out.",
-        "Hey, good to hear from you!"
-    ]
-    
-    availability_sender = [
-        "Is this product still available?",
-        "Do you still have this for sale?",
-        "Are you still selling this item?",
-        "Hey, just checking if this is still up for grabs.",
-        "Do you happen to have any extras of this?"
-    ]
-
-    availability_responses = [
-        "Yes, it’s still available!",
-        "I’ve got one left!",
-        "Sorry, it just sold earlier today.",
-        "Yeah, it’s still up for sale.",
-        "I only have one more available."
-    ]
-
-    negotiation_sender = [
-        "I’m really interested, but could you do a bit cheaper?",
-        "Would you take $5 less?",
-        "Could you do $10 off if I pick it up today?",
-        "Is the price negotiable?",
-        "That’s a bit expensive for me, can we work something out?"
-    ]
-
-    negotiation_responses = [
-        "Hmm, I can do a small discount, maybe $5 off.",
-        "Sorry, the price is firm.",
-        "If you pick it up today, I can lower it a little.",
-        "Let’s say $5 less — deal?",
-        "I’ve already dropped the price quite a bit, sorry!"
-    ]
-
-    meetup_sender = [
-        "Where should we meet up?",
-        "What times are you free to meet?",
-        "Can we meet on campus?",
-        "Would tomorrow afternoon work?",
-        f"Does {hour}{meridiem} work for you?",
-    ]
-
-    meetup_responses = [
-        "I can meet near the library.",
-        "Let’s do outside the student center?",
-        "I’m free after 3pm today.",
-        "Tomorrow works great, what time?",
-        f"{hour}{meridiem} sounds good to me!",
-    ]
-
-    closing_sender = [
-        "Perfect, see you then!",
-        "Thanks so much!",
-        "Sounds good, I’ll message when I’m there.",
-        "Alright, I’ll bring cash.",
-        "Appreciate it!"
-    ]
-
-    closing_responses = [
-        "See you soon!",
-        "No problem, thanks!",
-        "Okay, looking forward to it.",
-        "Awesome, have a good one!",
-        "Great, thanks again!"
-    ]
-    
     for i in range(rowsToGenerate):
         # get chat id
         # get user_id_1
         # get user_id_2
         
         
-        random.choice(greeting_sender),
-        random.choice(greeting_responses),
-        random.choice(availability_sender),
-        random.choice(availability_responses),
-        random.choice(negotiation_sender),
-        random.choice(negotiation_responses),
-        random.choice(meetup_sender),
-        random.choice(meetup_responses ),
-        random.choice(closing_sender),
-        random.choice(closing_responses),
+        random.choice(genMessage('greeting_sender')),
+        random.choice(genMessage('greeting_responses')),
+        random.choice(genMessage('availability_sender')),
+        random.choice(genMessage('availability_responses')),
+        random.choice(genMessage('negotiation_sender')),
+        random.choice(genMessage('negotiation_responses')),
+        random.choice(genMessage('meetup_sender')),
+        random.choice(genMessage('meetup_responses') ),
+        random.choice(genMessage('closing_sender')),
+        random.choice(genMessage('closing_responses'))
         
         message = [
         random.randint(1, 100),

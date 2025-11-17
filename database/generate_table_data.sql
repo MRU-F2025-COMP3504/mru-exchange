@@ -318,9 +318,13 @@ END $$;
 
 DO $$
 DECLARE
+    chat_id int8;
     send_id uuid;
-    user_id_1 uuid;
-    user_id_2 uuid;
+    user1_id uuid;
+    user2_id uuid;
+    count int8;
+    mes text[];
+    chat_to_send text;
     hour integer := floor(random() * 12 + 1);
     meridiem text := (ARRAY['am','pm'])[floor(random() * 2 + 1)];
 
@@ -407,36 +411,37 @@ DECLARE
     mes_types text[][] :=
     ARRAY
     [
-        greeting_sender text[],
-        greeting_responses text[],
-        availability_sender text[],
-        availability_responses text[],
-        negotiation_sender text[],
-        negotiation_responses text[],
-        meetup_sender text[],
-        meetup_responses text[],
-        closing_sender text[],
-        closing_responses text[]
+        greeting_sender,
+        greeting_responses,
+        availability_sender,
+        availability_responses,
+        negotiation_sender,
+        negotiation_responses,
+        meetup_sender,
+        meetup_responses,
+        closing_sender,
+        closing_responses
     ];
 
 BEGIN
-    FOR chat IN 
-        SELECT id, user_id_1, user_id_2
-        FROM mru_dev."Chats" 
+    FOR chat_id, user1_id, user2_id IN
+    SELECT id, user_id_1, user_id_2 FROM mru_dev."Chats"
     LOOP
-        count int8 := 0;
+        count := 0;
 
-        FOREACH mes IN ARRAY mes_types LOOP
-            IF count % 2 = 0 THEN send_id := chat.user_id_1;
-            ELSE send_id := chat.user_id_2;
+        FOREACH mes SLICE 1 IN ARRAY mes_types LOOP
+            IF count % 2 = 0 THEN send_id := user1_id;
+            ELSE send_id := user2_id;
             END IF;
 
+            chat_to_send := mes[floor(random() * array_length(mes, 1) + 1)::int];
 
-            message := mes[floor(random() * array_length(mes, 1) + 1)::int];
+            INSERT INTO mru_dev."Messages"(chat_id, sender_id, logged_message)
+            VALUES (chat_id, send_id, chat_to_send);
 
-            INSERT INTO mru_dev."Messages"(chat.id, sender_id, logged_message)
-            VALUES (chat_id, send_id, message);
-
+            IF floor(random() * 10 + 1) > 9 THEN 
+                EXIT;
+            END IF;
             count := count +1;
         END LOOP;
     END LOOP;
