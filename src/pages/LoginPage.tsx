@@ -1,13 +1,12 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@shared/contexts';
+import { UserAuthentication } from '@shared/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const auth = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -15,15 +14,19 @@ export default function LoginPage() {
     setError('');
     setIsLoading(true);
 
+    const signin = UserAuthentication.signIn();
+
     // Validate @mtroyal.ca email
-    if (!email.endsWith('@mtroyal.ca')) {
+    if (!signin.email(email).ok) {
       setError('Please use a valid @mtroyal.ca email address');
       setIsLoading(false);
 
       return;
     }
 
-    const result = await auth.signIn(email, password);
+    signin.password(password);
+
+    const result = await signin.submit();
 
     if (result.ok) {
       // Redirect to home page on successful login

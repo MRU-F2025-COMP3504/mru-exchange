@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthAPI } from '@shared/api';
+import { UserAuthentication } from '@shared/api';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -22,7 +22,11 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    const result = await AuthAPI.resetPassword(email);
+    const signin = UserAuthentication.signIn();
+
+    signin.email(email);
+
+    const result = await signin.resetPassword();
 
     if (result.ok) {
       setSuccessMessage(

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@shared/contexts';
+import { UserAuthentication } from '@shared/api';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -42,7 +43,13 @@ export default function SignUpPage() {
       return;
     }
 
-    const result = await auth.signUp(email, password, firstName, lastName);
+    const signup = UserAuthentication.signUp();
+
+    signup.email(email);
+    signup.password(email);
+    signup.fullname(firstName, lastName);
+
+    const result = await signup.submit();
 
     if (result.ok) {
       setSuccessMessage(

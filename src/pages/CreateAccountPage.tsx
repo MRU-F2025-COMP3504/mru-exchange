@@ -1,9 +1,8 @@
+import { UserAuthentication } from '@shared/api';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@shared/contexts';
 
 export default function CreateAccountPage() {
-  const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -50,19 +49,21 @@ export default function CreateAccountPage() {
 
     setIsSubmitting(true);
 
-    const result = await signUp(
-      formData.email,
-      formData.password,
-      formData.firstName,
-      formData.lastName,
-    );
+    const signup = UserAuthentication.signUp();
+
+    const email = signup.email(formData.email);
+
+    if (!email.ok) {
+      setErrors({ email: 'An account with this email already exists.' });
+    }
+
+    signup.password(formData.email);
+    signup.fullname(formData.firstName, formData.lastName);
+
+    const result = await signup.submit();
 
     if (!result.ok) {
-      if (result.error.message.includes('already registered')) {
-        setErrors({ email: 'An account with this email already exists.' });
-      } else {
-        setErrors({ general: result.error.message });
-      }
+      setErrors({ general: result.error.message });
       return;
     }
 
@@ -170,7 +171,9 @@ export default function CreateAccountPage() {
                 id='firstName'
                 type='text'
                 value={formData.firstName}
-                onChange={(e) => handleChange('firstName', e.target.value)}
+                onChange={(e) => {
+                  handleChange('firstName', e.target.value);
+                }}
                 placeholder='Enter your first name'
                 style={inputStyle(!!errors.firstName)}
               />
@@ -189,7 +192,9 @@ export default function CreateAccountPage() {
                 id='lastName'
                 type='text'
                 value={formData.lastName}
-                onChange={(e) => handleChange('lastName', e.target.value)}
+                onChange={(e) => {
+                  handleChange('lastName', e.target.value);
+                }}
                 placeholder='Enter your last name'
                 style={inputStyle(!!errors.lastName)}
               />
@@ -208,7 +213,9 @@ export default function CreateAccountPage() {
                 id='email'
                 type='email'
                 value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
+                onChange={(e) => {
+                  handleChange('email', e.target.value);
+                }}
                 placeholder='yourname@mtroyal.ca'
                 style={inputStyle(!!errors.email)}
               />
@@ -227,7 +234,9 @@ export default function CreateAccountPage() {
                 id='password'
                 type='password'
                 value={formData.password}
-                onChange={(e) => handleChange('password', e.target.value)}
+                onChange={(e) => {
+                  handleChange('password', e.target.value);
+                }}
                 placeholder='Create a password'
                 style={inputStyle(!!errors.password)}
               />
@@ -246,9 +255,9 @@ export default function CreateAccountPage() {
                 id='confirmPassword'
                 type='password'
                 value={formData.confirmPassword}
-                onChange={(e) =>
-                  handleChange('confirmPassword', e.target.value)
-                }
+                onChange={(e) => {
+                  handleChange('confirmPassword', e.target.value);
+                }}
                 placeholder='Re-enter your password'
                 style={inputStyle(!!errors.confirmPassword)}
               />
@@ -305,7 +314,9 @@ export default function CreateAccountPage() {
               Already have an account?{' '}
               <button
                 type='button'
-                onClick={() => navigate('/signin')}
+                onClick={() => {
+                  navigate('/signin');
+                }}
                 style={{
                   color: '#2563EB',
                   fontWeight: '500',

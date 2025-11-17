@@ -1,10 +1,9 @@
+import { UserAuthentication } from '@shared/api';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@shared/contexts';
 
 export default function SignInPage() {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -35,9 +34,13 @@ export default function SignInPage() {
 
     setIsSubmitting(true);
     try {
-      const result = await signIn(formData.email, formData.password);
+      const signin = UserAuthentication.signIn();
 
-      if (!result.ok) {
+      const email = signin.email(formData.email);
+      const password = signin.password(formData.password);
+      const result = await signin.submit();
+
+      if (!email.ok || !password.ok || !result.ok) {
         setErrors({ general: 'Invalid email or password' });
         return;
       }
@@ -151,7 +154,9 @@ export default function SignInPage() {
                 id='email'
                 type='email'
                 value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
+                onChange={(e) => {
+                  handleChange('email', e.target.value);
+                }}
                 placeholder='yourname@mtroyal.ca'
                 style={inputStyle(!!errors.email)}
               />
@@ -170,7 +175,9 @@ export default function SignInPage() {
                 id='password'
                 type='password'
                 value={formData.password}
-                onChange={(e) => handleChange('password', e.target.value)}
+                onChange={(e) => {
+                  handleChange('password', e.target.value);
+                }}
                 placeholder='Enter your password'
                 style={inputStyle(!!errors.password)}
               />
@@ -235,7 +242,9 @@ export default function SignInPage() {
               Don't have an account?{' '}
               <button
                 type='button'
-                onClick={() => navigate('/create-account')}
+                onClick={() => {
+                  navigate('/create-account');
+                }}
                 style={{
                   color: '#2563EB',
                   fontWeight: '500',

@@ -1,11 +1,10 @@
+import { UserAuthentication } from '@shared/api';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@shared/contexts';
 
 export default function VerifyEmailPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { resendEmailVerification } = useAuth();
   const email = location.state?.email || '';
   const [isResending, setIsResending] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
@@ -19,7 +18,10 @@ export default function VerifyEmailPage() {
     setIsResending(true);
     setResendMessage('');
 
-    const result = await resendEmailVerification(email);
+    const signup = UserAuthentication.signUp();
+
+    signup.email(email);
+    const result = await signup.reverify();
 
     if (!result.ok) {
       setResendMessage('Failed to resend link. Please try again.');
@@ -161,7 +163,7 @@ export default function VerifyEmailPage() {
 
           {/* Back to Sign In */}
           <button
-            onClick={() => navigate('/signin')}
+            onClick={() => { navigate('/signin'); }}
             style={{
               marginTop: '1.5rem',
               fontSize: '0.875rem',

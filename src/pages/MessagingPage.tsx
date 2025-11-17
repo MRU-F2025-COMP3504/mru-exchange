@@ -7,7 +7,6 @@ import { useChat, useChats } from '@features/messaging/hooks';
 import Header from './Header';
 import Footer from './Footer';
 import { supabase } from '@shared/api';
-import { getUser } from '@shared/api/auth';
 
 interface Chat {
   id: number;
@@ -139,7 +138,7 @@ export default function MessagingPage() {
               Please log in to view your chats
             </p>
             <button
-              onClick={() => navigate('/signin')}
+              onClick={() => { navigate('/signin'); }}
               className='px-6 py-2 bg-[#007FB5] text-white rounded-lg hover:bg-[#006B9E]'
             >
               Sign In
@@ -183,7 +182,7 @@ export default function MessagingPage() {
           chats.map((chat) => (
             <div
               key={chat.id}
-              onClick={() => setSelectedChat(chat.id)}
+              onClick={() => { setSelectedChat(chat.id); }}
               style={{
                 padding: '0.75rem',
                 marginBottom: '0.5rem',

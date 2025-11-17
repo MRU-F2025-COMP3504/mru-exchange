@@ -1,12 +1,13 @@
+import { UserAuthentication } from '@shared/api';
 import { useAuth } from '@shared/contexts';
 import { useNavigate } from 'react-router-dom';
 
 export default function Header() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
-    await signOut();
+    await UserAuthentication.signOut();
     navigate('/signin');
   };
 
@@ -47,7 +48,7 @@ export default function Header() {
           <img
             src='/MruExchangeLogo.png'
             alt='MRU Exchange Logo'
-            onClick={() => navigate('/home')}
+            onClick={() => { navigate('/home'); }}
             style={{
               width: '50px',
               height: 'auto',
@@ -55,7 +56,7 @@ export default function Header() {
             }}
           />
           <h1
-            onClick={() => navigate('/home')}
+            onClick={() => { navigate('/home'); }}
             style={{
               fontSize: '1.5rem',
               fontWeight: 'bold',
