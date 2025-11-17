@@ -294,12 +294,23 @@ $ npm run test:watch
 ```
 ### Adding Tests
 
--How to add a new Test
-Create a test file in the __tests__ directory next to your component: ComponentName.test.tsx
-Import testing utilities
-Write test cases using describe and it blocks
-Run tests locally
-Commit your test, CI will automatically run tests on every PR
+- How to add a new Test
+
+1. Create a test file in the __tests__ directory next to your component: ComponentName.test.tsx
+
+2. Import testing utilities
+
+3. Write test cases using describe and it blocks
+
+4. Run tests locally
+
+5. Commit your test, CI will automatically run tests on every PR
+
+### Adding Bugs 
+
+
+
+### Current Bugs
 
 ### 📖 Additional Resources
 
