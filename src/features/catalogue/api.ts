@@ -78,11 +78,10 @@ interface CategoryCatalogue {
  * Sellers may assign their products with one or more category tags that can be best represented.
  * Category tags influences user recommendations and search queries, enhancing product exposure.
  *
- * @see {@link CategoryListing} for registering and modifying existing category tags
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
  * @author Andrew Krawiec (AndrewTries)
+ * @see {@link CategoryListing} for registering and modifying existing category tags
  */
 export const CategoryCatalogue: CategoryCatalogue = {
   getTags: async (): DatabaseQuery<Category[], '*'> => {
@@ -189,11 +188,10 @@ interface ProductCatalogue {
  * Sellers must register products for public listing.
  * Only publicly listed products are shown to buyers.
  *
- * @see {@link ProductListing} for product registration and modification
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
  * @author Andrew Krawiec (AndrewTries)
+ * @see {@link ProductListing} for product registration and modification
  */
 export const ProductCatalogue: ProductCatalogue = {
   get: async (

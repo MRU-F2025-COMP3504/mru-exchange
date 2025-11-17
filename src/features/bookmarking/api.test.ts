@@ -62,9 +62,9 @@ describe('Product Bookmarking', () => {
       }),
     });
 
-    const cart = { id: 0 };
+    const bookmarker = { id: 0 };
     const products = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ProductBookmarking.store(cart, products);
+    const query = ProductBookmarking.store(bookmarker, products);
     const result = await query;
 
     expect(result.ok, 'store() failed').toBe(true);
@@ -83,9 +83,9 @@ describe('Product Bookmarking', () => {
       }),
     });
 
-    const cart = { id: 0 };
+    const bookmarker = { id: 0 };
     const products = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ProductBookmarking.remove(cart, products);
+    const query = ProductBookmarking.remove(bookmarker, products);
     const result = await query;
 
     expect(result.ok, 'remove() failed').toBe(true);
@@ -102,8 +102,8 @@ describe('Product Bookmarking', () => {
       }),
     });
 
-    const cart = { id: 0 };
-    const query = ProductBookmarking.clear(cart);
+    const bookmarker = { id: 0 };
+    const query = ProductBookmarking.clear(bookmarker);
     const result = await query;
 
     expect(result.ok, 'clear() failed');

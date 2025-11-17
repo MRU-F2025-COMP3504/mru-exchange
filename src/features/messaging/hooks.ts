@@ -71,10 +71,9 @@ interface UseChat {
  * Hooks user messaging functionality.
  * The hook state updates when its dependency states changes.
  *
- * @see {@link UserMessaging} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link UserMessaging} for more information
  */
 export function useChat(
   sender: RequireProperty<UserProfile, 'supabase_id'>,
@@ -231,10 +230,9 @@ interface UseChats {
  * Hooks user chatting functionality.
  * The hook state updates when its dependency state changes.
  *
- * @see {@link UserChatting} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link UserChatting} for more information
  */
 export function useChats(
   sender: RequireProperty<UserProfile, 'supabase_id'>,

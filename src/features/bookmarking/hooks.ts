@@ -59,7 +59,7 @@ interface UseBookmarker {
    *
    * @param the given product identifier(s)
    * @returns a wrapped query of stored bookmarked product(s)
-   * @see {@link ProductBookmarking.store}
+   * @see {@link ProductBookmarking.store()}
    */
   store: (
     products: RequireProperty<Product, 'id'>[],
@@ -103,10 +103,9 @@ type BookmarkerResult = DatabaseQueryResult<ProductBookmarker, '*'>;
  * Hooks product bookmarking functionality.
  * The hook state updates when its dependency states changes.
  *
- * @see {@link ProductBookmarking} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link ProductBookmarking} for more information
  */
 export function useBookmarker(
   buyer: RequireProperty<UserProfile, 'supabase_id'>,

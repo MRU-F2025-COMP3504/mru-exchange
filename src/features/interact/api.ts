@@ -117,12 +117,11 @@ interface UserInteraction {
  * When the buyer bookmarks a product, the seller of that product would be notified of the "order" and establish a new (or reuse existing) chat communication.
  * Users may block and mute recipients from receiving and silencing chat message notifications, respectively.
  *
- * @see {@link UserChatting} for user chat registration and fetching
- * @see {@link UserMessaging} for user messaging
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
  * @author Andrew Krawiec (AndrewTries)
+ * @see {@link UserChatting} for user chat registration and fetching
+ * @see {@link UserMessaging} for user messaging
  */
 export const UserInteraction: UserInteraction = {
   get: async (

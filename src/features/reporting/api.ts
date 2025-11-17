@@ -46,8 +46,8 @@ interface UserReporting {
   /**
    * Creates a new report.
    *
-   * @see {@link UserReporting} for more information on its builder features
    * @returns the user reporting builder
+   * @see {@link UserReporting} for more information on its builder features
    */
   create: () => UserReporter;
 

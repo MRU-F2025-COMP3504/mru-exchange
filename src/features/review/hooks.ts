@@ -135,10 +135,9 @@ interface UseProductReviews {
  * Hooks the functionality of fetching product reviews and calculating the average rating.
  * The hook state updates when its dependency states changes.
  *
- * @see {@link UserReviewing.getProductReviews()} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link UserReviewing.getProductReviews()} for more information
  */
 export function useProductReviews(
   product: RequireProperty<Product, 'id'>,
@@ -258,10 +257,9 @@ interface UseSellerReviewers {
  * Hooks seller reviewer functionality.
  * The hook state updates when its dependency states changes.
  *
- * @see {@link UseSellerReviewers} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link UseSellerReviewers} for more information
  */
 export function useSellerReviewers(
   reviewer: RequireProperty<UserProfile, 'supabase_id'>,
@@ -347,8 +345,6 @@ interface UseSellerReviews {
 /**
  * Hooks the functionality of fetching seller reviews and calculating the average rating.
  * The hook state updates when its dependency states changes.
- *
- * @see {@link UserReviewing.getSellerReviews()} for more information
  *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
