@@ -18,9 +18,6 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
-    onConsoleLog(_log: string, type: 'stdout' | 'stderr'): boolean {
-      return type === 'stdout';
-    },
   },
   resolve: {
     alias: {
