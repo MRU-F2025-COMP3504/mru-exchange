@@ -182,8 +182,7 @@ export const UserReviewing: UserReviewing = {
         .select('*')
         .eq('product_id', product.id)
         .eq('created_by_id', reviewer.supabase_id)
-        .order('created_at', { ascending: false })
-        .single(),
+        .order('created_at', { ascending: false }),
     );
   },
   getSellerReviews: async (
@@ -207,8 +206,7 @@ export const UserReviewing: UserReviewing = {
         .select('*')
         .eq('created_by_id', reviewer.supabase_id)
         .eq('created_on_id', seller.supabase_id)
-        .order('created_at', { ascending: false })
-        .single(),
+        .order('created_at', { ascending: false }),
     );
   },
   getAverageProductRating: async (
@@ -239,7 +237,11 @@ export const UserReviewing: UserReviewing = {
     const review: Partial<Review> = {};
     return {
       description(description: string): Result<ReviewPublisher> {
-        review.description = description;
+        if (!description) {
+          return err(new Error('Review description cannot be empty'));
+        } else {
+          review.description = description;
+        }
 
         return ok(this);
       },

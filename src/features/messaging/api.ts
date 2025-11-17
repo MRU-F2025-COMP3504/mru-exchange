@@ -11,7 +11,7 @@ import {
   type RealtimeChannel,
   type RealtimePostgresInsertPayload,
 } from '@supabase/supabase-js';
-import type { query } from '@shared/utils';
+import { query } from '@shared/utils';
 
 /**
  * See the implementation below for more information.

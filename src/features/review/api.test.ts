@@ -65,7 +65,7 @@ describe('Review Creation/Modification', () => {
 
     const reviewer = { supabase_id: 'abc123' };
     const reviews = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = UserReviewing.remove(reviewer, ...reviews);
+    const query = UserReviewing.remove(reviewer, reviews);
     const result = await query;
 
     expect(result.ok, 'remove() failed').toBe(true);
@@ -83,13 +83,25 @@ describe('Review Creation/Modification', () => {
     });
 
     const reviewer = { supabase_id: 'abc123' };
-    const review = {
-      id: 0,
-      rating: 4.5,
-      description: 'this is good',
-    };
+    const reviews = [
+      {
+        id: 0,
+        rating: 4.5,
+        description: 'this is good',
+      },
+      {
+        id: 1,
+        rating: 4.0,
+        dscruption: 'this is good too',
+      },
+      {
+        id: 2,
+        rating: 4.7,
+        description: 'even better',
+      },
+    ];
 
-    const query = UserReviewing.remove(reviewer, review);
+    const query = UserReviewing.remove(reviewer, reviews);
     const result = await query;
 
     expect(result.ok, 'update() failed').toBe(true);

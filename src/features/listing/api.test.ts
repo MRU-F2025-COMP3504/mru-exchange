@@ -139,11 +139,16 @@ describe('Product Listing', () => {
       '/test/image.jpg',
     ];
 
-    const validImageResult = register.image(validImages);
+    const validImageResult = register.image(
+      validImages.map((image) => ({
+        path: image,
+        body: new File([], ''),
+      })),
+    );
 
     expect(validImageResult.ok, 'register.image() invalid').toBe(true);
 
-    const invalidImage = [
+    const invalidImages = [
       '',
       '. database/images/test.jpg',
       '$!@#,',
@@ -152,7 +157,12 @@ describe('Product Listing', () => {
       '.jpg',
     ];
 
-    const invalidImageResult = register.image(invalidImage);
+    const invalidImageResult = register.image(
+      invalidImages.map((image) => ({
+        path: image,
+        body: new File([], ''),
+      })),
+    );
 
     expect(invalidImageResult.ok, 'register.image() valid').toBe(false);
 
@@ -266,11 +276,16 @@ describe('Product Listing', () => {
       '/test/image.jpg',
     ];
 
-    const validImageResult = attribute.image(validImages);
+    const validImageResult = attribute.image(
+      validImages.map((image) => ({
+        path: image,
+        body: new File([], ''),
+      })),
+    );
 
     expect(validImageResult.ok, 'attribute.image() invalid').toBe(true);
 
-    const invalidImage = [
+    const invalidImages = [
       '',
       '. database/images/test.jpg',
       '$!@#,',
@@ -279,7 +294,12 @@ describe('Product Listing', () => {
       '.jpg',
     ];
 
-    const invalidImageResult = attribute.image(invalidImage);
+    const invalidImageResult = attribute.image(
+      invalidImages.map((image) => ({
+        path: image,
+        body: new File([], ''),
+      })),
+    );
 
     expect(invalidImageResult.ok, 'attribute.image() valid').toBe(false);
 

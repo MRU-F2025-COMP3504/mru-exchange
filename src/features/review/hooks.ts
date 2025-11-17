@@ -308,7 +308,7 @@ export function useSellerReviewers(
 }
 
 /**
- * The return t ype for the {@link useSellerReviews()} hook.
+ * The return type for the {@link useSellerReviews()} hook.
  */
 interface UseSellerReviews {
   /**
