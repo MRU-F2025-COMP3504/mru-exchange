@@ -260,13 +260,13 @@ $ npm run dev
 ```
 ### Build Releases
 
-For updating the repository to include new changes to the files, use the main [main](https://github.com/MRU-F2025-COMP3504/mru-exchange/tree/main)
+For updating the repository to include new changes to the files, use the [main](https://github.com/MRU-F2025-COMP3504/mru-exchange/tree/main)
 
-Every time a feature is rolled out and confirmed to be working, merge the branch from main [Stable](https://github.com/MRU-F2025-COMP3504/mru-exchange/tree/Stable) 
+Every time a feature is rolled out and confirmed to be working, merge the branch from [Stable](https://github.com/MRU-F2025-COMP3504/mru-exchange/tree/Stable) 
 
 **DO NOT PUSH DIRECTLY INTO STABLE BRANCH**
 
-### Testing
+### Running Tests
 
 The system uses [vitest](https://vitest.dev/) for application testing.
 The following script runs unit and integration tests:
@@ -292,6 +292,14 @@ To run tests while running the system:
 ```
 $ npm run test:watch
 ```
+### Adding Tests
+
+-How to add a new Test
+Create a test file in the __tests__ directory next to your component: ComponentName.test.tsx
+Import testing utilities
+Write test cases using describe and it blocks
+Run tests locally
+Commit your test, CI will automatically run tests on every PR
 
 ### 📖 Additional Resources
 
