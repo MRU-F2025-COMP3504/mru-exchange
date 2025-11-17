@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import { ProductListing } from '@features/listing/api';
 import { supabase } from '@shared/api';
 import { useAuth } from '@shared/contexts';
 
@@ -173,16 +174,20 @@ export default function ProfilePage() {
     if (!confirm('Mark this product as sold?')) return;
 
     try {
-      // Mark as deleted and unlisted
-      const { error } = await supabase
-        .from('Product_Information')
-        .update({
-          isDeleted: true,
-          isListed: false,
-        })
-        .eq('id', productId);
+      console.log('Attempting to mark product as sold:', productId);
+      console.log('Current user ID:', currentUserId);
+      
+      // Call the database function to mark the product as sold
+      const { data, error } = await supabase.rpc('mark_product_as_sold', {
+        product_id_param: productId
+      });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Failed to mark product as sold:', error);
+        throw error;
+      }
+
+      console.log('Product marked as sold successfully');
 
       // Remove from listings
       setListedProducts((prev) => prev.filter((p) => p.id !== productId));
@@ -197,7 +202,8 @@ export default function ProfilePage() {
       alert('Product marked as sold!');
     } catch (err: any) {
       console.error('Error marking product as sold:', err);
-      alert('Failed to mark product as sold');
+      console.error('Error details:', JSON.stringify(err, null, 2));
+      alert('Failed to mark product as sold: ' + (err.message || 'Unknown error'));
     }
   };
 

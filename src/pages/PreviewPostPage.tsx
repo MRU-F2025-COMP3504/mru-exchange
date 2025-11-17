@@ -1,7 +1,7 @@
 import Header from './Header';
 import Footer from './Footer';
 import { useLocation } from 'react-router-dom';
-import { ProductListing } from '../features/listing/api.ts;
+import { ProductListing } from '../features/listing/api';
 import { ok, err } from '../shared/utils';
 import { supabase } from '@shared/api';
 import { useEffect, useState } from 'react';

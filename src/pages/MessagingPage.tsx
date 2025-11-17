@@ -2,13 +2,12 @@ import { useState, useEffect } from 'react';
 // import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@shared/contexts';
-import { get, getByUser, show, create } from '@features/messaging/api/chat.ts';
-import { getByChat, send, remove } from '@features/messaging/api/message.ts';
+import { UserChatting, UserMessaging } from '@features/messaging/api';
 import { useChat, useChats } from '@features/messaging/hooks';
 import Header from './Header';
 import Footer from './Footer';
 import { supabase } from '@shared/api';
-import { getUser } from '@shared/api/auth.ts';
+import { getUser } from '@shared/api/auth';
 
 interface Chat {
   id: number;
