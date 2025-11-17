@@ -298,55 +298,7 @@ export default function ProductPage() {
     }
   };
 
-  // function getImageUrls(imageData: { [key: string]: string }): string[] | null {
-
-  //       try {
-
-  //           // Create an array.
-  //           const imagesArray = [];
-
-  //           // For every image,
-  //           for (const key in imageData) {
-
-  //               // Get the imagePath.
-  //               const imagePath: string = imageData[key];
-
-  //               if (!imagePath) return null;
-
-  //               if (imagePath.startsWith('http')) {
-  //                   imagesArray.push(imagePath);
-  //               }
-
-
-  //               const filename = imagePath.replace('database/images/', '').split('/').pop();
-
-  //               if (!filename) return null;
-
-  //               const { data } = supabase.storage
-  //                   .from('product-images')
-  //                   .getPublicUrl(filename);
-
-  //               imagesArray.push(data.publicUrl);
-
-  //           }
-
-  //           // Return
-  //           return imagesArray;
-
-
-  //       } catch (error) {
-  //           console.error('Error getting image URL:', error);
-  //           return null;
-  //       }
-  //   };
-
-    /**
-     * Fetches all images for a product from the database. <Note> If this works, this function is actually unnecessary.
-     * @param imageData An object passed from the database containing image info.
-     *  image: string[] The array containing image paths.
-     * @returns An array of the image urls.
-     */
-    function getImageUrls(imageData: { image: string[] }): string[] | null {
+  function getImageUrls(imageData: { [key: string]: string }): string[] | null {
 
         try {
 
@@ -354,7 +306,10 @@ export default function ProductPage() {
             const imagesArray = [];
 
             // For every image,
-            for (const imagePath of imageData.image) {
+            for (const key in imageData) {
+
+                // Get the imagePath.
+                const imagePath: string = imageData[key];
 
                 if (!imagePath) return null;
 
@@ -384,6 +339,51 @@ export default function ProductPage() {
             return null;
         }
     };
+
+    /**
+     * Fetches all images for a product from the database. <Note> If this works, this function is actually unnecessary.
+     * @param imageData An object passed from the database containing image info.
+     *  image: string[] The array containing image paths.
+     * @returns An array of the image urls.
+     */
+    // function getImageUrls(imageData: { image: string[] }): string[] | null {
+
+    //     try {
+
+    //         // Create an array.
+    //         const imagesArray = [];
+
+    //         // For every image,
+    //         for (const imagePath of imageData.image) {
+
+    //             if (!imagePath) return null;
+
+    //             if (imagePath.startsWith('http')) {
+    //                 imagesArray.push(imagePath);
+    //             }
+
+
+    //             const filename = imagePath.replace('database/images/', '').split('/').pop();
+
+    //             if (!filename) return null;
+
+    //             const { data } = supabase.storage
+    //                 .from('product-images')
+    //                 .getPublicUrl(filename);
+
+    //             imagesArray.push(data.publicUrl);
+
+    //         }
+
+    //         // Return
+    //         return imagesArray;
+
+
+    //     } catch (error) {
+    //         console.error('Error getting image URL:', error);
+    //         return null;
+    //     }
+    // };
 
   const calculateAverageRating = (): number => {
     if (reviews.length === 0) return 0;
