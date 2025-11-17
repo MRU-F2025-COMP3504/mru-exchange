@@ -3,6 +3,28 @@ import type { User } from '@supabase/supabase-js';
 import type { UserProfile } from '@shared/types';
 
 /**
+ * See the implementation below for more information.
+ */
+export interface UserSignUp extends UserCredentialsBuilder {
+  /**
+   * Resends email verification on the sign-up page.
+   *
+   * @returns a promise that resolves when resending the verification is successful
+   */
+  reverify: () => PromiseResult<null>;
+}
+
+/**
+ * See the implementation below for more information.
+ */
+export interface UserSignIn extends UserCredentialsBuilder {
+  /**
+   * Resets the user's password on the sign-in page.
+   */
+  resetPassword: () => PromiseResult<null>;
+}
+
+/**
  * Represents the user's credentials for sign-ins, sign-outs, and sign-ups.
  *
  * @see {@link UserAuthentication}

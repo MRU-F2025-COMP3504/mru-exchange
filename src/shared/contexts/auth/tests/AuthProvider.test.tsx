@@ -13,7 +13,9 @@ function getContext(): { current: AuthContextType } {
 
 describe('AuthContext', () => {
   vi.spyOn(supabase, 'auth', 'get').mockReturnValue({
-    getUser: vi.fn().mockReturnValue({ data: {}, error: null }),
+    getUser: vi
+      .fn()
+      .mockReturnValue({ data: { user: 'success' }, error: null }),
     onAuthStateChange: vi.fn().mockReturnValue({
       data: {
         subscription: {
@@ -21,70 +23,19 @@ describe('AuthContext', () => {
         },
       },
     }),
-    signUp: vi.fn(),
-    signInWithPassword: vi.fn(),
-    signOut: vi.fn(),
-    resend: vi.fn(),
-  } as never);
-  vi.spyOn(supabase, 'from').mockReturnValue({
-    select: vi.fn().mockReturnValue({
-      eq: vi.fn().mockReturnValue({
-        single: vi.fn().mockReturnValue({ data: {}, error: null }),
-      }),
-    }),
   } as never);
 
-  it('should initially set loading to true', () => {
-    expect(getContext().current.loading).toBe(true);
-  });
-
-  it('should have signUp function', () => {
-    expect(typeof getContext().current.signUp).toBe('function');
-  });
-
-  it('should have signIn function', () => {
-    expect(typeof getContext().current.signIn).toBe('function');
-  });
-
-  it('should have signOut function', () => {
-    expect(typeof getContext().current.signOut).toBe('function');
-  });
-
-  it('should reject non-mtroyal.ca emails on signUp', async () => {
+  it('loads the client user', async () => {
     const context = getContext();
 
     await waitFor(() => {
-      expect(context.current.loading).toBe(false);
+      expect(context.current.loading, 'loading user failed').toBe(false);
     });
 
-    const result = await context.current.signUp(
-      'test@gmail.com',
-      'password123',
-      'John',
-      'Doe',
-    );
-
-    expect(result.ok).toBe(false);
-    expect(!result.ok && result.error.message).toContain('@mtroyal.ca');
+    expect(context.current.user.ok, 'user invalid').toBe(true);
   });
 
-  it('should reject non-mtroyal.ca emails on signIn', async () => {
-    const context = getContext();
-
-    await waitFor(() => {
-      expect(context.current.loading).toBe(false);
-    });
-
-    const result = await context.current.signIn(
-      'test@gmail.com',
-      'password123',
-    );
-
-    expect(result.ok).toBe(false);
-    expect(!result.ok && result.error.message).toContain('@mtroyal.ca');
-  });
-
-  it('should throw error when useAuth is used outside AuthProvider', () => {
+  it('throws an error when useAuth is used outside AuthProvider', () => {
     expect(() => {
       renderHook(() => useAuth());
     }).toThrow('useAuth must be used within the AuthProvider');

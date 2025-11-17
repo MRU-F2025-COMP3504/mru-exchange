@@ -5,6 +5,8 @@ import type {
   UserProfile,
   UserCredentialsBuilder,
   UserCredentials,
+  UserSignIn,
+  UserSignUp,
 } from '@shared/types';
 import {
   query,
@@ -74,7 +76,7 @@ interface UserAuthentication {
    * Modifies the user's credentials.
    *
    * @see {@link UserCredentialsBuilder} for more information on its builder features
-   * @returns the user credentials validator
+   * @returns the user credentials builder
    */
   modify: () => UserCredentialsBuilder;
 
@@ -83,9 +85,9 @@ interface UserAuthentication {
    *
    * @see {@link UserCredentialsBuilder} for more information on its builder features
    * @see {@link UserSignUp} for more information on its builder features
-   * @returns the user credentials validator and additional user sign-up features
+   * @returns the user credentials builder and additional user sign-up features
    */
-  signUp: () => UserCredentialsBuilder | UserSignUp;
+  signUp: () => UserSignUp;
 
   /**
    * Signs the user into the website.
@@ -94,40 +96,18 @@ interface UserAuthentication {
    *
    * @see {@link UserCredentialsBuilder} for more information on its builder features
    * @see {@link UserSignIn} for more information on its builder features
-   * @returns the user credentials validator and additional user sign-in features
+   * @returns the user credentials builder and additional user sign-in features
    */
-  signIn: () => UserCredentialsBuilder | UserSignIn;
+  signIn: () => UserSignIn;
 
   /**
    * Signs the user out of the website.
    * Invalidates existing authentication cookies.
    *
    * @see {@link UserCredentialsBuilder} for more information on its builder features
-   * @returns the user credentials validator
+   * @returns the user credentials builder
    */
   signOut: () => PromiseResult<null>;
-}
-
-/**
- * See the implementation below for more information.
- */
-interface UserSignUp {
-  /**
-   * Resends email verification on the sign-up page.
-   *
-   * @returns a promise that resolves when resending the verification is successful
-   */
-  reverify: () => PromiseResult<null>;
-}
-
-/**
- * See the implementation below for more information.
- */
-interface UserSignIn {
-  /**
-   * Resets the user's password on the sign-in page.
-   */
-  resetPassword: () => PromiseResult<null>;
 }
 
 /**
@@ -210,34 +190,21 @@ export const UserAuthentication: UserAuthentication = {
       },
     };
   },
-  signUp(): UserCredentialsBuilder | UserSignUp {
+  signUp(): UserSignUp {
     const credentials: Partial<UserCredentials> = {};
 
     return {
-      email(email: string): Result<UserCredentialsBuilder> {
-        return setEmail(this as UserCredentialsBuilder, credentials, email);
+      email(email: string): Result<UserSignUp> {
+        return setEmail(this, credentials, email);
       },
-      password(password: string): Result<UserCredentialsBuilder> {
-        return setPassword(
-          this as UserCredentialsBuilder,
-          credentials,
-          password,
-        );
+      password(password: string): Result<UserSignUp> {
+        return setPassword(this, credentials, password);
       },
-      fullname(first: string, last: string): Result<UserCredentialsBuilder> {
-        return setFullname(
-          this as UserCredentialsBuilder,
-          credentials,
-          first,
-          last,
-        );
+      fullname(first: string, last: string): Result<UserSignUp> {
+        return setFullname(this, credentials, first, last);
       },
-      username(username: string): Result<UserCredentialsBuilder> {
-        return setUsername(
-          this as UserCredentialsBuilder,
-          credentials,
-          username,
-        );
+      username(username: string): Result<UserSignUp> {
+        return setUsername(this, credentials, username);
       },
       async submit(): PromiseResult<User | UserProfile> {
         if (!credentials.email || !credentials.password) {
@@ -278,26 +245,20 @@ export const UserAuthentication: UserAuthentication = {
       },
     };
   },
-  signIn(): UserCredentialsBuilder | UserSignIn {
+  signIn(): UserSignIn {
     const credentials: Partial<UserCredentials> = {};
 
     return {
-      email(email: string): Result<UserCredentialsBuilder> {
-        return setEmail(this as UserCredentialsBuilder, credentials, email);
+      email(email: string): Result<UserSignIn> {
+        return setEmail(this, credentials, email);
       },
-      password(password: string): Result<UserCredentialsBuilder> {
-        if (!password) {
-          return err('Password cannot be empty');
-        } else {
-          credentials.password = password;
-        }
-
-        return ok(this as UserCredentialsBuilder);
+      password(password: string): Result<UserSignIn> {
+        return setPassword(this, credentials, password);
       },
-      fullname(): Result<UserCredentialsBuilder> {
+      fullname(): Result<UserSignIn> {
         return err('Unsupported operation (fullname)');
       },
-      username(): Result<UserCredentialsBuilder> {
+      username(): Result<UserSignIn> {
         return err('Unsupported operation (username)');
       },
       async submit(): PromiseResult<User | UserProfile> {
@@ -375,16 +336,16 @@ function authenticate(response: AuthResponse | UserResponse): Result<User> {
  * A utility function that validates and assigns the given email for the user's credentials.
  *
  * @internal
- * @param validator the given user credentials validator
+ * @param builder the given user credentials builder
  * @param credentials the given incomplete user credentials
  * @param email the given email to assign
  * @see {@link REGEX_EMAIL}
  */
-function setEmail(
-  validator: UserCredentialsBuilder,
+function setEmail<T extends UserCredentialsBuilder>(
+  builder: T,
   credentials: Partial<UserCredentials>,
   email: string,
-): Result<UserCredentialsBuilder> {
+): Result<T> {
   const trimmed = email.trim();
 
   if (!trimmed) {
@@ -395,22 +356,22 @@ function setEmail(
     credentials.email = trimmed;
   }
 
-  return ok(validator);
+  return ok(builder);
 }
 
 /**
  * A utility function that validates and assigns the given password for the user's credentials.
  *
  * @internal
- * @param validator the given user credentials validator
+ * @param builder the given user credentials builder
  * @param credentials the given incomplete user credentials
  * @param password the given password to assign
  */
-function setPassword(
-  validator: UserCredentialsBuilder,
+function setPassword<T extends UserCredentialsBuilder>(
+  builder: T,
   credentials: Partial<UserCredentials>,
   password: string,
-): Result<UserCredentialsBuilder> {
+): Result<T> {
   if (!password) {
     return err('Password cannot be empty');
   } else if (password.length < 8) {
@@ -421,25 +382,25 @@ function setPassword(
     credentials.password = password;
   }
 
-  return ok(validator);
+  return ok(builder);
 }
 
 /**
  * A utility function that validates and assigns the given user's full name for the user's credentials.
  *
  * @internal
- * @param validator the given user credentials validator
+ * @param builder the given user credentials builder
  * @param credentials the given incomplete user credentials
  * @param first the given first name to assign
  * @param last the given last name to assign
  * @see {@link REGEX_LETTERS_ONLY}
  */
-function setFullname(
-  validator: UserCredentialsBuilder,
+function setFullname<T extends UserCredentialsBuilder>(
+  builder: T,
   credentials: Partial<UserCredentials>,
   first: string,
   last: string,
-): Result<UserCredentialsBuilder> {
+): Result<T> {
   const trimmedFirst = first.trim();
   const trimmedLast = last.trim();
 
@@ -456,23 +417,23 @@ function setFullname(
     credentials.lastName = trimmedFirst;
   }
 
-  return ok(validator);
+  return ok(builder);
 }
 
 /**
  * A utility function that validates and assigns the given username for the user's credentials.
  *
  * @internal
- * @param validator the given user credentials validator
+ * @param builder the given user credentials builder
  * @param credentials the given incomplete user credentials
  * @param username the given username to assign
  * @see {@link REGEX_USERNAME}
  */
-function setUsername(
-  validator: UserCredentialsBuilder,
+function setUsername<T extends UserCredentialsBuilder>(
+  builder: T,
   credentials: Partial<UserCredentials>,
   username: string,
-): Result<UserCredentialsBuilder> {
+): Result<T> {
   const trimmed = username.trim();
 
   if (!trimmed) {
@@ -483,5 +444,5 @@ function setUsername(
     credentials.username = username;
   }
 
-  return ok(validator);
+  return ok(builder);
 }
