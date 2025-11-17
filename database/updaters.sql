@@ -35,3 +35,7 @@ BEGIN
     return new;
 END;
 $$;
+
+create or replace trigger create_shopping_cart_for_user
+after insert on mru_dev."User_Information" for each row
+execute function mru_dev.handle_mru_user();
