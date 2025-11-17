@@ -238,6 +238,7 @@ export default function ProductSearchPage() {
               border: 'none',
               borderRadius: '6px',
               fontSize: '1rem',
+              backgroundColor: 'white',
             }}
           />
           <button
