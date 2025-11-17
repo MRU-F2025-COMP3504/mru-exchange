@@ -65,10 +65,9 @@ export interface ProductBuilder {
    * To handle the validation result:
    * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
-   * @see {@link REGEX_IMAGE_PATH} for more information on the image path validation algorithm
-   *
    * @param paths the given product images
    * @returns a result that validates the given input
+   * @see {@link REGEX_IMAGE_PATH}
    */
   image: (image: ProductImage[]) => Result<this>;
 
@@ -116,7 +115,7 @@ export interface ProductBuilder {
  * Modifies a product attribute based on the selection of product properties.
  * Selection may happen during runtime (e.g., modifing product title property).
  *
- * @see {@likn ProductListing.attribute()}
+ * @see {@link ProductListing.attribute()}
  */
 export interface ProductAttributeModifier {
   /**
@@ -150,10 +149,9 @@ export interface ProductAttributeModifier {
    * To handle the validation result:
    * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
-   * @see {@link REGEX_IMAGE_PATH} for more information on the image path validation algorithm
-   *
    * @param paths the given product images
    * @returns a result that validates the given input
+   * @see {@link REGEX_IMAGE_PATH}
    */
   image: (paths: ProductImage[]) => Result<this>;
 

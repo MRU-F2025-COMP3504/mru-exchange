@@ -99,12 +99,11 @@ interface UserChatting {
  * - Users must subscribe to a registered chat channel to send and receive messages.
  * - Users may show or hide one or more chats.
  *
- * @see {@link UserInteraction} for user interaction registration and fetching
- * @see {@link UserMessaging} for user messaging
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
  * @author Andrew Krawiec (AndrewTries)
+ * @see {@link UserInteraction} for user interaction registration and fetching
+ * @see {@link UserMessaging} for user messaging
  */
 export const UserChatting: UserChatting = {
   subscribe: (
@@ -270,12 +269,11 @@ interface UserMessaging {
  * - Users may show or hide one or more user messages.
  * - Messages may be removed for special reasons (e.g., reporting, banning).
  *
- * @see {@link UserInteraction} for user interaction registration and fetching
- * @see {@link UserChatting} for user user chatting registration and fetching
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
  * @author Andrew Krawiec (AndrewTries)
+ * @see {@link UserInteraction} for user interaction registration and fetching
+ * @see {@link UserChatting} for user user chatting registration and fetching
  */
 export const UserMessaging: UserMessaging = {
   subscribe: (

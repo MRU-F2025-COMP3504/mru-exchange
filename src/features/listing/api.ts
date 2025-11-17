@@ -87,11 +87,10 @@ interface CategoryListing {
  * Sellers may assign their products with one or more category tags that can be best represented.
  * Sellers may register for one or more new category tags and modify them.
  *
- * @see {@link CategoryCatalogue} for fetching existing category tags
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
  * @author Andrew Krawiec (AndrewTries)
+ * @see {@link CategoryCatalogue} for fetching existing category tags
  */
 export const CategoryListing: CategoryListing = {
   register: async (
@@ -196,10 +195,9 @@ interface ProductListing {
    * Modifies the attributes of the given product.
    * Attributes, such as the title, description, and images are specified.
    *
-   * @see {@link ProductAttributeModifier} for more information on its builder features
-   *
    * @param the given product identifier to modify its attributes
    * @returns a promise that resolves the modified product
+   * @see {@link ProductAttributeModifier} for more information on its builder features
    */
   attribute(product: RequireProperty<Product, 'id'>): ProductAttributeModifier;
 
@@ -226,11 +224,10 @@ interface ProductListing {
  * Sellers may choose to show, hide, or unlist products from the public.
  * Only publicly listed products are shown to buyers.
  *
- * @see {@link ProductCatalogue} for fetching existing products
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
  * @author Andrew Krawiec (AndrewTries)
+ * @see {@link ProductCatalogue} for fetching existing products
  */
 export const ProductListing: ProductListing = {
   register: (): ProductBuilder => {
@@ -398,13 +395,13 @@ export const ProductListing: ProductListing = {
  * If the given title is empty, the function returns an error.
  *
  * @internal
- * @param controller the given product attribute modifier
+ * @param modifier the given product attribute modifier
  * @param product the given incomplete product modification
  * @param title the given new product title
  * @returns a wrapped result that may contain the product attribute modifier
  */
 function setTitle<T>(
-  controller: T,
+  modifier: T,
   product: Partial<Product>,
   title: string,
 ): Result<T> {
@@ -414,7 +411,7 @@ function setTitle<T>(
     product.title = title;
   }
 
-  return ok(controller);
+  return ok(modifier);
 }
 
 /**
@@ -422,13 +419,13 @@ function setTitle<T>(
  * If the given description is empty, the function returns an error.
  *
  * @internal
- * @param controller the given product attribute modifier
+ * @param modifier the given product attribute modifier
  * @param product the given incomplete product modification
  * @param title the given new product description
  * @returns a wrapped result that may contain the product attribute modifier
  */
 function setDescription<T>(
-  controller: T,
+  modifier: T,
   product: Partial<Product>,
   description: string,
 ): Result<T> {
@@ -438,23 +435,22 @@ function setDescription<T>(
     product.description = description;
   }
 
-  return ok(controller);
+  return ok(modifier);
 }
 
 /**
  * Modifies the product image.
  * If the given image is invalid, the function returns an error.
  *
- * @see {@link REGEX_IMAGE_PATH} for more information on the image path validation algorithm
- *
  * @internal
- * @param controller the given product attribute modifier
+ * @param modifier the given product attribute modifier
  * @param product the given incomplete product modification
  * @param title the given new product description
  * @returns a wrapped result that may contain the product attribute modifier
+ * @see {@link REGEX_IMAGE_PATH}
  */
 function setImage<T>(
-  controller: T,
+  modifier: T,
   product: Partial<Product>,
   images: ProductImage[],
 ): Result<T> {
@@ -468,5 +464,5 @@ function setImage<T>(
 
   product.image = { images: images.map((image) => image.path) };
 
-  return ok(controller);
+  return ok(modifier);
 }

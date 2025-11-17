@@ -42,10 +42,9 @@ type UseCategoriesResult = DatabaseQueryResult<Category[], '*'>;
 /**
  * Hooks the functionality of fetching all category tags.
  *
- * @see {@link CategoryCatalogue.getTags()} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link CategoryCatalogue.getTags()} for more information
  */
 export function useCategories(): UseCategories {
   const [loading, setLoading] = useState(true);
@@ -100,10 +99,9 @@ type UseCategorizedProductsResult = DatabaseQueryResult<
  * Hooks the functionality of fetching categorized product(s) by the given category tag.
  * The hook state updates when its dependency states changes.
  *
- * @see {@link CategoryCatalogue.getProductsByAssignedTag()} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link CategoryCatalogue.getProductsByAssignedTag()} for more information
  */
 export function useCategorizedProducts(
   category: RequireProperty<Category, 'id'>,
@@ -161,10 +159,9 @@ type UseCategoryResult = DatabaseQueryResult<Category, '*'>;
  * Hooks the functionality of fetching the given category tag.
  * The hook state updates when its dependency states changes.
  *
- * @see {@link CategoryCatalogue.getTag()} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link CategoryCatalogue.getTag()} for more information
  */
 export function useCategory(
   category: RequireProperty<Category, 'id'>,
@@ -219,10 +216,9 @@ type UseProductFilterResult = DatabaseQueryResult<Product[], 'id'>;
  * Hooks product filtering functionality.
  * The hook state updates when its dependency states changes.
  *
- * @see {@link ProductCatalogue.getByFilter()} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link ProductCatalogue.getByFilter()} for more information
  */
 export function useProductFilter(
   run: (filter: ProductFilter) => DatabaseQuery<Product[], 'id'>,
@@ -277,10 +273,9 @@ type UseProductSearchResult = DatabaseQueryResult<Product[], '*'>;
  * Hooks product searching functionality.
  * The hook state updates when its dependency states changes.
  *
- * @see {@link ProductCatalogue.getBySearch()} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link ProductCatalogue.getBySearch()} for more information
  */
 export function useProductSearch(text: string): UseProductSearch {
   const [loading, setLoading] = useState<boolean>(true);
@@ -333,10 +328,9 @@ type UseProductsResult = DatabaseQueryResult<Product[], '*'>;
  * Hooks the functionality of fetching the given product(s).
  * The hook state updates when its dependency states changes.
  *
- * @see {@link ProductCatalogue.get()} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link ProductCatalogue.get()} for more information
  */
 export function useProducts(
   products: RequireProperty<Product, 'id'>[],
@@ -391,10 +385,9 @@ type UseProductsBySellerResult = DatabaseQueryResult<Product[], '*'>;
  * Hooks the functionality of fetching products from the given seller.
  * The hook state updates when its dependency states changes.
  *
- * @see {@link ProductCatalogue.getBySeller()} for more information
- *
  * @author Sahil Grewal (SahilGrewal)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link ProductCatalogue.getBySeller()} for more information
  */
 export function useSellerProducts(
   seller: RequireProperty<UserProfile, 'supabase_id'>,

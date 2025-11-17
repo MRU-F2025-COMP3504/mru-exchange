@@ -109,10 +109,9 @@ interface UserReviewing {
   /**
    * Publishes a review made by the reviewer.
    *
-   * @see {@link ReviewPublisher} for more information on its builder features
-   *
    * @param reviewer the given user identifier
    * @returns the review publisher
+   * @see {@link ReviewPublisher} for more information on its builder features
    */
   create: (
     reviewer: RequireProperty<UserProfile, 'supabase_id'>,
