@@ -1,11 +1,12 @@
 /// <reference types="vitest/config" />
 import { defineConfig, type UserConfigExport } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   server: {
     host: '0.0.0.0', // Listen to all addresses (i.e., connects containers with host)
     port: 5173,
