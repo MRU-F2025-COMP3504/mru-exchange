@@ -2,18 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import { supabase } from '@shared/api';
-
-interface Product {
-  id?: number;
-  title: string | null;
-  description: string | null;
-  price: number | null;
-  image: File[] | null;
-  stock_count: number | null;
-  isListed: boolean | null;
-  isDeleted: boolean | null;
-  category: string | null;
-}
+import type { Product } from '../shared/types';
 
 interface Category {
   id: number;
@@ -85,7 +74,7 @@ export default function PostProductPage() {
   // Validates the required fields to pass into the Preview Page
   const handlePreviewButton = () => {
 
-    if (
+    {/* if (
       !product.title?.trim() || 
       !product.description?.trim() ||
       product.price === null ||
@@ -95,7 +84,7 @@ export default function PostProductPage() {
     ) {
       alert("Please fill out all fields and upload at least one image before previewing")
       return;
-    }
+    }*/}
 
     navigate('/preview-post', { state: { product } })
   }
