@@ -7,6 +7,7 @@ import { supabase } from '@shared/api';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@shared/contexts';
 
+
 interface SellerInfo {
   id: number;
   first_name: string | null;
@@ -16,17 +17,7 @@ interface SellerInfo {
   supabase_id: string;
 }
 
-// System Variables
-interface Product {
-  id?: number;
-  title: string | null;
-  description: string | null;
-  price: number | null;
-  image: File[] | null;
-  imageURLs: string[] | null;
-  stock_count: number | null;
-  category: string | null;
-}
+
 
 export default function PreviewPostPage() {
   const { user } = useAuth();
@@ -56,13 +47,21 @@ export default function PreviewPostPage() {
     return result;
   }
 
+  function convertToProductImages(files: File[]): ProductImage[] {
+  return files.map((file) => ({
+    path: `${file.name}`, // unique + original file name
+    body: file                                         // File is already a Blob
+  }));
+}
+
+
   async function handleProductPosting() {
     if (!product) {
       alert('No product data found!');
     }
 
     try {
-      const builder = ProductListing.register();
+      const builder = register()
 
       let result = builder.title(product.title);
       if (!result.ok) throw result.error;
@@ -70,8 +69,9 @@ export default function PreviewPostPage() {
       result = result.data.description(product.description);
       if (!result.ok) throw result.error;
 
-      //result = result.data.image(URL.createObjectURL(product.image[0]))
-      //if (result.ok === false) throw result.error;
+      result = result.data.image(convertToProductImages(product.image || []))
+      console.log(result);
+      if (result.ok === false) throw result.error;
 
       result = result.data.price(product.price);
       if (!result.ok) throw result.error;
@@ -81,11 +81,12 @@ export default function PreviewPostPage() {
 
       console.log(product.image);
       const insert = await result.data.build();
-
+      if (insert.ok === false) throw insert.error;
       alert('Product successfully inserted');
+      
       console.log('inserted:', insert);
     } catch (e) {
-      console.error(e);
+      throw e;
       alert('failed to register product');
     }
   }
