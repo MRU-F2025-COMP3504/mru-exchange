@@ -1,33 +1,47 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from './Header';
-import { supabase } from '@shared/api';
+import { supabase, UserAuthentication } from '@shared/api';
 import type { Product } from '../shared/types';
+import { useAuth } from '@shared/contexts';
 
 interface Category {
   id: number;
   name: string | null;
   description: string | null;
 }
+const defaultProduct: Product = {
+  created_at: "",
+  description: '',
+  id: 0,
+  image: null,
+  isDeleted: false,
+  isListed: false,
+  price: 0,
+  stock_count: 0,
+  title: '',
+  user_id: ""
+  };
 
 export default function PostProductPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product>({
-    title: '',
-    description: '',
-    price: null,
-    image: null,
-    stock_count: null,
-    isListed: null,
-    isDeleted: null,
-    category: null,
+  const { user } = useAuth();
+  const { state } = useLocation();
+  const [product, setProduct] = useState<Product>(() => {
+    return state?.product || defaultProduct;
   });
+  const [ categories, setCategories ] = useState<Category[]>([]);
+  const [ seller, setSeller ] = useState<any>(null);
+  const [ images, setImages ] = useState<File[]>([]);
 
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    fetchSeller();
+  }, [user])
+
   // Get all categories
   const fetchCategories = async () => {
     try {
@@ -46,6 +60,25 @@ export default function PostProductPage() {
     }
   };
 
+  const fetchSeller = async () => {
+    if (!user.ok) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('User_Information')
+        .select('*')
+        .eq('supabase_id', user.data.id)
+        .single();
+      if (!error && data) {
+        setSeller(data)
+      }
+      
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+    
+  };
+
   const updateProduct = (field: keyof Product, value: any) => {
     setProduct((prev) => ({ ...prev, [field]: value }));
   };
@@ -53,22 +86,21 @@ export default function PostProductPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
 
-    const images = selected.filter((file) => file.type.startsWith('image/'));
+    const imageFiles = selected.filter((file) => file.type.startsWith('image/'));
 
-    if (images.length !== selected.length) {
+    if (imageFiles.length !== selected.length) {
       alert('Only image files are allowed.');
       return;
     }
 
-    // Takes all the images and slices it upon the 10th one
-    const total = [...(product.image || []), ...images].slice(0, 10);
-    updateProduct('image', total);
+    setImages((prev) => {
+      const combined = [...prev, ...imageFiles];
+      return combined.slice(0,6);
+    })
   };
 
   const handleRemoveImage = (index: number) => {
-    const updatedImg = [...(product.image || [])];
-    updatedImg.splice(index, 1);
-    updateProduct('image', updatedImg);
+    setImages((prev) => prev.filter((_, i) => i !== index))
   };
 
   // Validates the required fields to pass into the Preview Page
@@ -86,7 +118,7 @@ export default function PostProductPage() {
       return;
     }*/}
 
-    navigate('/preview-post', { state: { product } })
+    navigate('/preview-post', { state: { product, images, seller } })
   }
 
   return (
@@ -261,7 +293,7 @@ export default function PostProductPage() {
                 marginBottom: '1rem',
               }}
             >
-              {(product.image || []).map((file, index) => {
+              {(images || []).map((file, index) => {
                 const url = URL.createObjectURL(file);
                 return (
                   <div
@@ -303,7 +335,7 @@ export default function PostProductPage() {
               })}
             </div>
 
-            {(product.image?.length || 0) < 10 && (
+            {(images?.length || 0) < 10 && (
               <input
                 type='file'
                 accept='image/*'
@@ -330,7 +362,7 @@ export default function PostProductPage() {
                 marginTop: '0.3rem',
               }}
             >
-              {product.image?.length || 0}/10 images selected
+              {images?.length || 0}/10 images selected
             </p>
           </label>
           <button
@@ -396,7 +428,7 @@ export default function PostProductPage() {
                 style={{
                   width: '340px',
                   height: '140px',
-                  backgroundColor: product.image && product.image.length > 0? 'transparent' : '#d9d9d9',
+                  backgroundColor: images && images.length > 0? 'transparent' : '#d9d9d9',
                   borderRadius: '12px',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -405,9 +437,9 @@ export default function PostProductPage() {
                   transition: 'transform 0.2s, box-shadow 0.2s',
                 }}
               >
-                {product.image && product.image.length > 0 ? (
+                {images && images.length > 0 ? (
                   <img
-                    src={URL.createObjectURL(product.image[0])}
+                    src={URL.createObjectURL(images[0])}
                     alt="Preview"
                     style={{
                       width: '100%',
