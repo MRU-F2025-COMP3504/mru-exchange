@@ -6,7 +6,8 @@ import { ok, err } from '../shared/utils';
 import { supabase } from '@shared/api';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@shared/contexts';
-
+import type { ProductImage } from '@shared/types';
+import { useNavigate } from 'react-router-dom';
 
 interface SellerInfo {
   id: number;
@@ -23,10 +24,14 @@ export default function PreviewPostPage() {
   const { user } = useAuth();
   const { state } = useLocation();
   const product = state?.product;
-  const avgRating = 3;
+  const images = state?.images;
+  const seller = state?.seller;
+  const categories = state?.categories;
+  const avgRating = 4;
   const totalReviews = 1;
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserName();
@@ -61,7 +66,7 @@ export default function PreviewPostPage() {
     }
 
     try {
-      const builder = register()
+      const builder = ProductListing.register()
 
       let result = builder.title(product.title);
       if (!result.ok) throw result.error;
@@ -69,7 +74,7 @@ export default function PreviewPostPage() {
       result = result.data.description(product.description);
       if (!result.ok) throw result.error;
 
-      result = result.data.image(convertToProductImages(product.image || []))
+      result = result.data.image(convertToProductImages(images || []))
       console.log(result);
       if (result.ok === false) throw result.error;
 
@@ -79,15 +84,30 @@ export default function PreviewPostPage() {
       result = result.data.stock(product.stock_count);
       if (!result.ok) throw result.error;
 
-      console.log(product.image);
+      result = result.data.seller(seller)
+      if (!result.ok) throw result.error;
+  
       const insert = await result.data.build();
       if (insert.ok === false) throw insert.error;
+
+      const insertedProduct = insert.data;
+
+      const { error: updateError } = await supabase
+        .from("Product_Information")
+        .update({ isListed: true })
+        .eq("id", insertedProduct.id );
+
+      if (updateError) {
+        console.error(updateError);
+        alert("Product posted, but failed to update listing status");
+        return;
+      }
+
       alert('Product successfully inserted');
-      
       console.log('inserted:', insert);
     } catch (e) {
+      alert('Error: failed to register product');
       throw e;
-      alert('failed to register product');
     }
   }
 
@@ -158,9 +178,9 @@ export default function PreviewPostPage() {
               <section className='p-5 flex flex-col sm:flex-row gap-5'>
                 <div className='w-full lg:w-1/3 flex justify-center lg:justify-start'>
                   <div className='inline-block rounded-2x1 shadow-x1 overflow-hidden'>
-                    {product.image && product.image.length > 0 ? (
+                    {images && images.length > 0 ? (
                       <img
-                        src={URL.createObjectURL(product.image[0])}
+                        src={URL.createObjectURL(images[0])}
                         alt={product.title}
                         className='w-[300px] h-[200px] object-cover rounded-2xl shadow-xl'
                       />
@@ -242,6 +262,18 @@ export default function PreviewPostPage() {
               }}
             >
               Post Product
+            </button>
+            <button 
+              onClick={() => navigate(-1)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#007fb5",
+                fontSize: "1rem",
+                cursor: "pointer",
+              }}
+            >
+              ← Back
             </button>
           </div>
         </div>
