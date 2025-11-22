@@ -292,7 +292,9 @@ export const ProductListing: ProductListing = {
             .from('product-images')
             .upload(image.path, image.body);
         }
-
+        console.log(product as Product)
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log(user);
         return query(
           await supabase
             .from('Product_Information')
