@@ -198,7 +198,7 @@ export interface Database {
           isDeleted?: boolean;
           isListed?: boolean;
           price: number;
-          stock_count?: number;
+          stock_count: number;
           title: string;
           user_id: string;
         };
@@ -493,7 +493,7 @@ export interface Database {
         Row: {
           created_at: string;
           deleted_on: string | null;
-          email: string | null;
+          email: string;
           first_name: string | null;
           flagged_type: string | null;
           id: number;
@@ -508,7 +508,7 @@ export interface Database {
         Insert: {
           created_at?: string;
           deleted_on?: string | null;
-          email?: string | null;
+          email: string;
           first_name?: string | null;
           flagged_type?: string | null;
           id?: number;
@@ -523,7 +523,7 @@ export interface Database {
         Update: {
           created_at?: string;
           deleted_on?: string | null;
-          email?: string | null;
+          email?: string;
           first_name?: string | null;
           flagged_type?: string | null;
           id?: number;
