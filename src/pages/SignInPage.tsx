@@ -1,9 +1,10 @@
-import { UserAuthentication } from '@shared/api';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@shared/contexts';
 
 export default function SignInPage() {
   const navigate = useNavigate();
+  const { signin } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -34,13 +35,14 @@ export default function SignInPage() {
 
     setIsSubmitting(true);
     try {
-      const signin = UserAuthentication.signIn();
+      const signer = signin();
 
-      const email = signin.email(formData.email);
-      const password = signin.password(formData.password);
-      const result = await signin.submit();
+      signer.email(formData.email);
+      signer.password(formData.password);
 
-      if (!email.ok || !password.ok || !result.ok) {
+      const result = await signer.submit();
+
+      if (!result.ok) {
         setErrors({ general: 'Invalid email or password' });
         return;
       }

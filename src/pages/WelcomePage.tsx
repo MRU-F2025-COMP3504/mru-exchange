@@ -42,7 +42,9 @@ export default function WelcomePage() {
           style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
         >
           <button
-            onClick={() => navigate('/signin')}
+            onClick={() => {
+              navigate('/signin');
+            }}
             style={{
               width: '100%',
               padding: '0.75rem 1rem',
@@ -66,7 +68,7 @@ export default function WelcomePage() {
           </button>
 
           <button
-            onClick={() => navigate('/create-account')}
+            onClick={() => { navigate('/create-account'); }}
             style={{
               width: '100%',
               padding: '0.75rem 1rem',
