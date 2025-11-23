@@ -1,4 +1,25 @@
-import type { Result } from '@shared/types';
+import type { Result, UnwrappedResult } from '@shared/types';
+
+/**
+ * A utility function that unwraps the given {@link Result}, which contains both the `data` and `error` property.
+ * When either of the property exists, the other property would be `undefined`.
+ *
+ * Incompatible with {@link Result} variants.
+ *
+ * @param result the given result to unwrap
+ * @returns an unwrapped result
+ * @see {@link Result}
+ * @see {@link UnwrappedResult}
+ */
+export function unwrap<T, E extends Error>(
+  result: Result<T, E>,
+): UnwrappedResult<T, E> {
+  if (result.ok) {
+    return { data: result.data, error: undefined };
+  } else {
+    return { data: undefined, error: result.error };
+  }
+}
 
 /**
  * A utility function that wraps the payload into a {@link Result}.

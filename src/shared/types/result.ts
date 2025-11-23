@@ -55,6 +55,7 @@ import type { ExtractArrayType, RequireProperty } from '@shared/types';
  *
  * @see {@link https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types} for more information on the union operator
  * @see {@link https://www.typescriptlang.org/docs/handbook/2/conditional-types.html} for more information on conditional types
+ * @see {@link UnwrappedResult} for more information on an unwrapped representation
  */
 export type Result<T, E extends Error = Error> =
   | { ok: true; data: T }
@@ -141,3 +142,24 @@ export type DatabaseQuery<
   Table,
   Columns extends '*' | keyof ExtractArrayType<Table>,
 > = Promise<DatabaseQueryResult<Table, Columns>>;
+
+/**
+ * Represents an unwrapped version of a {@link Result}, which contains both the `data` and `error` property.
+ * The {@link UnwrappedResult} evaluates to either the following:
+ * - The `data` property is derived from the {@link Result} and the `error` property is `undefined`.
+ * - The `data` property is `undefined` and the `error` property is derived from the {@link Result}.
+ *
+ * To unwrap a {@link Result}, the {@link unwrap()} utility function may be used.
+ *
+ * ```
+ * const result = ok('Success!');
+ * const unwrapped = unwrap(result);
+ * const { data, error } = unwrapped;
+ * ```
+ *
+ * @see {@link Result} for more information on the wrapped payload or error representation
+ */
+export interface UnwrappedResult<T, E extends Error = Error> {
+  data: T | undefined;
+  error: E | undefined;
+}
