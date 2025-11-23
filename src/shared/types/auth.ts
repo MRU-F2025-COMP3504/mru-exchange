@@ -1,28 +1,10 @@
-import type { PromiseResult, Result } from '@shared/types';
-import type { User } from '@supabase/supabase-js';
-import type { UserProfile } from '@shared/types';
-
-/**
- * See the implementation below for more information.
- */
-export interface UserSignUp extends UserCredentialsBuilder {
-  /**
-   * Resends email verification on the sign-up page.
-   *
-   * @returns a promise that resolves when resending the verification is successful
-   */
-  reverify: () => PromiseResult<null>;
-}
-
-/**
- * See the implementation below for more information.
- */
-export interface UserSignIn extends UserCredentialsBuilder {
-  /**
-   * Resets the user's password on the sign-in page.
-   */
-  resetPassword: () => PromiseResult<null>;
-}
+import type {
+  PromiseResult,
+  RequireProperty,
+  Result,
+  UserProfile,
+} from '@shared/types';
+import type { EmailOtpType, MobileOtpType, User } from '@supabase/supabase-js';
 
 /**
  * Represents the user's credentials for sign-ins, sign-outs, and sign-ups.
@@ -41,14 +23,9 @@ export interface UserCredentials {
   password: string;
 
   /**
-   * The user's first name.
+   * The user's full name.
    */
-  firstName: string;
-
-  /**
-   * The user's last name.
-   */
-  lastName: string;
+  fullname: string[];
 
   /**
    * The user's username/nickname.
@@ -57,12 +34,28 @@ export interface UserCredentials {
 }
 
 /**
- * Builds user credentials based on the given initialized inputs for selected user credential properties.
- * These properties depend on the use-case of user authentication; all properties are optional.
+ * Sends the user credentials to Supabase.
  *
  * @see {@link UserAuthentication}
  */
-export interface UserCredentialsBuilder {
+export interface UserCredentialsSigner {
+  /**
+   * Finalizes the builder and submits the provided credentials to Supabase's authentication system.
+   * The finalized version of the user credentials depends on the authentication scenario (e.g.,, sign-in, sign-up).
+   * Depending on the usage, the "incomplete" user credentials may be passed in.
+   *
+   * @returns a promise that resolves to the corresponding user
+   */
+  submit: () => PromiseResult<User>;
+}
+
+/**
+ * Builds sign-in user credentials.
+ *
+ * @see {@link UserAuthentication}
+ * @see {@link UserCredentialsSigner}
+ */
+export interface UserSignin extends UserCredentialsSigner {
   /**
    * Initializes the `email` property.
    * If the given email address is invalid, the function returns an error.
@@ -74,7 +67,7 @@ export interface UserCredentialsBuilder {
    * @returns a result that validates the given input
    * @see {@link REGEX_EMAIL}
    */
-  email: (email: string) => Result<this>;
+  email: (email: string) => Result<string>;
 
   /**
    * Initializes the `password` property.
@@ -86,8 +79,16 @@ export interface UserCredentialsBuilder {
    * @param password the given user password
    * @returns a result that validates the given input
    */
-  password: (password: string) => Result<this>;
+  password: (password: string) => Result<string>;
+}
 
+/**
+ * Builds sign-up user credentials.
+ *
+ * @see {@link UserAuthentication}
+ * @see {@link UserCredentialsSigner}
+ */
+export interface UserSignup extends UserSignin {
   /**
    * Initializes the `first` and `last` property.
    * If the given full name is invalid, the function returns an error.
@@ -99,7 +100,7 @@ export interface UserCredentialsBuilder {
    * @param last the given last name
    * @returns a result that validates the given input
    */
-  fullname: (first: string, last: string) => Result<this>;
+  fullname: ([first, last]: string[]) => Result<string[]>;
 
   /**
    * Initializes the `username` property.
@@ -111,16 +112,74 @@ export interface UserCredentialsBuilder {
    * @param username the given username
    * @returns a result that validates the given input
    */
-  username: (username: string) => Result<this>;
+  username: (username: string) => Result<string>;
 
   /**
-   * Finalizes the builder and submits the provided credentials to Supabase's authentication system.
+   * Resends the email verification or OTP.
    *
-   * To handle the promise result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   * @returns the verification resender
+   * @see {@link UserVerificationResender}
+   * @see {@link GoTrueClient.resend()}
+   */
+  resend(): UserVerificationResender;
+}
+
+/**
+ * Re-triggers sign-up verification based on one of the following method (i.e., email or mobile).
+ *
+ * @see {@link UserAuthentication}
+ * @see {@link UserSignup}
+ */
+export interface UserVerificationResender {
+  /**
+   * Resends the OTP by email verification from user sign-up or email change.
    *
+   * @param type the given {@link EmailOtpType} (i.e., `signup` or `email_change`)
+   * @param email the given email to re-verify
+   * @returns a promise that successfully resolves
+   */
+  email: (
+    type: Extract<EmailOtpType, 'signup' | 'email_change'>,
+    email: string,
+  ) => PromiseResult<null>;
+
+  /**
+   * Resends the OTP by phone change or SMS.
+   *
+   * @param type the given {@link MobileOtpType} (i.e., `sms` or `phone_change`)
+   * @param phone the given phone number to re-send
+   * @returns a promise that successfully resolves
+   */
+  mobile: (
+    type: Extract<MobileOtpType, 'sms' | 'phone_change'>,
+    phone: string,
+  ) => PromiseResult<null>;
+}
+
+/**
+ * Modifies the user's existing password based on one of the following method (i.e., reset by email or update).
+ *
+ * @see {@link UserAuthentication}
+ */
+export interface UserPasswordModifier {
+  /**
+   * Resets the user's password.
+   * An email would be sent to the user's email to configure a new password.
+   * Used on user sign-in, such as when a user forgets their password.
+   *
+   * @param email the given user profile (i.e., `email`)
+   * @returns a promise that successfully resolves
+   */
+  reset: (email: RequireProperty<UserProfile, 'email'>) => PromiseResult<null>;
+
+  /**
+   * Updates the user's password.
+   * Unlike the {@link UserPasswordModifier.reset()}, the authenticated user typically changes their password on their profile page.
+   *
+   * @param credentials the given user credentials (i.e., `password`)
    * @returns a promise that resolves to the corresponding user
    */
-  submit: () => PromiseResult<User | UserProfile>;
+  update: (
+    credentials: RequireProperty<UserCredentials, 'password'>,
+  ) => PromiseResult<User>;
 }

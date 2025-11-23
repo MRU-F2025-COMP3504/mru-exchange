@@ -1,63 +1,52 @@
+import { supabase } from '@shared/api';
 import type {
-  Result,
   PromiseResult,
-  DatabaseQuery,
-  UserProfile,
-  UserCredentialsBuilder,
+  RequireProperty,
+  Result,
+  UserVerificationResender,
   UserCredentials,
-  UserSignIn,
-  UserSignUp,
+  UserPasswordModifier,
+  UserProfile,
+  UserSignin,
+  UserSignup,
 } from '@shared/types';
 import {
-  query,
   err,
   ok,
+  query,
   REGEX_EMAIL,
   REGEX_LETTERS_ONLY,
   REGEX_USERNAME,
 } from '@shared/utils';
 import {
-  type User,
   type AuthChangeEvent,
   AuthError,
-  type Subscription,
   type AuthResponse,
-  type UserResponse,
+  type EmailOtpType,
+  type MobileOtpType,
+  type ResendParams,
   type Session,
+  type Subscription,
+  type User,
 } from '@supabase/supabase-js';
-import { supabase } from '@shared/api';
 
 /**
  * See the implementation below for more information.
  */
 interface UserAuthentication {
   /**
-   * Retrieves the current logged-in supabase {@link User}.
-   * The {@link User} contains information relevant for authentication.
-   *
-   * **This does not primarily pertain to the website user experience.**
+   * Retrieves the given user.
    *
    * To handle the promise result:
    * - The {@link PromiseResult} must be awaited.
    * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
-   * @see {@link UserAuthentication.getUserProfile()} for retrieving general user information
-   * @returns a promise that resolves to the corresponding supabase user
-   */
-  getUser: () => PromiseResult<User>;
-
-  /**
-   * Retrieves the current logged-in user.
-   * The {@link UserProfile} contains information relevant for website user experience.
-   *
-   * To handle the promise result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @see {@link UserAuthentication.getUser()} for retrieving user authentication-relevant information
+   * @param the given user identifier
    * @returns a promise that resolves to the corresponding user profile
    */
-  getUserProfile: () => DatabaseQuery<UserProfile, '*'>;
+  getUserProfile: (
+    user: RequireProperty<User, 'id'>,
+  ) => PromiseResult<UserProfile>;
 
   /**
    * Subscribes to {@link AuthChangeEvent} for the user.
@@ -73,41 +62,38 @@ interface UserAuthentication {
   ) => Subscription;
 
   /**
-   * Modifies the user's credentials.
-   *
-   * @see {@link UserCredentialsBuilder} for more information on its builder features
-   * @returns the user credentials builder
-   */
-  modify: () => UserCredentialsBuilder;
-
-  /**
    * Registers the user into the website.
    *
-   * @see {@link UserCredentialsBuilder} for more information on its builder features
-   * @see {@link UserSignUp} for more information on its builder features
+   * @see {@link UserSignup} for more information on its builder features
    * @returns the user credentials builder and additional user sign-up features
    */
-  signUp: () => UserSignUp;
+  signup: () => UserSignup;
 
   /**
    * Signs the user into the website.
    * The user must be registered in order to sign in.
    * If there are authentication cookies stored, the user signs in automatically without re-typing credentials.
    *
-   * @see {@link UserCredentialsBuilder} for more information on its builder features
-   * @see {@link UserSignIn} for more information on its builder features
+   * @see {@link UserSignin} for more information on its builder features
    * @returns the user credentials builder and additional user sign-in features
    */
-  signIn: () => UserSignIn;
+  signin: () => UserSignin;
 
   /**
    * Signs the user out of the website.
    * Invalidates existing authentication cookies.
    *
-   * @see {@link UserCredentialsBuilder} for more information on its builder features
+   * @returns a promise that successfully resolves
+   */
+  signout: () => PromiseResult<null>;
+
+  /**
+   * Modifies the user's password credentials.
+   *
+   * @see {@link UserPasswordModifier}
    * @returns the user credentials builder
    */
-  signOut: () => PromiseResult<null>;
+  password: () => UserPasswordModifier;
 }
 
 /**
@@ -120,23 +106,16 @@ interface UserAuthentication {
  * @author Andrew Krawiec (AndrewTries)
  */
 export const UserAuthentication: UserAuthentication = {
-  async getUser(): PromiseResult<User> {
-    return authenticate(await supabase.auth.getUser());
-  },
-  async getUserProfile(): DatabaseQuery<UserProfile, '*'> {
-    const user = await UserAuthentication.getUser();
-
-    if (user.ok) {
-      return query(
-        await supabase
-          .from('User_Information')
-          .select('*')
-          .eq('supabase_id', user.data.id)
-          .single(),
-      );
-    }
-
-    return user;
+  async getUserProfile(
+    user: RequireProperty<User, 'id'>,
+  ): PromiseResult<UserProfile> {
+    return query(
+      await supabase
+        .from('User_Information')
+        .select('*')
+        .eq('supabase_id', user.id)
+        .single(),
+    );
   },
   subscribe(
     callback: (
@@ -157,137 +136,95 @@ export const UserAuthentication: UserAuthentication = {
 
     return subscriber.data.subscription;
   },
-  modify(): UserCredentialsBuilder {
+  signup(): UserSignup {
     const credentials: Partial<UserCredentials> = {};
 
     return {
-      email(email: string): Result<UserCredentialsBuilder> {
-        return setEmail(this, credentials, email);
+      email(email: string): Result<string> {
+        return setEmail(credentials, email);
       },
-      password(password: string): Result<UserCredentialsBuilder> {
-        return setPassword(this, credentials, password);
+      password(password: string): Result<string> {
+        return setPassword(credentials, password);
       },
-      fullname(first: string, last: string): Result<UserCredentialsBuilder> {
-        return setFullname(this, credentials, first, last);
+      fullname(fullname: string[]): Result<string[]> {
+        return setFullname(credentials, fullname);
       },
-      username(username: string): Result<UserCredentialsBuilder> {
-        return setUsername(this, credentials, username);
+      username(username: string): Result<string> {
+        return setUsername(credentials, username);
       },
-      async submit(): PromiseResult<User | UserProfile> {
-        if (credentials.email || credentials.password) {
-          return authenticate(
-            await supabase.auth.updateUser({ ...credentials }),
-          );
-        }
-
-        return query(
-          await supabase
-            .from('User_Information')
-            .update({ ...credentials })
-            .select('id')
-            .single(),
-        );
-      },
-    };
-  },
-  signUp(): UserSignUp {
-    const credentials: Partial<UserCredentials> = {};
-
-    return {
-      email(email: string): Result<UserSignUp> {
-        return setEmail(this, credentials, email);
-      },
-      password(password: string): Result<UserSignUp> {
-        return setPassword(this, credentials, password);
-      },
-      fullname(first: string, last: string): Result<UserSignUp> {
-        return setFullname(this, credentials, first, last);
-      },
-      username(username: string): Result<UserSignUp> {
-        return setUsername(this, credentials, username);
-      },
-      async submit(): PromiseResult<User | UserProfile> {
-        if (!credentials.email || !credentials.password) {
-          return err(
-            new Error('Invalid email or password', { cause: credentials }),
-          );
-        }
+      async submit(): PromiseResult<User> {
+        const submitted = credentials as UserCredentials;
 
         return authenticate(
           await supabase.auth.signUp({
-            email: credentials.email,
-            password: credentials.password,
+            email: submitted.email,
+            password: submitted.password,
             options: {
               emailRedirectTo: `${window.location.origin}/home`,
               data: {
-                first_name: credentials.firstName,
-                last_name: credentials.lastName,
+                first_name: submitted.fullname[0],
+                last_name: submitted.fullname[1],
               },
             },
           }),
         );
       },
-      async reverify(): PromiseResult<null> {
-        if (!credentials.email) {
-          return err('Invalid email');
-        }
-
-        const { error } = await supabase.auth.resend({
-          type: 'signup',
-          email: credentials.email,
-        });
-
-        if (error) {
-          return err(error);
-        }
-
-        return ok(null);
+      resend(): UserVerificationResender {
+        return {
+          email(
+            type: Extract<EmailOtpType, 'signup' | 'email_change'>,
+            email: string,
+          ): PromiseResult<null> {
+            return resend({ type, email });
+          },
+          mobile(
+            type: Extract<MobileOtpType, 'sms' | 'phone_change'>,
+            phone: string,
+          ): PromiseResult<null> {
+            return resend({ type, phone });
+          },
+        };
       },
     };
   },
-  signIn(): UserSignIn {
+  signin(): UserSignin {
     const credentials: Partial<UserCredentials> = {};
 
     return {
-      email(email: string): Result<UserSignIn> {
-        return setEmail(this, credentials, email);
+      email(email: string): Result<string> {
+        return setEmail(credentials, email);
       },
-      password(password: string): Result<UserSignIn> {
-        return setPassword(this, credentials, password);
+      password(password: string): Result<string> {
+        return setPassword(credentials, password);
       },
-      fullname(): Result<UserSignIn> {
-        return err('Unsupported operation (fullname)');
-      },
-      username(): Result<UserSignIn> {
-        return err('Unsupported operation (username)');
-      },
-      async submit(): PromiseResult<User | UserProfile> {
-        if (credentials.email || credentials.password) {
-          return authenticate(
-            await supabase.auth.updateUser({ ...credentials }),
-          );
-        }
+      async submit(): PromiseResult<User> {
+        const submitted = credentials as UserCredentials;
 
-        return query(
-          await supabase
-            .from('User_Information')
-            .update({
-              email: credentials.email,
-              user_name: credentials.username,
-              first_name: credentials.firstName,
-              last_name: credentials.lastName,
-            })
-            .select('*')
-            .single(),
+        return authenticate(
+          await supabase.auth.signInWithPassword({
+            email: submitted.email,
+            password: submitted.password,
+          }),
         );
       },
-      async resetPassword(): PromiseResult<null> {
-        if (!credentials.email) {
-          return err('Invalid email');
-        }
+    };
+  },
+  async signout(): PromiseResult<null> {
+    const { error } = await supabase.auth.signOut();
 
+    if (error) {
+      return err(error);
+    }
+
+    return ok(null);
+  },
+  password(): UserPasswordModifier {
+    return {
+      async reset(
+        user: RequireProperty<UserProfile, 'email'>,
+      ): PromiseResult<null> {
         const { error } = await supabase.auth.resetPasswordForEmail(
-          credentials.email,
+          user.email,
           {
             redirectTo: `${window.location.origin}/reset-password`,
           },
@@ -299,28 +236,50 @@ export const UserAuthentication: UserAuthentication = {
 
         return ok(null);
       },
+      async update(
+        credentials: RequireProperty<UserCredentials, 'password'>,
+      ): PromiseResult<User> {
+        const validate = setPassword(credentials, credentials.password);
+
+        if (validate.ok) {
+          const password = validate.data;
+
+          const { data, error } = await supabase.auth.updateUser({
+            password,
+          });
+
+          if (error) {
+            return err(error);
+          }
+
+          return ok(data.user);
+        }
+
+        return validate;
+      },
     };
-  },
-  async signOut(): PromiseResult<null> {
-    const response = await supabase.auth.signOut();
-
-    if (response.error) {
-      return err(response.error);
-    }
-
-    return ok(null);
   },
 };
 
+async function resend(params: ResendParams): PromiseResult<null> {
+  const { error } = await supabase.auth.resend(params);
+
+  if (error) {
+    return err(error);
+  }
+
+  return ok(null);
+}
+
 /**
- * A utility function that wraps the authentication/user response into a {@link Result}.
+ * A utility function that wraps the authentication response into a {@link Result}.
  *
  * @internal
- * @param response the authentication or user response via supabase's authentication system
- * @returns the wrapped result that may contain the corresponding user
+ * @param response the authentication response from supabase's authentication system
+ * @returns a result that may contain the corresponding user
  * @see {@link Result}
  */
-function authenticate(response: AuthResponse | UserResponse): Result<User> {
+function authenticate(response: AuthResponse): Result<User> {
   const { data, error } = response;
 
   if (error) {
@@ -336,16 +295,14 @@ function authenticate(response: AuthResponse | UserResponse): Result<User> {
  * A utility function that validates and assigns the given email for the user's credentials.
  *
  * @internal
- * @param builder the given user credentials builder
  * @param credentials the given incomplete user credentials
  * @param email the given email to assign
  * @see {@link REGEX_EMAIL}
  */
-function setEmail<T extends UserCredentialsBuilder>(
-  builder: T,
+function setEmail(
   credentials: Partial<UserCredentials>,
   email: string,
-): Result<T> {
+): Result<string> {
   const trimmed = email.trim();
 
   if (!trimmed) {
@@ -353,87 +310,72 @@ function setEmail<T extends UserCredentialsBuilder>(
   } else if (!REGEX_EMAIL.test(trimmed)) {
     return err('Only @mtroyal.ca email addresses are allowed');
   } else {
-    credentials.email = trimmed;
+    return ok((credentials.email = trimmed));
   }
-
-  return ok(builder);
 }
 
 /**
  * A utility function that validates and assigns the given password for the user's credentials.
  *
  * @internal
- * @param builder the given user credentials builder
  * @param credentials the given incomplete user credentials
  * @param password the given password to assign
  */
-function setPassword<T extends UserCredentialsBuilder>(
-  builder: T,
+function setPassword(
   credentials: Partial<UserCredentials>,
   password: string,
-): Result<T> {
+): Result<string> {
   if (!password) {
     return err('Password cannot be empty');
-  } else if (password.length < 8) {
-    return err('Password must have 8 characters or more');
+  } else if (password.length < 4) {
+    return err('Password must have 4 characters or more');
   } else if (password.length > 128) {
     return err('Password must be no more than 128 characters');
   } else {
-    credentials.password = password;
+    return ok((credentials.password = password));
   }
-
-  return ok(builder);
 }
 
 /**
  * A utility function that validates and assigns the given user's full name for the user's credentials.
  *
  * @internal
- * @param builder the given user credentials builder
  * @param credentials the given incomplete user credentials
- * @param first the given first name to assign
- * @param last the given last name to assign
+ * @param fullname the given first and last name to assign
  * @see {@link REGEX_LETTERS_ONLY}
  */
-function setFullname<T extends UserCredentialsBuilder>(
-  builder: T,
+function setFullname(
   credentials: Partial<UserCredentials>,
-  first: string,
-  last: string,
-): Result<T> {
-  const trimmedFirst = first.trim();
-  const trimmedLast = last.trim();
+  [first, last]: string[],
+): Result<string[]> {
+  const tfirst = first.trim();
+  const tlast = last.trim();
 
-  if (!trimmedFirst) {
+  if (!tfirst) {
     return err('First name cannot be empty');
-  } else if (!trimmedLast) {
+  } else if (!tlast) {
     return err('Last name cannot be empty');
-  } else if (!REGEX_LETTERS_ONLY.test(trimmedFirst)) {
+  } else if (!REGEX_LETTERS_ONLY.test(tfirst)) {
     return err('Invalid first name');
-  } else if (!REGEX_LETTERS_ONLY.test(trimmedLast)) {
+  } else if (!REGEX_LETTERS_ONLY.test(tlast)) {
     return err('Invalid last name');
   } else {
-    credentials.firstName = trimmedFirst;
-    credentials.lastName = trimmedFirst;
+    return ok((credentials.fullname = [tfirst, tlast]));
   }
-
-  return ok(builder);
 }
 
 /**
  * A utility function that validates and assigns the given username for the user's credentials.
  *
  * @internal
- * @param builder the given user credentials builder
  * @param credentials the given incomplete user credentials
  * @param username the given username to assign
  * @see {@link REGEX_USERNAME}
  */
-function setUsername<T extends UserCredentialsBuilder>(
-  builder: T,
+function setUsername(
   credentials: Partial<UserCredentials>,
   username: string,
-): Result<T> {
+): Result<string> {
   const trimmed = username.trim();
 
   if (!trimmed) {
@@ -441,8 +383,6 @@ function setUsername<T extends UserCredentialsBuilder>(
   } else if (!REGEX_USERNAME.test(trimmed)) {
     return err('Invalid username');
   } else {
-    credentials.username = username;
+    return ok((credentials.username = username));
   }
-
-  return ok(builder);
 }
