@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { AuthContext, type AuthContextType } from '@shared/contexts';
+import { AuthContext } from '@shared/contexts';
 
 /**
  * Hooks user authentication functionality.
@@ -8,7 +8,7 @@ import { AuthContext, type AuthContextType } from '@shared/contexts';
  * @author Ramos Jacosalem (cjaco906)
  * @see {@link UserAuthentication} for more information
  */
-export function useAuth(): AuthContextType {
+export function useAuth(): AuthContext {
   const context = useContext(AuthContext);
 
   if (context) {

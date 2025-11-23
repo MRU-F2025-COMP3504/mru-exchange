@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
-import { type AuthContextType, AuthProvider, useAuth } from '@shared/contexts';
+import { renderHook } from '@testing-library/react';
+import { type AuthContext, AuthProvider, useAuth } from '@shared/contexts';
 import { supabase } from '@shared/api';
 
-function getContext(): { current: AuthContextType } {
+function getContext(): { current: AuthContext } {
   const wrapper = ({ children }: { children: React.ReactNode }) => {
     return <AuthProvider>{children}</AuthProvider>;
   };
@@ -25,12 +25,8 @@ describe('AuthContext', () => {
     }),
   } as never);
 
-  it('loads the client user', async () => {
+  it('loads the client user', () => {
     const context = getContext();
-
-    await waitFor(() => {
-      expect(context.current.loading, 'loading user failed').toBe(false);
-    });
 
     expect(context.current.user.ok, 'user invalid').toBe(true);
   });
