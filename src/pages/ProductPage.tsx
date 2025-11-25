@@ -455,47 +455,6 @@ export default function ProductPage() {
     },
   ];
 
-  // ------------------- Reviews
-  /**
-   * Sets up all the review event handlers.
-   */
-  function activateReviews(){
-
-    // Write a review button
-    reviewBtn.current?.addEventListener("click", e => {
-
-      // Reveal review.
-      reviewPopup.current?.classList.remove("hidden");
-      reviewPopup.current?.classList.add("flex");
-      
-    });
-
-    // Set up review popup close.
-    reviewPopup.current?.addEventListener("click", e => {
-
-      // Clear review.
-      
-
-      // Reveal review.
-      reviewPopup.current?.classList.add("hidden");
-      reviewPopup.current?.classList.remove("flex");
-
-    })
-
-    // Prevent clicking within the review content from closing and clearing.
-    reviewContent.current?.addEventListener("click", e => {
-
-      // Stop bubbling.
-      e.stopPropagation();
-
-    })
-
-    
-  }
-
-  // Activate reviews.
-  activateReviews();
-
   return (
     <div className='bg-[#F9FAFB] min-h-screen'>
       <Header />
@@ -644,10 +603,10 @@ export default function ProductPage() {
                     onClick={handleToggleBookmark}
                     disabled={bookmarking}
                     className={`px-6 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${bookmarking
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : isBookmarked
-                          ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                          : 'bg-[#007FB5] hover:bg-[#006B9E] text-white'
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : isBookmarked
+                        ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                        : 'bg-[#007FB5] hover:bg-[#006B9E] text-white'
                       }`}
                   >
                     <span className='text-xl'>{isBookmarked ? '★' : '☆'}</span>
@@ -706,12 +665,30 @@ export default function ProductPage() {
             {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
           </p>
 
-          <button ref={reviewBtn} className="hover:cursor-pointer bg-yellow-300 border-yellow-500 p-3 rounded mb-4 text-[#0B2545] font-semibold transition-colors hover:bg-yellow-400">Write a review</button>
+          <button 
+            ref={reviewBtn} 
+            className="hover:cursor-pointer bg-yellow-300 border-yellow-500 p-3 rounded mb-4 text-[#0B2545] font-semibold transition-colors hover:bg-yellow-400"
+            onClick={() => {
+              reviewPopup.current?.classList.remove("hidden");
+              reviewPopup.current?.classList.add("flex");
+            }}
+            >Write a review</button>
 
-          <div ref={reviewPopup} className="hidden flex items-center justify-center fixed top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.6)]">
-              <div ref={reviewContent} className="bg-white h-[75%] w-[75%]">
+          <div 
+          ref={reviewPopup} 
+          className="hidden flex items-center justify-center fixed top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.6)]"
+          onClick={() => {
+              reviewPopup.current?.classList.add("hidden");
+              reviewPopup.current?.classList.remove("flex");
+          }}
+          >
+            <div 
+              ref={reviewContent} 
+              className="bg-white h-[75%] w-[75%] rounded"
+              onClick={e => e.stopPropagation()}
+              >
 
-              </div>
+            </div>
           </div>
 
           {reviews.length === 0 ? (
