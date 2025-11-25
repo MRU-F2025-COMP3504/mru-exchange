@@ -684,10 +684,24 @@ export default function ProductPage() {
           >
             <div 
               ref={reviewContent} 
-              className="bg-white h-[75%] w-[75%] rounded"
+              className="bg-white h-[75%] w-[75%] rounded-2xl"
               onClick={e => {e.stopPropagation()}}
               >
-
+                <h3>Write a Review</h3>
+                <form>
+                  <label>
+                    Title:
+                    <input name="title" type="text"></input>
+                  </label>
+                  <br></br>
+                  <label>
+                    Description:
+                    <br></br>
+                    <textarea></textarea>
+                  </label>
+                  <button name="submit" type="submit">Submit</button>
+                  <button name="reset" type="reset">Clear</button>
+                </form>
             </div>
           </div>
 
