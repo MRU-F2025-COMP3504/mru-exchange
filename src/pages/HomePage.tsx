@@ -99,7 +99,7 @@ export default function HomePage() {
               imagesArray.push(data.publicUrl);
 
           }
-          console.log(imagesArray);
+          // console.log(imagesArray);
           // Return
           return imagesArray;
 
