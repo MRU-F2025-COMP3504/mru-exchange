@@ -685,7 +685,7 @@ export default function ProductPage() {
             <div 
               ref={reviewContent} 
               className="bg-white h-[75%] w-[75%] rounded"
-              onClick={e => e.stopPropagation()}
+              onClick={e => {e.stopPropagation()}}
               >
 
             </div>
