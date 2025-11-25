@@ -344,7 +344,7 @@ export default function ProductPage() {
    *  image: string[] The array containing image paths.
    * @returns An array of the image urls.
    */
-  // function getImageUrls(imageData: { image: string[] }): string[] | null {
+  // function getImageUrls(imageData: { images: string[] }): string[] | null {
 
   //     try {
 
@@ -352,7 +352,7 @@ export default function ProductPage() {
   //         const imagesArray = [];
 
   //         // For every image,
-  //         for (const imagePath of imageData.image) {
+  //         for (const imagePath of imageData.images) {
 
   //             if (!imagePath) return null;
 

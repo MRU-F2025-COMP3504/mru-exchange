@@ -66,40 +66,47 @@ export default function HomePage() {
     }
   };
 
-  // Get image URL from Supabase
-  const getImageUrl = (imageData: any): string | null => {
-    if (!imageData) return null;
+  /**
+   * Fetches all images for a product from the database. <Note> If this works, this function is actually unnecessary.
+   * @param imageData An object passed from the database containing image info.
+   *  image: string[] The array containing image paths.
+   * @returns An array of the image urls.
+   */
+  function getImageUrls(imageData: { images: string[] }): string[] | null {
 
-    try {
-      let imagePath: string | null = null;
+      try {
 
-      if (typeof imageData === 'object' && imageData !== null) {
-        imagePath =
-          imageData.image ||
-          imageData.path ||
-          imageData.url ||
-          imageData.filename;
-      } else if (typeof imageData === 'string') {
-        imagePath = imageData;
+          // Create an array.
+          const imagesArray = [];
+
+          // For every image,
+          for (const imagePath of imageData.images) {
+
+              if (!imagePath) return null;
+
+              if (imagePath.startsWith('http')) {
+                  imagesArray.push(imagePath);
+              }
+
+              const filename = imagePath.replace('database/images/', '').split('/').pop();
+
+              if (!filename) return null;
+
+              const { data } = supabase.storage
+                  .from('product-images')
+                  .getPublicUrl(filename);
+
+              imagesArray.push(data.publicUrl);
+
+          }
+          console.log(imagesArray);
+          // Return
+          return imagesArray;
+
+      } catch (error) {
+          console.error('Error getting image URL:', error);
+          return null;
       }
-
-      if (!imagePath) return null;
-      if (imagePath.startsWith('http')) return imagePath;
-
-      const filename = imagePath
-        .replace('database/images/', '')
-        .split('/')
-        .pop();
-      if (!filename) return null;
-
-      const { data } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filename);
-
-      return data.publicUrl;
-    } catch (error) {
-      return null;
-    }
   };
 
   return (
@@ -265,7 +272,7 @@ export default function HomePage() {
               }}
             >
               {recentProducts.map((product) => {
-                const imageUrl = getImageUrl(product.image);
+                const imageUrls = getImageUrls(product.image);
 
                 return (
                   <div
@@ -303,9 +310,9 @@ export default function HomePage() {
                         marginBottom: '0.75rem',
                       }}
                     >
-                      {imageUrl ? (
+                      {imageUrls ? (
                         <img
-                          src={imageUrl}
+                          src={imageUrls[0]}
                           alt={product.title || 'Product'}
                           style={{
                             width: '100%',
