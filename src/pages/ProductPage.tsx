@@ -150,7 +150,7 @@ export default function ProductPage() {
       const { data: cartData, error: cartError } = await supabase
         .from('Shopping_Cart')
         .select('id')
-        .eq('user_id', currentUserId as string)
+        .eq('user_id', currentUserId)
         .maybeSingle();
 
       if (cartError || !cartData) return;
@@ -185,10 +185,10 @@ export default function ProductPage() {
       setBookmarking(true);
       setError(null);
 
-      let { data: cartData, error: cartError } = await supabase
+      const { data: cartData, error: cartError } = await supabase
         .from('Shopping_Cart')
         .select('id')
-        .eq('user_id', currentUserId as string)
+        .eq('user_id', currentUserId)
         .maybeSingle();
 
       if (cartError && cartError.code !== 'PGRST116') {
@@ -199,7 +199,7 @@ export default function ProductPage() {
       if (!cartData) {
         const { data: newCart, error: createCartError } = await supabase
           .from('Shopping_Cart')
-          .insert({ user_id: currentUserId as string })
+          .insert({ user_id: currentUserId })
           .select('id')
           .single();
 
@@ -234,7 +234,9 @@ export default function ProductPage() {
 
         setIsBookmarked(true);
         setBookmarkSuccess(true);
-        setTimeout(() => setBookmarkSuccess(false), 3000);
+        setTimeout(() => {
+          setBookmarkSuccess(false);
+        }, 3000);
       }
     } catch (err: any) {
       console.error('Error toggling bookmark:', err);
@@ -271,7 +273,7 @@ export default function ProductPage() {
         const { data: newChat, error: chatCreateError } = await supabase
           .from('Chats')
           .insert({
-            user_id_1: currentUserId as string,
+            user_id_1: currentUserId,
             user_id_2: seller.supabase_id,
             visible: true,
           })
@@ -283,7 +285,7 @@ export default function ProductPage() {
 
         const { error: messageError } = await supabase.from('Messages').insert({
           chat_id: chatId,
-          sender_id: currentUserId as string,
+          sender_id: currentUserId,
           logged_message: `Hi! I'm interested in your product: ${product.title}`,
           visible: true,
         });
@@ -298,92 +300,86 @@ export default function ProductPage() {
     }
   };
 
-  function getImageUrls(imageData: { [key: string]: string }): string[] | null {
+  interface ImageURLs {
+    images: string[];
+  }
 
-        try {
+  function getImageUrls(imageData: ImageURLs): string[] | null {
+    try {
+      // Create an array.
+      const imagesArray = [];
 
-            // Create an array.
-            const imagesArray = [];
+      // For every image,
+      for (const path of imageData.images) {
+        // Get the imagePath.
 
-            // For every image,
-            for (const key in imageData) {
+        if (!path) return null;
 
-                // Get the imagePath.
-                const imagePath: string = imageData[key];
-
-                if (!imagePath) return null;
-
-                if (imagePath.startsWith('http')) {
-                    imagesArray.push(imagePath);
-                }
-
-
-                const filename = imagePath.replace('database/images/', '').split('/').pop();
-
-                if (!filename) return null;
-
-                const { data } = supabase.storage
-                    .from('product-images')
-                    .getPublicUrl(filename);
-
-                imagesArray.push(data.publicUrl);
-
-            }
-
-            // Return
-            return imagesArray;
-
-
-        } catch (error) {
-            console.error('Error getting image URL:', error);
-            return null;
+        if (path.startsWith('http')) {
+          imagesArray.push(path);
         }
-    };
 
-    /**
-     * Fetches all images for a product from the database. <Note> If this works, this function is actually unnecessary.
-     * @param imageData An object passed from the database containing image info.
-     *  image: string[] The array containing image paths.
-     * @returns An array of the image urls.
-     */
-    // function getImageUrls(imageData: { image: string[] }): string[] | null {
+        const filename = path.replace('database/images/', '').split('/').pop();
 
-    //     try {
+        if (!filename) return null;
 
-    //         // Create an array.
-    //         const imagesArray = [];
+        const { data } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(filename);
 
-    //         // For every image,
-    //         for (const imagePath of imageData.image) {
+        imagesArray.push(data.publicUrl);
+      }
 
-    //             if (!imagePath) return null;
+      // Return
+      return imagesArray;
+    } catch (error) {
+      console.error('Error getting image URL:', error);
+      return null;
+    }
+  }
 
-    //             if (imagePath.startsWith('http')) {
-    //                 imagesArray.push(imagePath);
-    //             }
+  /**
+   * Fetches all images for a product from the database. <Note> If this works, this function is actually unnecessary.
+   * @param imageData An object passed from the database containing image info.
+   *  image: string[] The array containing image paths.
+   * @returns An array of the image urls.
+   */
+  // function getImageUrls(imageData: { image: string[] }): string[] | null {
 
+  //     try {
 
-    //             const filename = imagePath.replace('database/images/', '').split('/').pop();
+  //         // Create an array.
+  //         const imagesArray = [];
 
-    //             if (!filename) return null;
+  //         // For every image,
+  //         for (const imagePath of imageData.image) {
 
-    //             const { data } = supabase.storage
-    //                 .from('product-images')
-    //                 .getPublicUrl(filename);
+  //             if (!imagePath) return null;
 
-    //             imagesArray.push(data.publicUrl);
+  //             if (imagePath.startsWith('http')) {
+  //                 imagesArray.push(imagePath);
+  //             }
 
-    //         }
+  //             const filename = imagePath.replace('database/images/', '').split('/').pop();
 
-    //         // Return
-    //         return imagesArray;
+  //             if (!filename) return null;
 
+  //             const { data } = supabase.storage
+  //                 .from('product-images')
+  //                 .getPublicUrl(filename);
 
-    //     } catch (error) {
-    //         console.error('Error getting image URL:', error);
-    //         return null;
-    //     }
-    // };
+  //             imagesArray.push(data.publicUrl);
+
+  //         }
+
+  //         // Return
+  //         return imagesArray;
+
+  //     } catch (error) {
+  //         console.error('Error getting image URL:', error);
+  //         return null;
+  //     }
+  // };
 
   const calculateAverageRating = (): number => {
     if (reviews.length === 0) return 0;
@@ -424,7 +420,9 @@ export default function ProductPage() {
             {error || 'Product not found'}
           </p>
           <button
-            onClick={() => navigate('/product-search')}
+            onClick={() => {
+              navigate('/product-search');
+            }}
             className='px-6 py-2 bg-[#007FB5] text-white rounded-lg hover:bg-[#006B9E]'
           >
             Back to Search
@@ -441,7 +439,7 @@ export default function ProductPage() {
     currentUserId && seller && currentUserId === product.user_id;
   const isOutOfStock = !product.stock_count || product.stock_count <= 0;
 
-  const linkData: Array<LinkData> = [
+  const linkData: LinkData[] = [
     {
       name: 'Product Search',
       path: '/product-search',
@@ -500,36 +498,36 @@ export default function ProductPage() {
               <div className='flex'>
                 {imageUrls
                   ? imageUrls.map((value: string, i: number) => (
-                      <>
-                        <div className='my-2 mr-1'>
-                          <img
-                            id={'img' + i}
-                            src={imageUrls[i]}
-                            alt={product.title || 'Product'}
-                            className='w-[50px] h-[50px] object-cover rounded-lg cursor-pointer'
-                            onClick={(e) => {
-                              // Get elements.
-                              const thisImg: HTMLImageElement =
-                                e.target as HTMLImageElement;
+                    <>
+                      <div className='my-2 mr-1'>
+                        <img
+                          id={'img' + i}
+                          src={imageUrls[i]}
+                          alt={product.title || 'Product'}
+                          className='w-[50px] h-[50px] object-cover rounded-lg cursor-pointer'
+                          onClick={(e) => {
+                            // Get elements.
+                            const thisImg: HTMLImageElement =
+                              e.target as HTMLImageElement;
 
-                              // If it exists,
-                              if (mainImgRef.current) {
-                                // Update its link.
-                                mainImgRef.current.src = thisImg.src;
-                              }
-                            }}
-                            onError={(e) => {
-                              const target =
-                                e.currentTarget as HTMLImageElement;
-                              target.style.display = 'none';
-                              if (target.parentElement) {
-                                target.parentElement.innerHTML =
-                                  '<div class="w-full h-[300px] flex items-center justify-center bg-gray-200"><span class="text-gray-500">Image unavailable</span></div>';
-                              }
-                            }}
-                          />
-                        </div>
-                        {/* <div className="my-2 mr-1">
+                            // If it exists,
+                            if (mainImgRef.current) {
+                              // Update its link.
+                              mainImgRef.current.src = thisImg.src;
+                            }
+                          }}
+                          onError={(e) => {
+                            const target =
+                              e.currentTarget as HTMLImageElement;
+                            target.style.display = 'none';
+                            if (target.parentElement) {
+                              target.parentElement.innerHTML =
+                                '<div class="w-full h-[300px] flex items-center justify-center bg-gray-200"><span class="text-gray-500">Image unavailable</span></div>';
+                            }
+                          }}
+                        />
+                      </div>
+                      {/* <div className="my-2 mr-1">
                                         <img
                                             id={"img" + i}
                                             src={imageUrls[i]}
@@ -559,8 +557,8 @@ export default function ProductPage() {
                                             }}
                                         />
                                     </div> */}
-                      </>
-                    ))
+                    </>
+                  ))
                   : null}
               </div>
             </div>
@@ -601,13 +599,12 @@ export default function ProductPage() {
                   <button
                     onClick={handleToggleBookmark}
                     disabled={bookmarking}
-                    className={`px-6 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                      bookmarking
+                    className={`px-6 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${bookmarking
                         ? 'bg-gray-400 cursor-not-allowed'
                         : isBookmarked
                           ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
                           : 'bg-[#007FB5] hover:bg-[#006B9E] text-white'
-                    }`}
+                      }`}
                   >
                     <span className='text-xl'>{isBookmarked ? '★' : '☆'}</span>
                     {bookmarking

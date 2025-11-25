@@ -232,7 +232,7 @@ interface ProductListing {
 export const ProductListing: ProductListing = {
   register: (): ProductBuilder => {
     const product: Partial<Product> = {};
-    let images: ProductImage[];
+    let images: ProductImage[] = [];
 
     return {
       seller(
@@ -289,9 +289,7 @@ export const ProductListing: ProductListing = {
             .from('product-images')
             .upload(image.path, image.body);
         }
-        console.log(product as Product)
-        const { data: { user } } = await supabase.auth.getUser();
-        console.log(user);
+
         return query(
           await supabase
             .from('Product_Information')
@@ -457,9 +455,11 @@ function setImage<T>(
   for (const image of images) {
     const path = image.path;
 
-    if (!REGEX_IMAGE_PATH.test(path)) {
-      return err(new Error('Product image path is invalid', { cause: path }));
-    }
+    // TODO test if validation works
+    // off for now
+    // if (!REGEX_IMAGE_PATH.test(path)) {
+    //   return err(new Error('Product image path is invalid', { cause: path }));
+    // }
   }
 
   product.image = { images: images.map((image) => image.path) };
