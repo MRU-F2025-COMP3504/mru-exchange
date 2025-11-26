@@ -665,43 +665,43 @@ export default function ProductPage() {
             {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
           </p>
 
-          <button 
-            ref={reviewBtn} 
+          <button
+            ref={reviewBtn}
             className="hover:cursor-pointer bg-yellow-300 border-yellow-500 p-3 rounded mb-4 text-[#0B2545] font-semibold transition-colors hover:bg-yellow-400"
             onClick={() => {
               reviewPopup.current?.classList.remove("hidden");
               reviewPopup.current?.classList.add("flex");
             }}
-            >Write a review</button>
+          >Write a review</button>
 
-          <div 
-          ref={reviewPopup} 
-          className="hidden flex items-center justify-center fixed top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.6)]"
-          onClick={() => {
+          <div
+            ref={reviewPopup}
+            className="hidden flex items-center justify-center fixed top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.6)]"
+            onClick={() => {
               reviewPopup.current?.classList.add("hidden");
               reviewPopup.current?.classList.remove("flex");
-          }}
+            }}
           >
-            <div 
-              ref={reviewContent} 
-              className="bg-white h-[75%] w-[75%] rounded-2xl"
-              onClick={e => {e.stopPropagation()}}
-              >
-                <h3>Write a Review</h3>
-                <form>
-                  <label>
-                    Title:
-                    <input name="title" type="text"></input>
-                  </label>
-                  <br></br>
-                  <label>
-                    Description:
-                    <br></br>
-                    <textarea></textarea>
-                  </label>
-                  <button name="submit" type="submit">Submit</button>
-                  <button name="reset" type="reset">Clear</button>
-                </form>
+            <div
+              ref={reviewContent}
+              className="bg-white h-[75%] w-[75%] rounded-2xl p-8"
+              onClick={e => { e.stopPropagation() }}
+            >
+              <h3 className="text-3xl font-bold mb-2">Write a Review</h3>
+              <form>
+                <label>
+                  <p className="text-xl my-2">Title:</p>
+                  <input name="title" type="text" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-[50%]"></input>
+                </label>
+                <label>
+                  <p className="text-xl my-2">Description:</p>
+                  <textarea name="desc" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-full h-40 resize-none"></textarea>
+                </label>
+                <div className="py-5">
+                  <button name="submit" type="submit" className="bg-amber-300 p-2 mr-5 hover:bg-amber-400 border-2 rounded border-amber-700 w-25">Submit</button>
+                  <button name="reset" type="reset" className="bg-amber-300 p-2 mr-5 hover:bg-amber-400 border-2 rounded border-amber-700 w-25">Clear</button>
+                </div>
+              </form>
             </div>
           </div>
 
