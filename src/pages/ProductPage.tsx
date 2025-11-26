@@ -476,12 +476,19 @@ export default function ProductPage() {
 
   
   function setRating(e: React.MouseEvent<HTMLSpanElement>){
+
+    // Fetch data
     const rating: number = Number(e.target?.dataset.value);
     // console.log(e.target);
     // console.log(e.target.dataset.value);
     const stars: string = displayStars(rating);
     const container: HTMLSpanElement = e.target.parentNode;
     // console.log(container);
+    
+    // Update the value.
+    container.dataset.value = rating.toString();
+
+    // For every star,
     for(let i = 0; i < container.children.length; i++){
 
       // Update the stars.
@@ -734,7 +741,7 @@ export default function ProductPage() {
                 </label>
                 <label>
                   <p className="text-xl my-2">Rate: &nbsp;
-                  <span className="text-2xl my-2 text-yellow-400">
+                  <span id="reviewRating" className="text-2xl my-2 text-yellow-400">
                     <span data-value="1" onClick={setRating}>☆</span>
                     <span data-value="2" onClick={setRating}>☆</span>
                     <span data-value="3" onClick={setRating}>☆</span>
