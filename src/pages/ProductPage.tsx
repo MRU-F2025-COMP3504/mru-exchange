@@ -696,7 +696,7 @@ export default function ProductPage() {
         {/* Reviews */}
         <section className='p-10'>
           <h2 className='text-2xl font-bold'>Reviews</h2>
-          <p className='text-2xl m-2'>
+          <p className='text-2xl my-2'>
             <span className='text-3xl'>{displayStars(avgRating)}</span> (
             {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
           </p>
