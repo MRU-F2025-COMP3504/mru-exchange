@@ -702,13 +702,13 @@ export default function ProductPage() {
             >
               <div className="flex justify-between">
                 <h3 className="text-3xl font-bold mb-2">Write a Review</h3>
-                <div 
+                <button 
                   id="reviewExitBtn" 
                   className="bg-gray-200 w-10 h-10 rounded-full flex items-center cursor-pointer"
                   onClick={hideReviewInput}
                 >
                   <p className="text-center w-full font-bold text-gray-700">✕</p>
-                </div>
+                </button>
               </div>
               <form>
                 <label>
