@@ -1,78 +1,46 @@
-import type { Result, UnwrappedResult } from '@shared/types';
-
-/**
- * A utility function that unwraps the given {@link Result}, which contains both the `data` and `error` property.
- * When either of the property exists, the other property would be `undefined`.
- *
- * Incompatible with {@link Result} variants.
- *
- * @param result the given result to unwrap
- * @returns an unwrapped result
- * @see {@link Result}
- * @see {@link UnwrappedResult}
- */
-export function unwrap<T, E extends Error>(
-  result: Result<T, E>,
-): UnwrappedResult<T, E> {
-  if (result.ok) {
-    return { data: result.data, error: undefined };
-  } else {
-    return { data: undefined, error: result.error };
-  }
-}
+import type { NullableResult, Result } from '@shared/types';
 
 /**
  * A utility function that wraps the payload into a {@link Result}.
- * This function evaluates the `ok` conditional property to `true`.
- *
  * Compatible with all {@link Result} variants.
- *
- * @see {@link Result} and {@link PromiseResult} for more information
  *
  * @param data the payload to handle
  * @returns the wrapped result that represents a successful computation
+ * @see {@link Result}
+ * @see {@link PromiseResult}
  */
 export function ok<T, E extends Error>(data: T): Result<T, E> {
-  return { ok: true, data };
+  return { data, error: null };
 }
 
 /**
  * A utility function that wraps the payload into a {@link Result}.
- * This function evaluates the `ok` conditional property to `false`.
- * Any {@link Error} variant is compatible with the payload of type `E`,
- * which is constrained to type {@link Error}.
- *
  * Compatible with all {@link Result} variants.
- *
- * @see {@link Result}
- * @see {@link PromiseResult}
  *
  * @param error the payload to handle, which may be an {@link Error} or `string`
  * @returns the wrapped result that represents a failed computation or error
+ * @see {@link Result}
+ * @see {@link PromiseResult}
  */
 export function err<T, E extends Error>(error: E | string): Result<T, E> {
-  if (typeof error === 'string') {
-    return { ok: false, error: new Error(error) as E };
-  }
-
-  return { ok: false, error };
+  return { data: null, error: (typeof error === 'string' ? new Error(error) : error) as E };
 }
 
 /**
- * A utility function that represents an "empty" {@link Result}.
- * This function evaluates the `ok` conditional property to `false`.
- * The `error` payload property is empty.
- * Useful for representing `null` payload properties.
+ * A utility function that represents a {@link NullableResult}.
+ * Both the `data` and `error` payload are `null`.
  *
  * Compatible with all {@link Result} variants.
  *
- * @see {@link Result} and {@link PromiseResult} for more information
- * @see {@link present()} that performs the opposite evaluation
- *
  * @returns the wrapped result that represents an empty payload
+ * @see {@link present()} that performs the opposite evaluation
+ * @see {@link Result}
+ * @see {@link NullableResult}
+ * @see {@link PromiseResult}
+ * @see {@link PromiseNullableResult}
  */
-export function empty<T, E extends Error>(): Result<T, E> {
-  return { ok: false, error: new Error() as E };
+export function empty<T, E extends Error>(): NullableResult<T, E> {
+  return { data: null, error: null };
 }
 
 /**
@@ -87,11 +55,10 @@ export function empty<T, E extends Error>(): Result<T, E> {
  *
  * Compatible with all {@link Result} variants.
  *
- * @see {@link Result} and {@link PromiseResult} for more information
- * @see {@link present()} that performs the opposite evaluation
- *
  * @param data the given payload
  * @returns the wrapped result that may contain the given payload
+ * @see {@link Result} and {@link PromiseResult} for more information
+ * @see {@link present()} that performs the opposite evaluation
  */
 export function present<T>(data: T | null | undefined): Result<T> {
   if (data) {
