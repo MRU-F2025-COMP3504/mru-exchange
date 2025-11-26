@@ -465,6 +465,15 @@ export default function ProductPage() {
     reviewPopup.current?.classList.remove("flex");
   }
 
+  // Also hide review input if Esc is pressed.
+  document.addEventListener("keyup", e => {
+    if(e.key === "Escape"){
+      if(reviewPopup.current){
+        hideReviewInput();
+      }
+    }
+  })
+
   return (
     <div className='bg-[#F9FAFB] min-h-screen'>
       <Header />
