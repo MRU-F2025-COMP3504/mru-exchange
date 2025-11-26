@@ -467,12 +467,29 @@ export default function ProductPage() {
 
   // Also hide review input if Esc is pressed.
   document.addEventListener("keyup", e => {
-    if(e.key === "Escape"){
-      if(reviewPopup.current){
+    if (e.key === "Escape") {
+      if (reviewPopup.current) {
         hideReviewInput();
       }
     }
   })
+
+  
+  function setRating(e: React.MouseEvent<HTMLSpanElement>){
+    const rating: number = Number(e.target?.dataset.value);
+    // console.log(e.target);
+    // console.log(e.target.dataset.value);
+    const stars: string = displayStars(rating);
+    const container: HTMLSpanElement = e.target.parentNode;
+    // console.log(container);
+    for(let i = 0; i < container.children.length; i++){
+
+      // Update the stars.
+      container.children[i].textContent = stars[i];
+
+    }
+
+  }
 
   return (
     <div className='bg-[#F9FAFB] min-h-screen'>
@@ -702,26 +719,37 @@ export default function ProductPage() {
             >
               <div className="flex justify-between">
                 <h3 className="text-3xl font-bold mb-2">Write a Review</h3>
-                <button 
-                  id="reviewExitBtn" 
+                <button
+                  id="reviewExitBtn"
                   className="bg-gray-200 w-10 h-10 rounded-full flex items-center cursor-pointer"
                   onClick={hideReviewInput}
                 >
                   <p className="text-center w-full font-bold text-gray-700">✕</p>
                 </button>
               </div>
-              <form>
+              <form method="GET">
                 <label>
                   <p className="text-xl my-2">Title:</p>
-                  <input name="title" type="text" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-[50%]"></input>
+                  <input name="title" type="text" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-[50%] min-w-60"></input>
+                </label>
+                <label>
+                  <p className="text-xl my-2">Rate: &nbsp;
+                  <span className="text-2xl my-2 text-yellow-400">
+                    <span data-value="1" onClick={setRating}>☆</span>
+                    <span data-value="2" onClick={setRating}>☆</span>
+                    <span data-value="3" onClick={setRating}>☆</span>
+                    <span data-value="4" onClick={setRating}>☆</span>
+                    <span data-value="5" onClick={setRating}>☆</span>
+                  </span>
+                  </p>
                 </label>
                 <label>
                   <p className="text-xl my-2">Description:</p>
                   <textarea name="desc" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-full h-40 resize-none"></textarea>
                 </label>
                 <div className="py-5">
-                  <button name="submit" type="submit" className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Submit</button>
-                  <button name="reset" type="reset" className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Clear</button>
+                  <button type="submit" className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Submit</button>
+                  <button type="reset" className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Clear</button>
                 </div>
               </form>
             </div>
