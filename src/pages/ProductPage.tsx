@@ -667,7 +667,7 @@ export default function ProductPage() {
 
           <button
             ref={reviewBtn}
-            className="hover:cursor-pointer bg-yellow-300 border-yellow-500 p-3 rounded mb-4 text-[#0B2545] font-semibold transition-colors hover:bg-yellow-400"
+            className="hover:cursor-pointer bg-yellow-300 border-yellow-500 border p-3 rounded mb-4 text-[#0B2545] font-semibold transition-colors hover:bg-yellow-400"
             onClick={() => {
               reviewPopup.current?.classList.remove("hidden");
               reviewPopup.current?.classList.add("flex");
@@ -698,8 +698,8 @@ export default function ProductPage() {
                   <textarea name="desc" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-full h-40 resize-none"></textarea>
                 </label>
                 <div className="py-5">
-                  <button name="submit" type="submit" className="bg-amber-300 p-2 mr-5 hover:bg-amber-400 border-2 rounded border-amber-700 w-25">Submit</button>
-                  <button name="reset" type="reset" className="bg-amber-300 p-2 mr-5 hover:bg-amber-400 border-2 rounded border-amber-700 w-25">Clear</button>
+                  <button name="submit" type="submit" className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Submit</button>
+                  <button name="reset" type="reset" className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Clear</button>
                 </div>
               </form>
             </div>
