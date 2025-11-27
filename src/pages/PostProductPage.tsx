@@ -95,7 +95,7 @@ export default function PostProductPage() {
 
     setImages((prev) => {
       const combined = [...prev, ...imageFiles];
-      return combined.slice(0,6);
+      return combined.slice(0,5);
     })
   };
 
@@ -106,17 +106,15 @@ export default function PostProductPage() {
   // Validates the required fields to pass into the Preview Page
   const handlePreviewButton = () => {
 
-    {/* if (
+    if (
       !product.title?.trim() || 
       !product.description?.trim() ||
       product.price === null ||
-      product.stock_count === null ||
-      !product.image ||
-      product.image.length === 0
+      product.stock_count === null 
     ) {
       alert("Please fill out all fields and upload at least one image before previewing")
       return;
-    }*/}
+    }
 
     navigate('/preview-post', { state: { product, images, seller } })
   }
@@ -210,8 +208,7 @@ export default function PostProductPage() {
             }}
           >
             <select
-              value={product.category || ''}
-              onChange={(e) => updateProduct('category', e.target.value)}
+              
               style={{
                 width: '100%',
                 padding: '0.5rem',
