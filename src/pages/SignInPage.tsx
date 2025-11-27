@@ -188,7 +188,32 @@ export default function SignInPage() {
                   <span>✕</span> {errors.password}
                 </p>
               )}
-            </div>
+              <p
+              style={{
+                fontSize: '0.75rem',
+                color: '#6B7280',
+                marginTop: '0.3rem',
+              }}
+            >
+              {' '}
+              <button
+                type='button'
+                onClick={() => {
+                  navigate('/reset-password');
+                }}
+                style={{
+                  color: '#2563EB',
+                  fontWeight: '500',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                }}
+              >
+                Forgot Password?
+              </button>
+            </p>
+            </div>           
 
             {errors.general && (
               <div
