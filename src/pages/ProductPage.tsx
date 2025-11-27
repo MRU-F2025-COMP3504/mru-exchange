@@ -308,39 +308,39 @@ export default function ProductPage() {
     images: string[];
   }
 
-  function getImageUrls(imageData: ImageURLs): string[] | null {
-    try {
-      // Create an array.
-      const imagesArray = [];
+  // function getImageUrls(imageData: ImageURLs): string[] | null {
+  //   try {
+  //     // Create an array.
+  //     const imagesArray = [];
 
-      // For every image,
-      for (const path of imageData.images) {
-        // Get the imagePath.
+  //     // For every image,
+  //     for (const path of imageData.images) {
+  //       // Get the imagePath.
 
-        if (!path) return null;
+  //       if (!path) return null;
 
-        if (path.startsWith('http')) {
-          imagesArray.push(path);
-        }
+  //       if (path.startsWith('http')) {
+  //         imagesArray.push(path);
+  //       }
 
-        const filename = path.replace('database/images/', '').split('/').pop();
+  //       const filename = path.replace('database/images/', '').split('/').pop();
 
-        if (!filename) return null;
+  //       if (!filename) return null;
 
-        const { data } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(filename);
+  //       const { data } = supabase.storage
+  //         .from('product-images')
+  //         .getPublicUrl(filename);
 
-        imagesArray.push(data.publicUrl);
-      }
+  //       imagesArray.push(data.publicUrl);
+  //     }
 
-      // Return
-      return imagesArray;
-    } catch (error) {
-      console.error('Error getting image URL:', error);
-      return null;
-    }
-  }
+  //     // Return
+  //     return imagesArray;
+  //   } catch (error) {
+  //     console.error('Error getting image URL:', error);
+  //     return null;
+  //   }
+  // }
 
   /**
    * Fetches all images for a product from the database. <Note> If this works, this function is actually unnecessary.
@@ -348,42 +348,42 @@ export default function ProductPage() {
    *  image: string[] The array containing image paths.
    * @returns An array of the image urls.
    */
-  // function getImageUrls(imageData: { images: string[] }): string[] | null {
+  function getImageUrls(imageData: { images: string[] }): string[] | null {
 
-  //     try {
+      try {
 
-  //         // Create an array.
-  //         const imagesArray = [];
+          // Create an array.
+          const imagesArray = [];
 
-  //         // For every image,
-  //         for (const imagePath of imageData.images) {
+          // For every image,
+          for (const imagePath of imageData.images) {
 
-  //             if (!imagePath) return null;
+              if (!imagePath) return null;
 
-  //             if (imagePath.startsWith('http')) {
-  //                 imagesArray.push(imagePath);
-  //             }
+              if (imagePath.startsWith('http')) {
+                  imagesArray.push(imagePath);
+              }
 
-  //             const filename = imagePath.replace('database/images/', '').split('/').pop();
+              const filename = imagePath.replace('database/images/', '').split('/').pop();
 
-  //             if (!filename) return null;
+              if (!filename) return null;
 
-  //             const { data } = supabase.storage
-  //                 .from('product-images')
-  //                 .getPublicUrl(filename);
+              const { data } = supabase.storage
+                  .from('product-images')
+                  .getPublicUrl(filename);
 
-  //             imagesArray.push(data.publicUrl);
+              imagesArray.push(data.publicUrl);
 
-  //         }
+          }
 
-  //         // Return
-  //         return imagesArray;
+          // Return
+          return imagesArray;
 
-  //     } catch (error) {
-  //         console.error('Error getting image URL:', error);
-  //         return null;
-  //     }
-  // };
+      } catch (error) {
+          console.error('Error getting image URL:', error);
+          return null;
+      }
+  };
 
   const calculateAverageRating = (): number => {
     if (reviews.length === 0) return 0;
@@ -517,9 +517,12 @@ export default function ProductPage() {
     const title: FormDataEntryValue = form.get("title");
     const desc: FormDataEntryValue = form.get("desc");
     const rate: number = rating;
+    
     // console.log(title);
     // console.log(desc);
     // console.log(rate);
+
+
 
   }
 
