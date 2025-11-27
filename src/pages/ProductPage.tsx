@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
@@ -51,6 +51,7 @@ export default function ProductPage() {
   const [bookmarking, setBookmarking] = useState(false);
   const [bookmarkSuccess, setBookmarkSuccess] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [rating, setRating] = useState(0);
 
   const mainImgRef = useRef<HTMLImageElement>(null);
   const reviewBtn = useRef<HTMLButtonElement>(null);
@@ -474,8 +475,11 @@ export default function ProductPage() {
     }
   })
 
-  
-  function setRating(e: React.MouseEvent<HTMLSpanElement>){
+  /**
+   * Displays the rating on the review input form.
+   * @param e The event form
+   */
+  function displayRating(e: React.MouseEvent<HTMLSpanElement>): void {
 
     // Fetch data
     const rating: number = Number(e.target?.dataset.value);
@@ -486,7 +490,8 @@ export default function ProductPage() {
     // console.log(container);
     
     // Update the value.
-    container.dataset.value = rating.toString();
+    setRating(rating);
+    // console.log(rating);
 
     // For every star,
     for(let i = 0; i < container.children.length; i++){
@@ -495,6 +500,26 @@ export default function ProductPage() {
       container.children[i].textContent = stars[i];
 
     }
+
+  }
+
+  /**
+   * Submits the review to the database.
+   * @param event The submit event.
+   */
+  function submitReview(event: FormEvent<HTMLFormElement>): void {
+
+    // Stop the submission.
+    event.preventDefault();
+
+    // Get values.
+    const form: FormData = new FormData(event.currentTarget);
+    const title: FormDataEntryValue = form.get("title");
+    const desc: FormDataEntryValue = form.get("desc");
+    const rate: number = rating;
+    // console.log(title);
+    // console.log(desc);
+    // console.log(rate);
 
   }
 
@@ -734,7 +759,9 @@ export default function ProductPage() {
                   <p className="text-center w-full font-bold text-gray-700">✕</p>
                 </button>
               </div>
-              <form method="GET">
+              <form
+              onSubmit={submitReview}
+              >
                 <label>
                   <p className="text-xl my-2">Title:</p>
                   <input name="title" type="text" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-[50%] min-w-60"></input>
@@ -742,11 +769,11 @@ export default function ProductPage() {
                 <label>
                   <p className="text-xl my-2">Rate: &nbsp;
                   <span id="reviewRating" className="text-2xl my-2 text-yellow-400">
-                    <span data-value="1" onClick={setRating}>☆</span>
-                    <span data-value="2" onClick={setRating}>☆</span>
-                    <span data-value="3" onClick={setRating}>☆</span>
-                    <span data-value="4" onClick={setRating}>☆</span>
-                    <span data-value="5" onClick={setRating}>☆</span>
+                    <span data-value="1" onClick={displayRating}>☆</span>
+                    <span data-value="2" onClick={displayRating}>☆</span>
+                    <span data-value="3" onClick={displayRating}>☆</span>
+                    <span data-value="4" onClick={displayRating}>☆</span>
+                    <span data-value="5" onClick={displayRating}>☆</span>
                   </span>
                   </p>
                 </label>
@@ -755,7 +782,9 @@ export default function ProductPage() {
                   <textarea name="desc" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-full h-40 resize-none"></textarea>
                 </label>
                 <div className="py-5">
-                  <button type="submit" className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Submit</button>
+                  <button 
+                  type="submit" 
+                  className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Submit</button>
                   <button type="reset" className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Clear</button>
                 </div>
               </form>
