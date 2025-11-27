@@ -167,40 +167,41 @@ export default function ProductSearchPage() {
     });
   };
 
-  const getImageUrl = (imageData: any): string | null => {
-    if (!imageData) return null;
+  function getImageUrls(imageData: { images: string[] }): string[] | null {
 
-    try {
-      let imagePath: string | null = null;
+      try {
 
-      if (typeof imageData === 'object' && imageData !== null) {
-        imagePath =
-          imageData.image ||
-          imageData.path ||
-          imageData.url ||
-          imageData.filename;
-      } else if (typeof imageData === 'string') {
-        imagePath = imageData;
+          // Create an array.
+          const imagesArray = [];
+
+          // For every image,
+          for (const imagePath of imageData.images) {
+
+              if (!imagePath) return null;
+
+              if (imagePath.startsWith('http')) {
+                  imagesArray.push(imagePath);
+              }
+
+              const filename = imagePath.replace('database/images/', '').split('/').pop();
+
+              if (!filename) return null;
+
+              const { data } = supabase.storage
+                  .from('product-images')
+                  .getPublicUrl(filename);
+
+              imagesArray.push(data.publicUrl);
+
+          }
+          // console.log(imagesArray);
+          // Return
+          return imagesArray;
+
+      } catch (error) {
+          console.error('Error getting image URL:', error);
+          return null;
       }
-
-      if (!imagePath) return null;
-      if (imagePath.startsWith('http')) return imagePath;
-
-      const filename = imagePath
-        .replace('database/images/', '')
-        .split('/')
-        .pop();
-      if (!filename) return null;
-
-      const { data } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filename);
-
-      return data.publicUrl;
-    } catch (error) {
-      console.error('Error getting image URL:', error);
-      return null;
-    }
   };
 
   return (
@@ -425,7 +426,7 @@ export default function ProductSearchPage() {
           {!loading &&
             !error &&
             products.map((product) => {
-              const imageUrl = getImageUrl(product.image);
+              const imageUrls = getImageUrls(product.image);
 
               return (
                 <div
@@ -462,9 +463,9 @@ export default function ProductSearchPage() {
                       justifyContent: 'center',
                     }}
                   >
-                    {imageUrl ? (
+                    {imageUrls ? (
                       <img
-                        src={imageUrl}
+                        src={imageUrls[0]}
                         alt={product.title || 'Product'}
                         style={{
                           width: '100%',
@@ -472,7 +473,7 @@ export default function ProductSearchPage() {
                           objectFit: 'cover',
                         }}
                         onError={(e) => {
-                          console.error('Image failed to load:', imageUrl);
+                          console.error('Image failed to load:', imageUrls[0]);
                           const target = e.currentTarget as HTMLImageElement;
                           target.style.display = 'none';
                           if (target.parentElement) {
