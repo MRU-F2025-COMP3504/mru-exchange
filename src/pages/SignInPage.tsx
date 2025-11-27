@@ -199,7 +199,7 @@ export default function SignInPage() {
               <button
                 type='button'
                 onClick={() => {
-                  navigate('/reset-password');
+                  navigate('/forgot-password');
                 }}
                 style={{
                   color: '#2563EB',
