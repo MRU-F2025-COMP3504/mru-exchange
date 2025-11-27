@@ -17,6 +17,7 @@ import {
   PostProductPage,
   PreviewPostPage,
 } from '@pages/index';
+import ForgotPasswordPage from '@pages/ForgotPasswordPage';
 
 function App() {
   return (
@@ -29,8 +30,10 @@ function App() {
           <Route path='/create-account' element={<CreateAccountPage />} />
           <Route path='/verify-email' element={<VerifyEmailPage />} />
           <Route path='/reset-password' element={<ResetPasswordPage />} />
+          <Route path='/forgot-password' element={<ForgotPasswordPage />} />
           <Route path='/sign-up' element={<SignUpPage />} />
           <Route path='/contact-us' element={<ContactUsPage />} />
+          <Route path='/messaging' element={<MessagingPage />} />
 
           {/* Protected routes */}
           <Route
@@ -70,6 +73,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <MessagingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/reset-password'
+            element={
+              <ProtectedRoute>
+                <ResetPasswordPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/forgot-password'
+            element={
+              <ProtectedRoute>
+                <ForgotPasswordPage />
               </ProtectedRoute>
             }
           />
