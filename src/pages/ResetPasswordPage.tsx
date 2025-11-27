@@ -1,144 +1,262 @@
-import { useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@shared/contexts';
 import { UserAuthentication } from '@shared/api';
 
-export default function ResetPasswordPage() {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+export default function ForgotPasswordPage() {
+  const navigate = useNavigate();
+  const { password } = useAuth();
+  const [formData, setFormData] = useState({
+    password: '',
+    confirmPassword: '',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    }
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Password confirmation is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    setError('');
-    setSuccessMessage('');
-    setIsLoading(true);
+    setIsSubmitting(true);
+    try {
+      const signer = signin();
 
-    // Validate @mtroyal.ca email
-    if (!email.endsWith('@mtroyal.ca')) {
-      setError('Please use a valid @mtroyal.ca email address');
-      setIsLoading(false);
-      return;
+      signer.password(formData.password);
+      signer.confirmPassword(formData.confirmPassword);
+
+      const result = await signer.submit();
+
+      if (!result.ok) {
+        setErrors({ general: 'Passwords do not match' });
+        return;
+      }
+
+      navigate('/home');
+    } catch (error: any) {
+      console.error('Error confirming password:', error);
+      setErrors({ general: 'An error occurred. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
     }
+  };
 
-    const signin = UserAuthentication.signIn();
-
-    signin.email(email);
-
-    const result = await signin.resetPassword();
-
-    if (result.ok) {
-      setSuccessMessage(
-        'Password reset link has been sent to your email. Please check your inbox.',
-      );
-      setEmail('');
-    } else {
-      setError(result.error.message);
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
     }
+  };
 
-    setIsLoading(false);
+  const inputStyle = (hasError: boolean) => ({
+    width: '100%',
+    padding: '0.5rem 0.75rem',
+    fontSize: '0.875rem',
+    border: `1px solid ${hasError ? '#EF4444' : '#E5E7EB'}`,
+    borderRadius: '0.375rem',
+    backgroundColor: hasError ? '#FEF2F2' : '#F9FAFB',
+    outline: 'none',
+  });
+
+  const labelStyle = {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: '0.25rem',
+  };
+
+  const errorStyle = {
+    marginTop: '0.25rem',
+    fontSize: '0.75rem',
+    color: '#DC2626',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem',
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4'>
-      <div className='w-full max-w-md'>
-        {/* Logo/Brand Section */}
-        <div className='text-center mb-8'>
-          <h1 className='text-4xl font-bold text-indigo-600 mb-2'>
-            MRU Exchange
-          </h1>
-          <p className='text-gray-600'>Reset Your Password</p>
-        </div>
-
-        {/* Reset Password Card */}
-        <div className='bg-white rounded-lg shadow-xl p-8'>
-          <h2 className='text-2xl font-semibold text-gray-800 mb-6'>
-            Forgot Password?
-          </h2>
-
-          <p className='text-gray-600 mb-6'>
-            Enter your email address and we'll send you a link to reset your
-            password.
-          </p>
-
-          <form onSubmit={void handleSubmit} className='space-y-6'>
-            {/* Email Input */}
-            <div>
-              <label
-                htmlFor='email'
-                className='block text-sm font-medium text-gray-700 mb-2'
-              >
-                Email Address
-              </label>
-              <input
-                id='email'
-                type='email'
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-                placeholder='student@mtroyal.ca'
-                required
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
-                disabled={isLoading}
-              />
-              <p className='mt-1 text-xs text-gray-500'>
-                Must be a valid @mtroyal.ca email
-              </p>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm'>
-                {error}
-              </div>
-            )}
-
-            {/* Success Message */}
-            {successMessage && (
-              <div className='bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm'>
-                {successMessage}
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type='submit'
-              disabled={isLoading}
-              className='w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed'
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(to bottom right, #EFF6FF, #E0E7FF)',
+        padding: '3rem 1rem',
+      }}
+    >
+      <div style={{ width: '100%', maxWidth: '24rem' }}>
+        <div
+          style={{
+            backgroundColor: 'white',
+            borderRadius: '0.75rem',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            padding: '2rem',
+          }}
+        >
+          <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+            <img
+              src='/MruExchangeLogo.png'
+              alt='MRU Exchange Logo'
+              style={{
+                width: '100px',
+                height: 'auto',
+                marginBottom: '1rem',
+                margin: '0 auto 1rem',
+              }}
+            />
+            <h2
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#111827',
+                marginBottom: '0.25rem',
+              }}
             >
-              {isLoading ? 'Sending...' : 'Send Reset Link'}
-            </button>
-          </form>
-
-          {/* Divider */}
-          <div className='relative my-6'>
-            <div className='absolute inset-0 flex items-center'>
-              <div className='w-full border-t border-gray-300'></div>
-            </div>
-            <div className='relative flex justify-center text-sm'>
-              <span className='px-2 bg-white text-gray-500'>
-                Remember your password?
-              </span>
-            </div>
+              Reset your password
+            </h2>
           </div>
 
-          {/* Back to Login Link */}
-          <Link
-            to='/login'
-            className='block w-full text-center py-3 border border-indigo-600 text-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition-colors'
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.875rem',
+            }}
           >
-            Back to Sign In
-          </Link>
-        </div>
+            <div>
+              <label htmlFor='password' style={labelStyle}>
+                Password
+              </label>
+              <input
+                id='password'
+                type='password'
+                value={formData.password}
+                onChange={(e) => {
+                  handleChange('password', e.target.value);
+                }}
+                placeholder='Enter your password'
+                style={inputStyle(!!errors.password)}
+              />
+              {errors.password && (
+                <p style={errorStyle}>
+                  <span>✕</span> {errors.password}
+                </p>
+              )}
+            </div>
 
-        {/* Footer */}
-        <div className='mt-8 text-center text-sm text-gray-600'>
-          <p>
-            Check your spam folder if you don't see the email within a few
-            minutes
-          </p>
+            <div>
+              <label htmlFor='confirmPassword' style={labelStyle}>
+                Confirm Password
+              </label>
+              <input
+                id='confirmPassword'
+                type='confirmPassword'
+                value={formData.confirmPassword}
+                onChange={(e) => {
+                  handleChange('password', e.target.value);
+                }}
+                placeholder='Re-enter your password'
+                style={inputStyle(!!errors.confirmPassword)}
+              />
+              {errors.confirmPassword && (
+                <p style={errorStyle}>
+                  <span>✕</span> {errors.confirmPassword}
+                </p>
+              )}              
+            </div>
+
+            
+
+            {errors.general && (
+              <div
+                style={{
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #FEE2E2',
+                  borderRadius: '0.375rem',
+                  padding: '0.625rem',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '0.75rem',
+                    color: '#DC2626',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                  }}
+                >
+                  <span>✕</span> {errors.general}
+                </p>
+              </div>
+            )}
+
+            <div style={{ marginTop: '0.5rem' }}>
+              <button
+                type='submit'
+                disabled={isSubmitting}
+                style={{
+                  width: '100%',
+                  padding: '0.625rem 1rem',
+                  backgroundColor: isSubmitting ? '#93C5FD' : '#2563EB',
+                  color: 'white',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  borderRadius: '0.375rem',
+                  border: 'none',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
+              </button>
+            </div>
+
+            <p
+              style={{
+                textAlign: 'center',
+                fontSize: '0.75rem',
+                color: '#6B7280',
+                marginTop: '0.25rem',
+              }}
+            >
+              Don't have an account?{' '}
+              <button
+                type='button'
+                onClick={() => {
+                  navigate('/create-account');
+                }}
+                style={{
+                  color: '#2563EB',
+                  fontWeight: '500',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                }}
+              >
+                Create account.
+              </button>
+            </p>
+          </form>
         </div>
       </div>
     </div>
