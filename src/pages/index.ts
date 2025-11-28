@@ -1,10 +1,8 @@
 export { default as ContactUsPage } from '@pages/ContactUsPage';
-export { default as CreateAccountPage } from '@pages/CreateAccountPage';
 export { default as Footer } from '@pages/Footer';
 export { default as ForgotPasswordPage } from '@pages/ForgotPasswordPage';
 export { default as Header } from '@pages/Header';
 export { default as HomePage } from '@pages/HomePage';
-export { default as LoginPage } from '@pages/LoginPage';
 export { default as MessagingPage } from '@pages/MessagingPage';
 export { default as PostProductPage } from '@pages/PostProductPage';
 export { default as PreviewPostPage } from '@pages/PreviewPostPage';
