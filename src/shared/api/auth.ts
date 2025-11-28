@@ -3,15 +3,17 @@ import type {
   PromiseResult,
   RequireProperty,
   Result,
-  UserVerificationResender,
   UserCredentials,
+  Username,
   UserPasswordModifier,
   UserProfile,
   UserSignin,
   UserSignup,
+  UserVerificationResender,
 } from '@shared/types';
 import {
   err,
+  FormUtils,
   ok,
   query,
   REGEX_EMAIL,
@@ -20,8 +22,6 @@ import {
 } from '@shared/utils';
 import {
   type AuthChangeEvent,
-  AuthError,
-  type AuthResponse,
   type EmailOtpType,
   type MobileOtpType,
   type ResendParams,
@@ -37,10 +37,6 @@ interface UserAuthentication {
   /**
    * Retrieves the given user.
    *
-   * To handle the promise result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param the given user identifier
    * @returns a promise that resolves to the corresponding user profile
    */
@@ -55,16 +51,13 @@ interface UserAuthentication {
    * @returns the subscription for the {@link AuthChangeEvent}
    */
   subscribe: (
-    callback: (
-      event: AuthChangeEvent,
-      session: Result<Session, AuthError>,
-    ) => void,
+    callback: (event: AuthChangeEvent, session: Result<Session>) => void,
   ) => Subscription;
 
   /**
    * Registers the user into the website.
    *
-   * @see {@link UserSignup} for more information on its builder features
+   * @see {@link UserSignup}
    * @returns the user credentials builder and additional user sign-up features
    */
   signup: () => UserSignup;
@@ -72,26 +65,33 @@ interface UserAuthentication {
   /**
    * Signs the user into the website.
    * The user must be registered in order to sign in.
-   * If there are authentication cookies stored, the user signs in automatically without re-typing credentials.
    *
-   * @see {@link UserSignin} for more information on its builder features
+   * @see {@link UserSignin}
    * @returns the user credentials builder and additional user sign-in features
    */
   signin: () => UserSignin;
 
   /**
    * Signs the user out of the website.
-   * Invalidates existing authentication cookies.
    *
    * @returns a promise that successfully resolves
    */
   signout: () => PromiseResult<null>;
 
   /**
+   * Resends the email verification or OTP.
+   *
+   * @returns the verification resender
+   * @see {@link UserVerificationResender}
+   * @see {@link GoTrueClient.resend()} for the underlying supabase implementation
+   */
+  resend(): UserVerificationResender;
+
+  /**
    * Modifies the user's password credentials.
    *
    * @see {@link UserPasswordModifier}
-   * @returns the user credentials builder
+   * @returns the user password modifier
    */
   password: () => UserPasswordModifier;
 }
@@ -118,19 +118,13 @@ export const UserAuthentication: UserAuthentication = {
     );
   },
   subscribe(
-    callback: (
-      event: AuthChangeEvent,
-      session: Result<Session, AuthError>,
-    ) => void,
+    callback: (event: AuthChangeEvent, session: Result<Session>) => void,
   ): Subscription {
     const subscriber = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         callback(event, ok(session));
       } else {
-        callback(
-          event,
-          err(new AuthError('No session found', 401, 'session_not_found')),
-        );
+        callback(event, err('No user session found', { event, session }));
       }
     });
 
@@ -140,50 +134,49 @@ export const UserAuthentication: UserAuthentication = {
     const credentials: Partial<UserCredentials> = {};
 
     return {
-      email(email: string): Result<string> {
-        return setEmail(credentials, email);
+      email(form: FormData, key = 'email'): Result<string> {
+        return setEmail(credentials, form, key);
       },
-      password(password: string): Result<string> {
-        return setPassword(credentials, password);
+      password(form: FormData, key = 'password'): Result<string> {
+        return setPassword(credentials, form, key);
       },
-      fullname(fullname: string[]): Result<string[]> {
-        return setFullname(credentials, fullname);
+      name(
+        form: FormData,
+        key = ['firstname', 'lastname', 'alias'],
+      ): [Result<string>, Result<string>, Result<string>] {
+        return setName(credentials, form, key);
       },
-      username(username: string): Result<string> {
-        return setUsername(credentials, username);
-      },
-      async submit(): PromiseResult<User> {
-        const submitted = credentials as UserCredentials;
+      isValid(): boolean {
+        if (!credentials.email) {
+          return false;
+        } else if (!credentials.password) {
+          return false;
+        } else if (!credentials.name) {
+          return false;
+        }
 
-        return authenticate(
-          await supabase.auth.signUp({
-            email: submitted.email,
-            password: submitted.password,
-            options: {
-              emailRedirectTo: `${window.location.origin}/home`,
-              data: {
-                first_name: submitted.fullname[0],
-                last_name: submitted.fullname[1],
-              },
-            },
-          }),
-        );
+        return true;
       },
-      resend(): UserVerificationResender {
-        return {
-          email(
-            type: Extract<EmailOtpType, 'signup' | 'email_change'>,
-            email: string,
-          ): PromiseResult<null> {
-            return resend({ type, email });
+      async submit(): PromiseResult<null> {
+        const { email, password, name } = credentials as UserCredentials;
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/home`,
+            data: {
+              first_name: name.first,
+              last_name: name.last,
+              user_name: name.alias,
+            },
           },
-          mobile(
-            type: Extract<MobileOtpType, 'sms' | 'phone_change'>,
-            phone: string,
-          ): PromiseResult<null> {
-            return resend({ type, phone });
-          },
-        };
+        });
+
+        if (error) {
+          return err('Unable to create the account. Please try again.');
+        } else {
+          return ok(null);
+        }
       },
     };
   },
@@ -191,21 +184,33 @@ export const UserAuthentication: UserAuthentication = {
     const credentials: Partial<UserCredentials> = {};
 
     return {
-      email(email: string): Result<string> {
-        return setEmail(credentials, email);
+      email(form: FormData, key = 'email'): Result<string> {
+        return setEmail(credentials, form, key);
       },
-      password(password: string): Result<string> {
-        return setPassword(credentials, password);
+      password(form: FormData, key = 'password'): Result<string> {
+        return setPassword(credentials, form, key);
       },
-      async submit(): PromiseResult<User> {
-        const submitted = credentials as UserCredentials;
+      isValid(): boolean {
+        if (!credentials.email) {
+          return false;
+        } else if (!credentials.password) {
+          return false;
+        }
 
-        return authenticate(
-          await supabase.auth.signInWithPassword({
-            email: submitted.email,
-            password: submitted.password,
-          }),
-        );
+        return true;
+      },
+      async submit(): PromiseResult<null> {
+        const { email, password } = credentials as UserCredentials;
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          return err('Invalid email or password', error);
+        } else {
+          return ok(null);
+        }
       },
     };
   },
@@ -213,10 +218,34 @@ export const UserAuthentication: UserAuthentication = {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      return err(error);
+      return err('Ungraceful sign-out', error);
+    } else {
+      return ok(null);
     }
-
-    return ok(null);
+  },
+  resend(): UserVerificationResender {
+    return {
+      async email(
+        type: Extract<EmailOtpType, 'signup' | 'email_change'>,
+        email: Result<string>,
+      ): PromiseResult<null> {
+        if (email.ok) {
+          return resend({ type, email: email.data });
+        } else {
+          return email;
+        }
+      },
+      async mobile(
+        type: Extract<MobileOtpType, 'sms' | 'phone_change'>,
+        phone: Result<string>,
+      ): PromiseResult<null> {
+        if (phone.ok) {
+          return resend({ type, phone: phone.data });
+        } else {
+          return phone;
+        }
+      },
+    };
   },
   password(): UserPasswordModifier {
     return {
@@ -231,28 +260,26 @@ export const UserAuthentication: UserAuthentication = {
         );
 
         if (error) {
-          return err(error);
+          return err('Faild to reset the password', error);
+        } else {
+          return ok(null);
         }
-
-        return ok(null);
       },
-      async update(
-        credentials: RequireProperty<UserCredentials, 'password'>,
-      ): PromiseResult<User> {
-        const validate = setPassword(credentials, credentials.password);
+      async update(form: FormData, key: string): PromiseResult<null> {
+        const validate = setPassword({}, form, key);
 
         if (validate.ok) {
           const password = validate.data;
 
-          const { data, error } = await supabase.auth.updateUser({
+          const { error } = await supabase.auth.updateUser({
             password,
           });
 
           if (error) {
-            return err(error);
+            return err('Failed to update the password', error);
+          } else {
+            return ok(null);
           }
-
-          return ok(data.user);
         }
 
         return validate;
@@ -261,34 +288,21 @@ export const UserAuthentication: UserAuthentication = {
   },
 };
 
+/**
+ * Resends the given email or phone verification.
+ *
+ * @internal
+ * @param params the {@link ResendParams} for email or phone re-verification
+ * @returns the {@link Promise} that successfully resolves
+ */
 async function resend(params: ResendParams): PromiseResult<null> {
   const { error } = await supabase.auth.resend(params);
 
   if (error) {
-    return err(error);
+    return err('Failed to resend verification', error);
+  } else {
+    return ok(null);
   }
-
-  return ok(null);
-}
-
-/**
- * A utility function that wraps the authentication response into a {@link Result}.
- *
- * @internal
- * @param response the authentication response from supabase's authentication system
- * @returns a result that may contain the corresponding user
- * @see {@link Result}
- */
-function authenticate(response: AuthResponse): Result<User> {
-  const { data, error } = response;
-
-  if (error) {
-    return err(error);
-  } else if (data.user) {
-    return ok(data.user);
-  }
-
-  return err('Invalid authentication response');
 }
 
 /**
@@ -296,21 +310,26 @@ function authenticate(response: AuthResponse): Result<User> {
  *
  * @internal
  * @param credentials the given incomplete user credentials
- * @param email the given email to assign
+ * @param form the given {@link FormData}
+ * @param key the given key to {@link FormDataEntryValue}
+ * @returns the wrapped {@link Result} of the corresponding given email
  * @see {@link REGEX_EMAIL}
  */
 function setEmail(
   credentials: Partial<UserCredentials>,
-  email: string,
+  form: FormData,
+  key: string,
 ): Result<string> {
-  const trimmed = email.trim();
+  const { data, error } = FormUtils.getString(form, key);
 
-  if (!trimmed) {
+  if (error) {
+    return err('Invalid email', error);
+  } else if (!data) {
     return err('Email is empty');
-  } else if (!REGEX_EMAIL.test(trimmed)) {
-    return err('Only @mtroyal.ca email addresses are allowed');
+  } else if (!REGEX_EMAIL.test(data)) {
+    return err('Only @mtroyal.ca email addresses are allowed', data);
   } else {
-    return ok((credentials.email = trimmed));
+    return ok((credentials.email = data));
   }
 }
 
@@ -319,20 +338,27 @@ function setEmail(
  *
  * @internal
  * @param credentials the given incomplete user credentials
- * @param password the given password to assign
+ * @param form the given {@link FormData}
+ * @param key the given key to {@link FormDataEntryValue}
+ * @returns the wrapped {@link Result} of the corresponding given password
  */
 function setPassword(
   credentials: Partial<UserCredentials>,
-  password: string,
+  form: FormData,
+  key: string,
 ): Result<string> {
-  if (!password) {
+  const { data, error } = FormUtils.getString(form, key);
+
+  if (error) {
+    return err('Invalid password', error);
+  } else if (!data) {
     return err('Password cannot be empty');
-  } else if (password.length < 4) {
-    return err('Password must have 4 characters or more');
-  } else if (password.length > 128) {
-    return err('Password must be no more than 128 characters');
+  } else if (data.length < 4) {
+    return err('Password must have 4 characters or more', data);
+  } else if (data.length > 128) {
+    return err('Password must be no more than 128 characters', data);
   } else {
-    return ok((credentials.password = password));
+    return ok((credentials.password = data));
   }
 }
 
@@ -341,48 +367,73 @@ function setPassword(
  *
  * @internal
  * @param credentials the given incomplete user credentials
- * @param fullname the given first and last name to assign
+ * @param form the given {@link FormData}
+ * @param key the given key to three {@link FormDataEntryValue} (i.e., `[firstname, lastname, alias]`)
+ * @returns the wrapped {@link Result} of the corresponding given full name
  * @see {@link REGEX_LETTERS_ONLY}
  */
-function setFullname(
+function setName(
   credentials: Partial<UserCredentials>,
-  [first, last]: string[],
-): Result<string[]> {
-  const tfirst = first.trim();
-  const tlast = last.trim();
+  form: FormData,
+  key: [string, string, string],
+): [Result<string>, Result<string>, Result<string>] {
+  const first: () => Result<string> = () => {
+    const { data, error } = FormUtils.getString(form, key[0]);
 
-  if (!tfirst) {
-    return err('First name cannot be empty');
-  } else if (!tlast) {
-    return err('Last name cannot be empty');
-  } else if (!REGEX_LETTERS_ONLY.test(tfirst)) {
-    return err('Invalid first name');
-  } else if (!REGEX_LETTERS_ONLY.test(tlast)) {
-    return err('Invalid last name');
-  } else {
-    return ok((credentials.fullname = [tfirst, tlast]));
+    if (error) {
+      return err('Invalid first name', error);
+    } else if (!data) {
+      return err('First name cannot be empty');
+    } else if (!REGEX_LETTERS_ONLY.test(data)) {
+      return err('First name cannot have non-letters', data);
+    } else {
+      return ok(data);
+    }
+  };
+
+  const last: () => Result<string> = () => {
+    const { data, error } = FormUtils.getString(form, key[1]);
+
+    if (error) {
+      return err('Invalid last name', error);
+    } else if (!data) {
+      return err('Last name cannot be empty');
+    } else if (!REGEX_LETTERS_ONLY.test(data)) {
+      return err('Last name cannot have non-letters', data);
+    } else {
+      return ok(data);
+    }
+  };
+
+  const alias: () => Result<string> = () => {
+    const { data, error } = FormUtils.getString(form, key[2]);
+
+    if (error) {
+      return err('Invalid username', error);
+    } else if (!data) {
+      return err('Username cannot be empty');
+    } else if (!REGEX_USERNAME.test(data)) {
+      return err('Username cannot have in-between spaces', data);
+    } else {
+      return ok(data);
+    }
+  };
+
+  const name: [Result<string>, Result<string>, Result<string>] = [
+    first(),
+    last(),
+    alias(),
+  ];
+
+  const [firstName, lastName, aliasName] = name;
+
+  if (firstName.ok && lastName.ok && aliasName.ok) {
+    credentials.name = {
+      first: firstName.data,
+      last: firstName.data,
+      alias: aliasName.data,
+    };
   }
-}
 
-/**
- * A utility function that validates and assigns the given username for the user's credentials.
- *
- * @internal
- * @param credentials the given incomplete user credentials
- * @param username the given username to assign
- * @see {@link REGEX_USERNAME}
- */
-function setUsername(
-  credentials: Partial<UserCredentials>,
-  username: string,
-): Result<string> {
-  const trimmed = username.trim();
-
-  if (!trimmed) {
-    return err('Username cannot be empty');
-  } else if (!REGEX_USERNAME.test(trimmed)) {
-    return err('Invalid username');
-  } else {
-    return ok((credentials.username = username));
-  }
+  return name;
 }
