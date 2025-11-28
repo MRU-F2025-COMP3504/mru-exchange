@@ -239,7 +239,7 @@ export const ProductListing: ProductListing = {
         seller: RequireProperty<UserProfile, 'supabase_id'>,
       ): Result<ProductBuilder> {
         if (!seller.supabase_id) {
-          return err(new Error('Product ID is not specified'));
+          return err('Product ID is not specified', seller);
         } else {
           product.user_id = seller.supabase_id;
         }
@@ -263,9 +263,7 @@ export const ProductListing: ProductListing = {
       },
       price(price: number): Result<ProductBuilder> {
         if (price < 0) {
-          return err(
-            new Error('Product price cannot be negative', { cause: price }),
-          );
+          return err('Product price cannot be negative', price);
         } else {
           product.price = price;
         }
@@ -274,9 +272,7 @@ export const ProductListing: ProductListing = {
       },
       stock(stock: number): Result<ProductBuilder> {
         if (stock < 0) {
-          return err(
-            new Error('Product stock cannot be negative', { cause: stock }),
-          );
+          return err('Product stock cannot be negative', stock);
         } else {
           product.stock_count = stock;
         }
@@ -404,7 +400,7 @@ function setTitle<T>(
   title: string,
 ): Result<T> {
   if (!title) {
-    return err(new Error('Product title is not specified'));
+    return err('Title is empty', product);
   } else {
     product.title = title;
   }
@@ -428,7 +424,7 @@ function setDescription<T>(
   description: string,
 ): Result<T> {
   if (!description) {
-    return err(new Error('Product description is not specified'));
+    return err('Description is empty', product);
   } else {
     product.description = description;
   }
@@ -455,11 +451,9 @@ function setImage<T>(
   for (const image of images) {
     const path = image.path;
 
-    // TODO test if validation works
-    // off for now
-    // if (!REGEX_IMAGE_PATH.test(path)) {
-    //   return err(new Error('Product image path is invalid', { cause: path }));
-    // }
+    if (!REGEX_IMAGE_PATH.test(path)) {
+      return err('Invalid product image path', path);
+    }
   }
 
   product.image = { images: images.map((image) => image.path) };

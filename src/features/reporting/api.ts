@@ -151,16 +151,14 @@ export const UserReporting: UserReporting = {
     return {
       description(description: string): Result<UserReporter> {
         if (!description) {
-          return err(new Error('User report description is not specified'));
+          return err('Report description is empty', report);
         }
 
         return ok(this);
       },
       link(link: string): Result<UserReporter> {
         if (!REGEX_TEXT_PATH.test(link)) {
-          return err(
-            new Error('User report link information is not specified'),
-          );
+          return err('Report link is empty', report);
         }
 
         return ok(this);

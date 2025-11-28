@@ -237,7 +237,7 @@ export const UserReviewing: UserReviewing = {
     return {
       description(description: string): Result<ReviewPublisher> {
         if (!description) {
-          return err(new Error('Review description cannot be empty'));
+          return err('Review description cannot be empty', review);
         } else {
           review.description = description;
         }
@@ -246,9 +246,9 @@ export const UserReviewing: UserReviewing = {
       },
       rating(rating: number): Result<ReviewPublisher> {
         if (rating < 0) {
-          return err(new Error('Review rating cannot be negative'));
+          return err('Review rating cannot be negative', review);
         } else if (rating > 5) {
-          return err(new Error('Review rating exceeds max rating'));
+          return err('Review rating exceeds max rating', review);
         } else {
           review.rating = rating;
         }
