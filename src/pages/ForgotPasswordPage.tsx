@@ -1,43 +1,123 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { UserAuthentication } from '@shared/api';
+import { supabase, UserAuthentication } from '@shared/api'
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@shared/contexts';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
+  const formData = { email };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+
+  const validateForm = () => {
+    console.log('validating')
+    const newErrors: Record<string, string> = {};
+
+    console.log(formData.email)
+
+    console.log("Email coming into form:", formData.email);
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!formData.email.endsWith('@mtroyal.ca')) {
+      newErrors.email = 'Please use a valid @mtroyal.ca address';
+      setIsLoading(false);
+    }
+
+    setErrors(newErrors);
+    console.log(newErrors)
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    console.log('submitting')
     e.preventDefault();
 
     setError('');
     setSuccessMessage('');
     setIsLoading(true);
+    setIsSubmitting(true);
 
-    // Validate @mtroyal.ca email
-    if (!email.endsWith('@mtroyal.ca')) {
-      setError('Please use a valid @mtroyal.ca email address');
+    if (!validateForm()) {
       setIsLoading(false);
       return;
     }
 
-    const signin = UserAuthentication.signIn();
+    setIsSubmitting(true);
 
-    signin.email(email);
+    const passwordRes = UserAuthentication.password();
 
-    const result = await signin.resetPassword();
+    // const email = user.ok ? user.data.email : undefined;
 
-    if (result.ok) {
-      setSuccessMessage(
-        'Password reset link has been sent to your email. Please check your inbox.',
-      );
-      setEmail('');
-    } else {
-      setError(result.error.message);
+    if (!email) {
+      setErrors({ general: "Email is missing." });
+      setIsSubmitting(false);
+      setIsLoading(false);
+      return;
     }
 
+    const result = await passwordRes.reset({ email });
+
+    // Handle failure
+    if (!result.ok) {
+      setError(result.error.message);
+      setIsSubmitting(false);
+      setIsLoading(false);
+      return;
+    }
+    console.log("Sending reset email for:", email);
+
+    // Success
+    setSuccessMessage(
+      'Password reset link has been sent to your email. Please check your inbox.'
+    );
+    setEmail('');
+
+    navigate('/verify-email', { state: { email: formData.email } });
+
+    setIsSubmitting(false);
     setIsLoading(false);
+  };
+
+  useEffect(() => {
+      if (email) {
+        fetchEmail();
+      }
+    }, [email]);
+
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  const fetchEmail = async () => {
+
+    try {
+      const { data, error } = await supabase
+        .from('User_Information')
+        .select('email')
+        .eq('email', email)
+        .single();
+
+      if (!error) {
+        setEmail(data.email || '');
+      }
+    } catch (error) {
+      console.error('Error fetching user name:', error);
+    }
   };
 
   return (
@@ -62,7 +142,7 @@ export default function ResetPasswordPage() {
             password.
           </p>
 
-          <form onSubmit={void handleSubmit} className='space-y-6'>
+          <form onSubmit={handleSubmit} className='space-y-6'>
             {/* Email Input */}
             <div>
               <label
@@ -73,6 +153,7 @@ export default function ResetPasswordPage() {
               </label>
               <input
                 id='email'
+                name='email'
                 type='email'
                 value={email}
                 onChange={(e) => {
