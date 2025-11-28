@@ -32,7 +32,9 @@ export default function PostProductPage() {
   });
   const [ categories, setCategories ] = useState<Category[]>([]);
   const [ seller, setSeller ] = useState<any>(null);
-  const [ images, setImages ] = useState<File[]>([]);
+  const [ images, setImages ] = useState<File[]>(()  => {
+    return state?.images || [];
+  });
 
   useEffect(() => {
     fetchCategories();
@@ -155,10 +157,15 @@ export default function PostProductPage() {
           <label
             style={{
               display: 'block',
-              marginBottom: '0.5rem',
-              padding: '1rem',
+              marginBottom: '0.25rem',
+              padding: '0.5rem',
             }}
           >
+            <div 
+              style={{
+                padding: '0.25rem',
+              }}>Enter the Title: 
+            </div>
             <input
               type='textbox'
               placeholder='Enter title here...'
@@ -178,15 +185,20 @@ export default function PostProductPage() {
           <label
             style={{
               display: 'block',
-              marginBottom: '0.5rem',
-              padding: '1rem',
+              marginBottom: '0.25rem',
+              padding: '0.5rem',
             }}
           >
+            <div 
+              style={{
+                padding: '0.25rem',
+              }}>Enter the Price: 
+            </div>
             <input
               type='number'
               min='0'
               max='10000'
-              placeholder='Enter price here...'
+              placeholder='$'
               value={product.price || ''}
               onChange={(e) => updateProduct('price', e.target.value)}
               style={{
@@ -203,10 +215,15 @@ export default function PostProductPage() {
           <label
             style={{
               display: 'block',
-              marginBottom: '0.5rem',
-              padding: '1rem',
+              marginBottom: '0.25rem',
+              padding: '0.5rem',
             }}
           >
+            <div 
+              style={{
+                padding: '0.25rem',
+              }}>Choose Category: 
+            </div>
             <select
               
               style={{
@@ -219,7 +236,7 @@ export default function PostProductPage() {
                 cursor: 'pointer',
               }}
             >
-              <option value=''>Choose Category...</option>
+              <option value=''></option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.name || ''}>
                   {cat.name}
@@ -230,12 +247,16 @@ export default function PostProductPage() {
           <label
             style={{
               display: 'block',
-              marginBottom: '0.5rem',
-              padding: '1rem',
+              marginBottom: '0.25rem',
+              padding: '0.5rem',
             }}
           >
-            <input
-              type='textbox'
+            <div 
+              style={{
+                padding: '0.25rem',
+              }}>Enter Description: 
+            </div>
+            <textarea
               placeholder='Description'
               value={product.description || ''}
               onChange={(e) => updateProduct('description', e.target.value)}
@@ -247,16 +268,21 @@ export default function PostProductPage() {
                 fontSize: '1rem',
                 backgroundColor: 'white',
                 cursor: 'pointer',
-              }}
-            />
+              }}>
+            </textarea>
           </label>
           <label
             style={{
               display: 'block',
-              marginBottom: '0.5rem',
-              padding: '1rem',
+              marginBottom: '0.25rem',
+              padding: '0.5rem',
             }}
           >
+            <div 
+              style={{
+                padding: '0.25rem',
+              }}>Enter Stock Count: 
+            </div>
             <input
               type='number'
               min='1'
@@ -286,8 +312,8 @@ export default function PostProductPage() {
               style={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '0.5rem',
-                marginBottom: '1rem',
+                gap: '0.25rem',
+                marginBottom: '0.5rem',
               }}
             >
               {(images || []).map((file, index) => {
@@ -332,7 +358,7 @@ export default function PostProductPage() {
               })}
             </div>
 
-            {(images?.length || 0) < 10 && (
+            {(images?.length || 0) < 6 && (
               <input
                 type='file'
                 accept='image/*'
@@ -359,7 +385,7 @@ export default function PostProductPage() {
                 marginTop: '0.3rem',
               }}
             >
-              {images?.length || 0}/10 images selected
+              {images?.length || 0}/6 images selected
             </p>
           </label>
           <button
@@ -469,10 +495,12 @@ export default function PostProductPage() {
                     color: '#666',
                     fontSize: '0.9rem',
                     overflow: 'hidden',
+                    overflowWrap: 'anywhere',
                     textOverflow: 'ellipsis',
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical',
+                    whiteSpace: 'normal'
                   }}
                 >
                   {product.description}

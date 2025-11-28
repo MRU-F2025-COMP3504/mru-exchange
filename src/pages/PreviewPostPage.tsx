@@ -1,5 +1,3 @@
-import Header from './Header';
-import Footer from './Footer';
 import { useLocation } from 'react-router-dom';
 import { ProductListing } from '../features/listing/api';
 import { ok, err } from '../shared/utils';
@@ -293,7 +291,7 @@ export default function PreviewPostPage() {
             gap: "0.5rem"
           }}>
             <button 
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/post-product', { state: { product, images} }) }
               style={{
                 padding: '0.75rem 2rem',
                 background: "none",
