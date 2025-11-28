@@ -5,7 +5,6 @@ import { UserAuthentication } from '@shared/api';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
-  const { password } = useAuth();
   const [formData, setFormData] = useState({
     password: '',
     confirmPassword: '',
@@ -18,34 +17,38 @@ export default function ForgotPasswordPage() {
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Password confirmation is required';
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords don't match.";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const password = UserAuthentication.password();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!validateForm()) return;
 
+    const form = new FormData(event.currentTarget);
+    console.log(formData)
+
     setIsSubmitting(true);
-    try {
-      const signer = signin();
+    try {console.log(form)
+      const update = await password.update(form, formData.password);
 
-      signer.password(formData.password);
-      signer.confirmPassword(formData.confirmPassword);
-
-      const result = await signer.submit();
-
-      if (!result.ok) {
-        setErrors({ general: 'Passwords do not match' });
+      if (!update.ok) {
+        setErrors({ general: 'Password update failed' });
         return;
       }
 
-      navigate('/home');
+      navigate('/signin');
     } catch (error: any) {
       console.error('Error confirming password:', error);
       setErrors({ general: 'An error occurred. Please try again.' });
@@ -150,6 +153,7 @@ export default function ForgotPasswordPage() {
               <input
                 id='password'
                 type='password'
+                name='password'
                 value={formData.password}
                 onChange={(e) => {
                   handleChange('password', e.target.value);
@@ -170,10 +174,11 @@ export default function ForgotPasswordPage() {
               </label>
               <input
                 id='confirmPassword'
-                type='confirmPassword'
+                type='password'
+                name='confirmPassword'
                 value={formData.confirmPassword}
                 onChange={(e) => {
-                  handleChange('password', e.target.value);
+                  handleChange('confirmPassword', e.target.value);
                 }}
                 placeholder='Re-enter your password'
                 style={inputStyle(!!errors.confirmPassword)}
