@@ -409,11 +409,11 @@ function setName(
     const { data, error } = FormUtils.getString(form, key[2]);
 
     if (error) {
-      return err('Invalid username', error);
+      return err('Invalid alias', error);
     } else if (!data) {
-      return err('Username cannot be empty');
+      return err('Alias cannot be empty');
     } else if (!REGEX_USERNAME.test(data)) {
-      return err('Username cannot have in-between spaces', data);
+      return err('Alias cannot have in-between spaces', data);
     } else {
       return ok(data);
     }
