@@ -1,23 +1,22 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from '@shared/contexts';
-import { ProtectedRoute } from '@shared/components';
 import {
-  WelcomePage,
-  SignInPage,
-  CreateAccountPage,
-  VerifyEmailPage,
-  HomePage,
-  ResetPasswordPage,
-  SignUpPage,
   ContactUsPage,
-  ProfilePage,
-  ProductSearchPage,
-  ProductPage,
+  ForgotPasswordPage,
+  HomePage,
   MessagingPage,
   PostProductPage,
   PreviewPostPage,
+  ProductPage,
+  ProductSearchPage,
+  ProfilePage,
+  ResetPasswordPage,
+  SignInPage,
+  SignUpPage,
+  VerifyEmailPage,
+  WelcomePage,
 } from '@pages/index';
-import ForgotPasswordPage from '@pages/ForgotPasswordPage';
+import { ProtectedRoute } from '@shared/components';
+import { AuthProvider } from '@shared/contexts';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 function App() {
   return (
@@ -26,8 +25,8 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path='/' element={<WelcomePage />} />
-          <Route path='/signin' element={<SignInPage />} />
-          <Route path='/create-account' element={<CreateAccountPage />} />
+          <Route path='/sign-in' element={<SignInPage />} />
+          <Route path='/sign-up' element={<SignUpPage />} />
           <Route path='/verify-email' element={<VerifyEmailPage />} />
           <Route path='/reset-password' element={<ResetPasswordPage />} />
           <Route path='/forgot-password' element={<ForgotPasswordPage />} />

@@ -22,7 +22,7 @@ export default function WelcomePage() {
           <button
             className='w-full py-3 px-4 border-2 border-blue-600 rounded-md text-blue-600 bg-white font-medium text-base cursor-pointer transition-colors duration-200 hover:bg-blue-50'
             onClick={() => {
-              navigate('/signin');
+              navigate('/sign-in');
             }}
           >
             Sign In
@@ -31,7 +31,7 @@ export default function WelcomePage() {
           <button
             className='w-full py-3 px-4 bg-blue-600 text-white rounded-md font-medium text-base border-none cursor-pointer transition-colors duration-200 hover:bg-blue-700'
             onClick={() => {
-              navigate('/create-account');
+              navigate('/sign-up');
             }}
           >
             Create Account
