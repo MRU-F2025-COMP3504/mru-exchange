@@ -445,7 +445,7 @@ export default function ProductSearchPage() {
               const imageUrls = getImageUrls(product.image);
 
               return (
-                <div
+                <button
                   key={product.id}
                   onClick={() => navigate(`/product/${product.id}`)}
                   style={{
@@ -455,6 +455,7 @@ export default function ProductSearchPage() {
                     boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
                     cursor: 'pointer',
                     transition: 'transform 0.2s, box-shadow 0.2s',
+                    textAlign: "left"
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-4px)';
@@ -556,7 +557,7 @@ export default function ProductSearchPage() {
                       </p>
                     )}
                   </div>
-                </div>
+                </button>
               );
             })}
         </main>
