@@ -34,6 +34,13 @@ interface UserMessage {
   logged_message: string;
   sender_id: string;
   visible: boolean;
+  sender: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    supabase_id: string;
+    profile_image: any | null;
+  } | null;
 }
 
 export default function MessagingPage() {
@@ -55,7 +62,7 @@ export default function MessagingPage() {
 
   useEffect(() => {
     if (currentUserId && chats.length === 0) fetchChats();
-    if (currentUserId && chats.length > 0 && messages.length === 0) fetchFirstMessages();
+    if (currentUserId && chats.length > 0 && messages.length === 0) fetchMessages();
   }, [currentUserId, chats]);
 
 
@@ -113,7 +120,7 @@ export default function MessagingPage() {
     }
   }
 
-  const fetchFirstMessages = async () => {
+  const fetchFirstMessages = async (chat_id: Chat['id']) => {
     if (!currentUserId) return;
 
     const chat_ids = chats.map(chat => chat.id);
@@ -139,8 +146,9 @@ export default function MessagingPage() {
     }
   };
 
-  const fetchMessages = async (chat_id: Chat['id']) => {
+  const fetchMessages = async () => {
     if (!currentUserId) return;
+    const chat_ids = chats.map(chat => chat.id);
 
     try {
       const { data, error } = await supabase
@@ -156,10 +164,11 @@ export default function MessagingPage() {
           id,
           first_name,
           last_name,
-          supabase_id
+          supabase_id,
+          profile_image
         )
         `)
-        .eq('chat_id', chat_id)
+        .in('chat_id', chat_ids)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -322,9 +331,8 @@ export default function MessagingPage() {
     showRemove?: boolean;
     showVisible?: boolean;
   }) => {
-    // const [currentUser, otherUser] = chat.user_id_1 === currentUserId ? [chat.user1, chat.user2] : [chat.user2, chat.user1];
     const isVisible = message.visible;
-    // const imageUrl = getImageUrl(otherUser?.profile_image);
+    const imageUrl = getImageUrl(message.sender?.profile_image);
 
     const messageDate = new Date(message?.created_at)
     let date;
@@ -346,8 +354,8 @@ export default function MessagingPage() {
         className={`bg-white rounded-lg shadow`}
       >
         <div className='grid grid-cols-[10%_90%] p-2'>
-          <div className='relative'>
-            {/* {imageUrl ? (
+          <div className='relative flex items-center justify-center'>
+            {imageUrl ? (
               <img
                 src={imageUrl}
                 className={`w-full h-full object-cover`}
@@ -358,19 +366,20 @@ export default function MessagingPage() {
                 }}
               />
             ) : (
-              <div className='aspect-square h-full bg-gray-200 flex items-center justify-center rounded-4xl'>
-                <span className='text-gray-500 text-xs'>no image</span>
+              <div className='aspect-square h-1/2 bg-gray-200 flex items-center justify-center rounded-4xl'>
+                <span className='text-gray-500 text-xs'>n/a</span>
               </div>
-            )} */}
-            </div>
+            )}
+          </div>
           <div>
-            {/* <div className='px-4 font-bold font-black'>{otherUser?.first_name}</div> */}
+            <div className='px-4 font-semibold'>{message?.sender?.first_name}</div>
             <div className='flex items-start h-full px-4 text-sm'>
 
               <div className='flex-1 overflow-hidden'>
                 <div className='text-black'> {message?.logged_message} </div>
-              </div>              
-            </div><div className='text-gray-500 text-xs'>{date}</div>
+                <div className='text-gray-500 text-xs'>{date}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -403,9 +412,9 @@ export default function MessagingPage() {
       <div className='bg-[#F9FAFB] min-h-screen'>
         <Header />
         { /* Left aside for chats */}
-        <div className='flex min-w-full'>
+        <div className='flex min-w-full p-5 gap-5'>
           <aside className="flex flex-col w-1/3">
-            <p className='text-xl text-gray-600 text-center '>Chats</p>
+            <p className='text-xl text-gray-600 text-center'>Chats</p>
             {chats.length === 0 ? (
               <div className='bg-white rounded-lg shadow p-8 text-center'>
                 <p className='text-gray-600 mb-4'>
@@ -424,39 +433,58 @@ export default function MessagingPage() {
               </div>
             )}
           </aside>
-          <main className='flex flex-col w-2/3 items-center min-h-[60vh]'>
-            {chatLoading ? (<div className='flex items-center justify-center h-full text-xl'>Select a chat to view messages</div>
+          <main className='flex flex-col w-2/3 items-center min-h-[60vh] rounded-2xl p-5 bg-blue-300'>
+            {chatLoading ? (<div className='flex items-center justify-center text-xl'>Select a chat to view messages</div>
             ) : (
-              /* Main area for the selected chat */
-              <div className='flex flex-col gap-6 min-w-[20vw]'>
-                {messages.map((message) => (
-                  <MessageCard
-                    key={message.id}
-                    message={message}
-                    showRemove={true}
-                  />
-                ))}
+              <>
+                {/* Main area for the selected chat */}
+                <div className='flex flex-col gap-6 overflow-y-auto max-h-[70vh]'>
+                  {messages
+                    .filter(message => message.visible)
+                    .map((message) => {
+                      const alignment =
+                        message.sender.supabase_id === currentUserId
+                          ? 'items-end'
+                          : 'items-start';
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${alignment} min-w-[20vw]`}
+                        >
+                          <MessageCard message={message} showRemove={true} />
+                        </div>
+                      );
+                    })}
+                </div>
                 <div>
                   <form onSubmit={handleSubmit} className='space-y-6'>
                     {/* handle message input */}
                     <div>
                       <label
                         htmlFor='text'
-                        className='block text-sm font-medium text-gray-700 mb-2'>
+                        className='block font-medium text-gray-700 mb-2 w-full'>
                         Send Message
                       </label>
+                      <input className='bg-white rounded-2xl w-[40vw] p-2'
+                        id='text'
+                        type='text'
+                        name='text'
+                        value={FormData.text}
+                        onChange={(e) => {
+                          handleChange('text', e.target.value);
+                        }}
+                        placeholder='Send a message'
+                        >
+                      </input>
                     </div>
                   </form>
                 </div>
-              </div>
+              </>
             )}
-
-
-
           </main>
-        </div>
+        </div >
         <Footer />
-      </div>
+      </div >
     );
   }
 
