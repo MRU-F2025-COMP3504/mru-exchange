@@ -59,6 +59,7 @@ export default function MessagingPage() {
   const [loading, setLoading] = useState(true);
   const [chatLoading, setChatLoading] = useState(true);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+  const [chatName, setChatName] = useState();
 
   useEffect(() => {
     if (currentUserId && chats.length === 0) fetchChats();
@@ -274,7 +275,10 @@ export default function MessagingPage() {
     return (
       <div
         className={`bg-white rounded-lg shadow hover:shadow-lg transition-shadow ${!isVisible ? 'opacity-60' : 'cursor-pointer'}`}
-        onClick={() => setChatLoading(!chatLoading) && setSelectedChat(chat)}
+        onClick={() => {
+          setChatLoading(!chatLoading);
+          setSelectedChat(chat);
+        }}
       >
         <div className='grid grid-cols-[10%_90%] p-4'>
           <div className='relative'>
@@ -348,11 +352,14 @@ export default function MessagingPage() {
     if (messageDate > yesterdayEnd) date = `${messageDate.getHours()}: ${messageDate.getMinutes()}`;
     else if (messageDate >= yesterdayStart && messageDate < yesterdayEnd) date = "Yesterday";
     else date = messageDate.toLocaleDateString();
+    const senderBool = message.sender?.supabase_id === currentUserId; 
+    const bgColor = senderBool ? 'bg-message-sender' :  'bg-white';
+    const textColor = senderBool ? 'text-white' :  'text-black';
+    const name = senderBool ? '' :  message?.sender?.first_name;
+    const image = senderBool ? '' :  message?.sender?.first_name;
 
     return (
-      <div
-        className={`bg-white rounded-lg shadow`}
-      >
+      <div className={`${bgColor} rounded-2xl shadow flex justify-end`}>
         <div className='grid grid-cols-[10%_90%] p-2'>
           <div className='relative flex items-center justify-center'>
             {imageUrl ? (
@@ -372,11 +379,11 @@ export default function MessagingPage() {
             )}
           </div>
           <div>
-            <div className='px-4 font-semibold'>{message?.sender?.first_name}</div>
+            <div className='px-4 font-semibold'>{name}</div>
             <div className='flex items-start h-full px-4 text-sm'>
 
               <div className='flex-1 overflow-hidden'>
-                <div className='text-black'> {message?.logged_message} </div>
+                <div className={`${textColor}`}> {message?.logged_message} </div>
                 <div className='text-gray-500 text-xs'>{date}</div>
               </div>
             </div>
@@ -433,14 +440,14 @@ export default function MessagingPage() {
               </div>
             )}
           </aside>
-          <main className='flex flex-col w-2/3 items-center min-h-[60vh] rounded-2xl p-5 bg-blue-300'>
+          <main className='flex flex-col w-2/3 items-center min-h-[60vh] rounded-2xl p-5 bg-blue-300'>{selectedChat ? selectedChat.user2?.first_name: 'false'}
             {chatLoading ? (<div className='flex items-center justify-center text-xl'>Select a chat to view messages</div>
             ) : (
               <>
                 {/* Main area for the selected chat */}
                 <div className='flex flex-col gap-6 overflow-y-auto max-h-[70vh]'>
                   {messages
-                    .filter(message => message.visible)
+                    .filter(message => message.visible && message.chat_id === selectedChat?.id)
                     .map((message) => {
                       const alignment =
                         message.sender.supabase_id === currentUserId
