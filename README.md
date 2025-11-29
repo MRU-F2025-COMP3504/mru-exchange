@@ -108,6 +108,14 @@ mruexchange.app
 
 See the [nginx.conf](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/nginx.conf) to configure the reverse proxy for the production server.
 
+### Logging In
+If you would like to view the site without creating an account, you can use the following credentials:
+
+```
+Email: publicUser@mtroyal.ca
+Password: publicPassword
+```
+
 ## Daily Operation & Development
 
 We use the `npm` [(node package manager)](https://www.npmjs.com/) and [docker](https://www.docker.com/) for dependency management and running the application.
