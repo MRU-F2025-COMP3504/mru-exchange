@@ -105,7 +105,9 @@ export default function PreviewPostPage() {
       }
 
       alert('Product successfully inserted');
-      console.log('inserted:', insert);
+      
+      navigate(`/product/${insertedProduct.id}`)
+
     } catch (e) {
       alert('Error: failed to register product');
       throw e;
