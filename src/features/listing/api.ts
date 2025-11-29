@@ -1,19 +1,23 @@
 import type {
+  ProductAttributeModifier,
+  ProductBuilder,
+} from '@features/listing';
+import { supabase } from '@shared/api';
+import type {
   CategorizedProduct,
   Category,
   DatabaseQuery,
-  RequireProperty,
   Product,
+  RequireProperty,
   Result,
-  UserProfile,
-  ProductImage,
 } from '@shared/types';
-import { supabase } from '@shared/api';
-import { err, ok, query, REGEX_IMAGE_PATH } from '@shared/utils';
-import type {
-  ProductBuilder,
-  ProductAttributeModifier,
-} from '@features/listing';
+import {
+  err,
+  FormUtils,
+  ok,
+  query,
+  REGEX_LETTER_NUMBERS_ONLY,
+} from '@shared/utils';
 
 /**
  * See the implementation below for more information.
@@ -23,26 +27,18 @@ interface CategoryListing {
    * Registers the category tag.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param category the given category tag to register
-   * @returns a promise that resolves the registered category tag
+   * @returns the {@link Promise} that resolves the registered category tag
    */
-  register: (
+  create: (
     category: RequireProperty<Category, 'name' | 'description'>,
   ) => DatabaseQuery<Category, '*'>;
 
   /**
    * Removes the given category tag(s).
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param categories the given category tag identifier(s) to remove
-   * @returns a promise that resolves the deleted category tag(s)
+   * @returns the {@link Promise} that resolves the deleted category tag(s)
    */
   remove: (
     categories: RequireProperty<Category, 'id'>[],
@@ -52,13 +48,9 @@ interface CategoryListing {
    * Modifies the name and/or description of the given category tag.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param target the given category tag identifier to modify
    * @param change the new name and/or description
-   * @returns a promise that resolves the modified category tag
+   * @returns the {@link Promise} that resolves the modified category tag
    */
   modify: (
     target: RequireProperty<Category, 'id'>,
@@ -68,10 +60,6 @@ interface CategoryListing {
   /**
    * Assigns the given product with the given category tag(s).
    * Selects all columns.
-   *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param product the given product identifier
    * @param categories the given category tag identifier(s) to modify
@@ -93,9 +81,9 @@ interface CategoryListing {
  * @see {@link CategoryCatalogue} for fetching existing category tags
  */
 export const CategoryListing: CategoryListing = {
-  register: async (
+  async create(
     category: RequireProperty<Category, 'name' | 'description'>,
-  ): DatabaseQuery<Category, '*'> => {
+  ): DatabaseQuery<Category, '*'> {
     return query(
       await supabase
         .from('Category_Tags')
@@ -104,9 +92,9 @@ export const CategoryListing: CategoryListing = {
         .single(),
     );
   },
-  remove: async (
+  async remove(
     categories: RequireProperty<Category, 'id'>[],
-  ): DatabaseQuery<Category[], 'id'> => {
+  ): DatabaseQuery<Category[], 'id'> {
     return query(
       await supabase
         .from('Category_Tags')
@@ -118,10 +106,10 @@ export const CategoryListing: CategoryListing = {
         .select('id'),
     );
   },
-  modify: async (
+  async modify(
     target: RequireProperty<Category, 'id'>,
     change: Pick<Partial<Category>, 'name' | 'description'>,
-  ): DatabaseQuery<Category, '*'> => {
+  ): DatabaseQuery<Category, '*'> {
     return query(
       await supabase
         .from('Category_Tags')
@@ -131,10 +119,10 @@ export const CategoryListing: CategoryListing = {
         .single(),
     );
   },
-  tag: async (
+  async tag(
     product: RequireProperty<Product, 'id'>,
     categories: RequireProperty<Category, 'id'>[],
-  ): DatabaseQuery<CategorizedProduct[], '*'> => {
+  ): DatabaseQuery<CategorizedProduct[], '*'> {
     return query(
       await supabase
         .from('Category_Assigned_Products')
@@ -159,18 +147,24 @@ interface ProductListing {
    * @see {@link ProductBuilder} for more information on its builder features
    * @returns the product builder
    */
-  register: () => ProductBuilder;
+  create: () => ProductBuilder;
+
+  /**
+   * Modifies the attributes of the given product.
+   * Attributes, such as the title, description, and images are specified.
+   *
+   * @param the given product identifier to modify its attributes
+   * @returns the {@link Promise} that resolves the modified product
+   * @see {@link ProductAttributeModifier} for more information on its builder features
+   */
+  attribute(product: RequireProperty<Product, 'id'>): ProductAttributeModifier;
 
   /**
    * Specifies the listing visibility of the given product.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param isListed the visibility flag
    * @param products the given product identifier(s)
-   * @returns a promise that resolves the product visibility
+   * @returns the {@link Promise} that resolves the product visibility
    */
   list: (
     isListed: boolean,
@@ -180,42 +174,42 @@ interface ProductListing {
   /**
    * Removes the given product(s).
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param products the given product identifier(s) to remove
-   * @returns a promise that resolves the deleted product(s)
+   * @returns the {@link Promise} that resolves the deleted product(s)
    */
   remove: (
     products: RequireProperty<Product, 'id'>[],
   ) => DatabaseQuery<Product[], 'id'>;
 
   /**
-   * Modifies the attributes of the given product.
-   * Attributes, such as the title, description, and images are specified.
+   * Modifies the price of the given product.
+   * By default, the form `key` parameter is `price`.
    *
-   * @param the given product identifier to modify its attributes
-   * @returns a promise that resolves the modified product
-   * @see {@link ProductAttributeModifier} for more information on its builder features
+   * @param product the given product identifier to modify its stock
+   * @param form the given {@link FormData}
+   * @param key the given key (`price`) to {@link FormDataEntryValue}
+   * @return the {@link Promise} that resolves the modified product
    */
-  attribute(product: RequireProperty<Product, 'id'>): ProductAttributeModifier;
+  price(
+    product: RequireProperty<Product, 'id'>,
+    form: FormData,
+    key?: string,
+  ): DatabaseQuery<Product, '*'>;
 
   /**
    * Modifies the stock of the given product.
-   * The stock amount must be greater than or equal to zero (0).
-   *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   * By default, the form `key` parameter is `stock`.
    *
    * @param product the given product identifier to modify its stock
-   * @return a promise that resolves the modified product
+   * @param form the given {@link FormData}
+   * @param key the given key (`stock`) to {@link FormDataEntryValue}
+   * @return the {@link Promise} that resolves the modified product
    */
   stock(
     product: RequireProperty<Product, 'id'>,
-    stock: number,
-  ): DatabaseQuery<Product, 'id'>;
+    form: FormData,
+    key?: string,
+  ): DatabaseQuery<Product, '*'>;
 }
 
 /**
@@ -230,60 +224,46 @@ interface ProductListing {
  * @see {@link ProductCatalogue} for fetching existing products
  */
 export const ProductListing: ProductListing = {
-  register: (): ProductBuilder => {
+  create(): ProductBuilder {
     const product: Partial<Product> = {};
-    let images: ProductImage[] = [];
+    const images: File[] = [];
 
     return {
-      seller(
-        seller: RequireProperty<UserProfile, 'supabase_id'>,
-      ): Result<ProductBuilder> {
-        if (!seller.supabase_id) {
-          return err('Product ID is not specified', seller);
-        } else {
-          product.user_id = seller.supabase_id;
+      title(form: FormData, key = 'title'): Result<string> {
+        return setTitle(product, form, key);
+      },
+      description(form: FormData, key = 'description'): Result<string> {
+        return setDescription(product, form, key);
+      },
+      images(form: FormData, key = 'images'): Result<File[]> {
+        return setImages(product, images, form, key);
+      },
+      price(form: FormData, key = 'price'): Result<number> {
+        return setPrice(product, form, key);
+      },
+      stock(form: FormData, key = 'stock'): Result<number> {
+        return setStock(product, form, key);
+      },
+      isSatisfied(): boolean {
+        if (!product.title) {
+          return false;
+        } else if (!product.description) {
+          return false;
+        } else if (!product.price) {
+          return false;
         }
 
-        return ok(this);
+        return true;
       },
-      title(title: string): Result<ProductBuilder> {
-        return setTitle(this, product, title);
-      },
-      description(description: string): Result<ProductBuilder> {
-        return setDescription(this, product, description);
-      },
-      image(files: ProductImage[]): Result<ProductBuilder> {
-        const result = setImage(this, product, files);
-
-        if (result.ok) {
-          images = files;
+      async submit(): DatabaseQuery<Product, '*'> {
+        if (!this.isSatisfied()) {
+          return err('Missing required product properties');
         }
 
-        return result;
-      },
-      price(price: number): Result<ProductBuilder> {
-        if (price < 0) {
-          return err('Product price cannot be negative', price);
-        } else {
-          product.price = price;
-        }
-
-        return ok(this);
-      },
-      stock(stock: number): Result<ProductBuilder> {
-        if (stock < 0) {
-          return err('Product stock cannot be negative', stock);
-        } else {
-          product.stock_count = stock;
-        }
-
-        return ok(this);
-      },
-      async build(): DatabaseQuery<Product, 'id'> {
         for (const image of images) {
           await supabase.storage
             .from('product-images')
-            .upload(image.path, image.body);
+            .upload(image.name, image, { upsert: true });
         }
 
         return query(
@@ -296,10 +276,10 @@ export const ProductListing: ProductListing = {
       },
     };
   },
-  list: async (
+  async list(
     isListed: boolean,
     products: RequireProperty<Product, 'id'>[],
-  ): DatabaseQuery<Product[], 'id'> => {
+  ): DatabaseQuery<Product[], 'id'> {
     return query(
       await supabase
         .from('Product_Information')
@@ -313,9 +293,9 @@ export const ProductListing: ProductListing = {
         .select('id'),
     );
   },
-  remove: async (
+  async remove(
     products: RequireProperty<Product, 'id'>[],
-  ): DatabaseQuery<Product[], 'id'> => {
+  ): DatabaseQuery<Product[], 'id'> {
     return query(
       await supabase
         .from('Product_Information')
@@ -331,29 +311,23 @@ export const ProductListing: ProductListing = {
     product: RequireProperty<Product, 'id'>,
   ): ProductAttributeModifier => {
     const change: Partial<Product> = {};
-    let images: ProductImage[];
+    const images: File[] = [];
 
     return {
-      title(title: string): Result<ProductAttributeModifier> {
-        return setTitle(this, product, title);
+      title(form: FormData, key = 'title'): Result<string> {
+        return setTitle(change, form, key);
       },
-      description(description: string): Result<ProductAttributeModifier> {
-        return setDescription(this, product, description);
+      description(form: FormData, key = 'description'): Result<string> {
+        return setDescription(change, form, key);
       },
-      image(files: ProductImage[]): Result<ProductAttributeModifier> {
-        const result = setImage(this, product, files);
-
-        if (result.ok) {
-          images = files;
-        }
-
-        return result;
+      images(form: FormData, key = 'images'): Result<File[]> {
+        return setImages(change, images, form, key);
       },
-      async modify(): DatabaseQuery<Product, 'id'> {
+      async submit(): DatabaseQuery<Product, '*'> {
         for (const image of images) {
           await supabase.storage
             .from('product-images')
-            .upload(image.path, image.body, { upsert: true });
+            .upload(image.name, image, { upsert: true });
         }
 
         return query(
@@ -367,20 +341,49 @@ export const ProductListing: ProductListing = {
       },
     };
   },
-  stock: async (
+  async price(
     product: RequireProperty<Product, 'id'>,
-    stock: number,
-  ): DatabaseQuery<Product, 'id'> => {
-    return query(
-      await supabase
-        .from('Product_Information')
-        .update({
-          stock_count: stock,
-        })
-        .eq('id', product.id)
-        .select()
-        .single(),
-    );
+    form: FormData,
+    key = 'price',
+  ): DatabaseQuery<Product, '*'> {
+    const price = setPrice(product, form, key);
+
+    if (price.ok) {
+      return query(
+        await supabase
+          .from('Product_Information')
+          .update({
+            price: price.data,
+          })
+          .eq('id', product.id)
+          .select()
+          .single(),
+      );
+    }
+
+    return price;
+  },
+  async stock(
+    product: RequireProperty<Product, 'id'>,
+    form: FormData,
+    key = 'stock',
+  ): DatabaseQuery<Product, '*'> {
+    const stock = setStock(product, form, key);
+
+    if (stock.ok) {
+      return query(
+        await supabase
+          .from('Product_Information')
+          .update({
+            stock_count: stock.data,
+          })
+          .eq('id', product.id)
+          .select()
+          .single(),
+      );
+    }
+
+    return stock;
   },
 };
 
@@ -389,23 +392,27 @@ export const ProductListing: ProductListing = {
  * If the given title is empty, the function returns an error.
  *
  * @internal
- * @param modifier the given product attribute modifier
  * @param product the given incomplete product modification
- * @param title the given new product title
- * @returns a wrapped result that may contain the product attribute modifier
+ * @param form the given {@link FormData}
+ * @param key the given key to {@link FormDataEntryValue}
+ * @returns the {@link Result} that may contain the product title
  */
-function setTitle<T>(
-  modifier: T,
+function setTitle(
   product: Partial<Product>,
-  title: string,
-): Result<T> {
-  if (!title) {
-    return err('Title is empty', product);
-  } else {
-    product.title = title;
-  }
+  form: FormData,
+  key: string,
+): Result<string> {
+  const { data, error } = FormUtils.getString(form, key);
 
-  return ok(modifier);
+  if (error) {
+    return err('Invalid product title', error);
+  } else if (!data) {
+    return err('Title cannot be empty');
+  } else if (!REGEX_LETTER_NUMBERS_ONLY.test(data)) {
+    return err('Title cannot have special characters', data);
+  } else {
+    return ok((product.title = data));
+  }
 }
 
 /**
@@ -413,23 +420,25 @@ function setTitle<T>(
  * If the given description is empty, the function returns an error.
  *
  * @internal
- * @param modifier the given product attribute modifier
  * @param product the given incomplete product modification
- * @param title the given new product description
- * @returns a wrapped result that may contain the product attribute modifier
+ * @param form the given {@link FormData}
+ * @param key the given key to {@link FormDataEntryValue}
+ * @returns the {@link Result} that may contain the product description
  */
-function setDescription<T>(
-  modifier: T,
+function setDescription(
   product: Partial<Product>,
-  description: string,
-): Result<T> {
-  if (!description) {
-    return err('Description is empty', product);
-  } else {
-    product.description = description;
-  }
+  form: FormData,
+  key: string,
+): Result<string> {
+  const { data, error } = FormUtils.getString(form, key);
 
-  return ok(modifier);
+  if (error) {
+    return err('Invalid product description', error);
+  } else if (!data) {
+    return err('Description cannot be empty');
+  } else {
+    return ok((product.description = data));
+  }
 }
 
 /**
@@ -437,26 +446,86 @@ function setDescription<T>(
  * If the given image is invalid, the function returns an error.
  *
  * @internal
- * @param modifier the given product attribute modifier
  * @param product the given incomplete product modification
- * @param title the given new product description
- * @returns a wrapped result that may contain the product attribute modifier
+ * @param images the given images in {@link File} format for upload
+ * @param form the given {@link FormData}
+ * @param key the given key to {@link FormDataEntryValue}
+ * @returns the {@link Result} that may contain the product images
  * @see {@link REGEX_IMAGE_PATH}
  */
-function setImage<T>(
-  modifier: T,
+function setImages(
   product: Partial<Product>,
-  images: ProductImage[],
-): Result<T> {
-  for (const image of images) {
-    const path = image.path;
+  images: File[],
+  form: FormData,
+  key: string,
+): Result<File[]> {
+  const { data, error } = FormUtils.getFiles(form, key);
 
-    if (!REGEX_IMAGE_PATH.test(path)) {
-      return err('Invalid product image path', path);
-    }
+  if (error) {
+    return err('Invalid product image(s)', error);
+  } else {
+    images.splice(0, images.length, ...data);
+
+    product.image = {
+      images: data.map((file) => file.name),
+    };
+
+    return ok(images);
   }
+}
 
-  product.image = { images: images.map((image) => image.path) };
+/**
+ * Modifies the product price amount.
+ * If the given price is empty, negative, or invalid, the function returns an error.
+ *
+ * @internal
+ * @param product the given incomplete product modification
+ * @param form the given {@link FormData}
+ * @param key the given key to {@link FormDataEntryValue}
+ * @returns the {@link Result} that may contain the product price amount
+ */
+function setPrice(
+  product: Partial<Product>,
+  form: FormData,
+  key: string,
+): Result<number> {
+  const { data, error } = FormUtils.getString(form, key);
 
-  return ok(modifier);
+  if (error) {
+    return err('Invalid product price', error);
+  } else if (!data) {
+    return err('Price cannot be empty', data);
+  } else if (+data < 0) {
+    return err('Price cannot be negative', +data);
+  } else {
+    return ok((product.price = +data));
+  }
+}
+
+/**
+ * Modifies the product stock amount.
+ * If the given price is empty, negative, or invalid, the function returns an error.
+ *
+ * @internal
+ * @param product the given incomplete product modification
+ * @param form the given {@link FormData}
+ * @param key the given key to {@link FormDataEntryValue}
+ * @returns the {@link Result} that may contain the product stock amount
+ */
+function setStock(
+  product: Partial<Product>,
+  form: FormData,
+  key: string,
+): Result<number> {
+  const { data, error } = FormUtils.getString(form, key);
+
+  if (error) {
+    return err('Invalid product stock', error);
+  } else if (!data) {
+    return err('Stock cannot be empty', data);
+  } else if (+data < 0) {
+    return err('Stock cannot be negative', +data);
+  } else {
+    return ok((product.stock_count = +data));
+  }
 }
