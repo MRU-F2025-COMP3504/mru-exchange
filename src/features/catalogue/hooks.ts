@@ -1,16 +1,16 @@
 import type {
-  DatabaseQueryResult,
-  Category,
   CategorizedProduct,
-  RequireProperty,
+  Category,
   DatabaseQuery,
+  DatabaseQueryResult,
   Product,
+  RequireProperty,
   UserProfile,
 } from '@shared/types';
-import { empty, err, HookUtils } from '@shared/utils';
-import { useState, useEffect } from 'react';
+import { err, HookUtils } from '@shared/utils';
+import { useEffect, useState } from 'react';
 import { CategoryCatalogue, ProductCatalogue } from './api';
-import type { ProductFilter } from './types';
+import type { ProductFilterBuilder } from './types';
 
 /**
  * The return type for the {@link useCategories()} hook.
@@ -26,10 +26,7 @@ interface UseCategories {
   /**
    * The current query result state.
    *
-   * To handle the query result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query result that may contain all category tags
+   * @returns the {@link DatabaseQueryResult} that may contain all category tags
    */
   result: UseCategoriesResult;
 }
@@ -81,10 +78,7 @@ interface UseCategorizedProducts {
   /**
    * The current query result state.
    *
-   * To handle the query result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query result that may contain the specified categorized product(s)
+   * @returns the {@link DatabaseQueryResult} that may contain the specified categorized product(s)
    */
   result: UseCategorizedProductsResult;
 }
@@ -144,10 +138,7 @@ interface UseCategory {
   /**
    * The current query result state.
    *
-   * To handle the query result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query result that may contain the specified category tag
+   * @returns the {@link DatabaseQueryResult} that may contain the specified category tag
    */
   result: UseCategoryResult;
 }
@@ -203,10 +194,7 @@ interface UseProductFilter {
   /**
    * The current query result state.
    *
-   * To handle the query result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query result that may contain product(s) that passed the filters
+   * @returns the {@link DatabaseQueryResult} that may contain product(s) that passed the filters
    */
   result: UseProductFilterResult;
 }
@@ -225,7 +213,7 @@ type UseProductFilterResult = DatabaseQueryResult<Product[], 'id'>;
  * @see {@link ProductCatalogue.getByFilter()} for more information
  */
 export function useProductFilter(
-  run: (filter: ProductFilter) => DatabaseQuery<Product[], 'id'>,
+  run: (filter: ProductFilterBuilder) => DatabaseQuery<Product[], 'id'>,
 ): UseProductFilter {
   const [loading, setLoading] = useState<boolean>(true);
   const [result, setResult] = useState<UseProductFilterResult>(() =>
@@ -262,10 +250,7 @@ interface UseProductSearch {
   /**
    * The current query result state.
    *
-   * To handle the query result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query result that may contain searched product(s)
+   * @returns the {@link DatabaseQueryResult} that may contain searched product(s)
    */
   result: UseProductSearchResult;
 }
@@ -319,10 +304,7 @@ interface UseProducts {
   /**
    * The current query result state.
    *
-   * To handle the query result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query result that may contain the given product(s)
+   * @returns the {@link DatabaseQueryResult} that may contain the given product(s)
    */
   result: UseProductsResult;
 }
@@ -378,10 +360,7 @@ interface UseProductsBySeller {
   /**
    * The current query result state.
    *
-   * To handle the query result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query result that may contain the given seller's product(s)
+   * @returns the {@link DatabaseQueryResult} that may contain the given seller's product(s)
    */
   result: UseProductsBySellerResult;
 }
