@@ -112,7 +112,8 @@ export default function PostProductPage() {
       !product.title?.trim() || 
       !product.description?.trim() ||
       product.price === null ||
-      product.stock_count === null 
+      product.stock_count === null ||
+      images.length === 0
     ) {
       alert("Please fill out all fields and upload at least one image before previewing")
       return;
@@ -385,7 +386,7 @@ export default function PostProductPage() {
                 marginTop: '0.3rem',
               }}
             >
-              {images?.length || 0}/6 images selected
+              {images?.length || 0}/5 images selected
             </p>
           </label>
           <button
