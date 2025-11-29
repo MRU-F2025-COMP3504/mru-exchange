@@ -1,6 +1,6 @@
 import { UserAuthentication } from '@shared/api';
 import { AuthContext } from '@shared/contexts';
-import type { Result } from '@shared/types';
+import type { NullableResult, Result } from '@shared/types';
 import { empty, ok } from '@shared/utils';
 import type { User } from '@supabase/supabase-js';
 import {
@@ -30,51 +30,50 @@ interface AuthProvider {
  * @author Ramos Jacosalem (cjaco906)
  */
 export function AuthProvider({ children }: AuthProvider): JSX.Element {
-  const [user, setUser] = useState<Result<User>>(() => empty());
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<NullableResult<User>>(() => empty());
 
   /**
    * Hooks the `signup()` functionality.
    *
    * @see {@link UserAuthentication.signup()}
    */
-  const signup = useCallback(() => {
-    return UserAuthentication.signup();
-  }, []);
+  const signup = () => UserAuthentication.signup();
 
   /**
    * Hooks the `signin()` functionality.
    *
    * @see {@link UserAuthentication.signin()}
    */
-  const signin = useCallback(() => {
-    return UserAuthentication.signin();
-  }, []);
+  const signin = () => UserAuthentication.signin();
 
   /**
    * Hooks the `signout()` functionality.
    *
    * @see {@link UserAuthentication.signout()}
    */
-  const signout = useCallback(async () => {
-    return UserAuthentication.signout();
-  }, []);
+  const signout = async () => UserAuthentication.signout();
+
+  /**
+   * Hooks the `resend()` functionality.
+   */
+  const resend = () => UserAuthentication.resend();
 
   /**
    * Hooks the `password()` functionality.
    *
    * @see {@link UserAuthentication.password()}
    */
-  const password = useCallback(() => {
-    return UserAuthentication.password();
-  }, []);
+  const password = () => UserAuthentication.password();
 
   /**
    * Subscribes the authentication provider to user authentication events.
    */
   useEffect(() => {
-    const subscription = UserAuthentication.subscribe((_event, result) => {
+    const subscription = UserAuthentication.subscribe((_, result) => {
       if (result.ok) {
         setUser(ok(result.data.user));
+        setLoading(false);
       } else {
         setUser(result);
       }
@@ -88,10 +87,12 @@ export function AuthProvider({ children }: AuthProvider): JSX.Element {
   return (
     <AuthContext.Provider
       value={{
+        loading,
         user,
         signup,
         signin,
         signout,
+        resend,
         password,
       }}
     >

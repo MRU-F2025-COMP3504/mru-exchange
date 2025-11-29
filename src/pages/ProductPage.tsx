@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
@@ -51,8 +51,12 @@ export default function ProductPage() {
   const [bookmarking, setBookmarking] = useState(false);
   const [bookmarkSuccess, setBookmarkSuccess] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [rating, setRating] = useState(0);
 
   const mainImgRef = useRef<HTMLImageElement>(null);
+  const reviewBtn = useRef<HTMLButtonElement>(null);
+  const reviewPopup = useRef<HTMLDivElement>(null);
+  const reviewContent = useRef<HTMLDivElement>(null);
 
   const currentUserId = user.ok ? user.data.id : null;
 
@@ -304,39 +308,39 @@ export default function ProductPage() {
     images: string[];
   }
 
-  function getImageUrls(imageData: ImageURLs): string[] | null {
-    try {
-      // Create an array.
-      const imagesArray = [];
+  // function getImageUrls(imageData: ImageURLs): string[] | null {
+  //   try {
+  //     // Create an array.
+  //     const imagesArray = [];
 
-      // For every image,
-      for (const path of imageData.images) {
-        // Get the imagePath.
+  //     // For every image,
+  //     for (const path of imageData.images) {
+  //       // Get the imagePath.
 
-        if (!path) return null;
+  //       if (!path) return null;
 
-        if (path.startsWith('http')) {
-          imagesArray.push(path);
-        }
+  //       if (path.startsWith('http')) {
+  //         imagesArray.push(path);
+  //       }
 
-        const filename = path.replace('database/images/', '').split('/').pop();
+  //       const filename = path.replace('database/images/', '').split('/').pop();
 
-        if (!filename) return null;
+  //       if (!filename) return null;
 
-        const { data } = supabase.storage
-          .from('product-images')
-          .getPublicUrl(filename);
+  //       const { data } = supabase.storage
+  //         .from('product-images')
+  //         .getPublicUrl(filename);
 
-        imagesArray.push(data.publicUrl);
-      }
+  //       imagesArray.push(data.publicUrl);
+  //     }
 
-      // Return
-      return imagesArray;
-    } catch (error) {
-      console.error('Error getting image URL:', error);
-      return null;
-    }
-  }
+  //     // Return
+  //     return imagesArray;
+  //   } catch (error) {
+  //     console.error('Error getting image URL:', error);
+  //     return null;
+  //   }
+  // }
 
   /**
    * Fetches all images for a product from the database. <Note> If this works, this function is actually unnecessary.
@@ -344,42 +348,42 @@ export default function ProductPage() {
    *  image: string[] The array containing image paths.
    * @returns An array of the image urls.
    */
-  // function getImageUrls(imageData: { images: string[] }): string[] | null {
+  function getImageUrls(imageData: { images: string[] }): string[] | null {
 
-  //     try {
+      try {
 
-  //         // Create an array.
-  //         const imagesArray = [];
+          // Create an array.
+          const imagesArray = [];
 
-  //         // For every image,
-  //         for (const imagePath of imageData.images) {
+          // For every image,
+          for (const imagePath of imageData.images) {
 
-  //             if (!imagePath) return null;
+              if (!imagePath) return null;
 
-  //             if (imagePath.startsWith('http')) {
-  //                 imagesArray.push(imagePath);
-  //             }
+              if (imagePath.startsWith('http')) {
+                  imagesArray.push(imagePath);
+              }
 
-  //             const filename = imagePath.replace('database/images/', '').split('/').pop();
+              const filename = imagePath.replace('database/images/', '').split('/').pop();
 
-  //             if (!filename) return null;
+              if (!filename) return null;
 
-  //             const { data } = supabase.storage
-  //                 .from('product-images')
-  //                 .getPublicUrl(filename);
+              const { data } = supabase.storage
+                  .from('product-images')
+                  .getPublicUrl(filename);
 
-  //             imagesArray.push(data.publicUrl);
+              imagesArray.push(data.publicUrl);
 
-  //         }
+          }
 
-  //         // Return
-  //         return imagesArray;
+          // Return
+          return imagesArray;
 
-  //     } catch (error) {
-  //         console.error('Error getting image URL:', error);
-  //         return null;
-  //     }
-  // };
+      } catch (error) {
+          console.error('Error getting image URL:', error);
+          return null;
+      }
+  };
 
   const calculateAverageRating = (): number => {
     if (reviews.length === 0) return 0;
@@ -451,6 +455,76 @@ export default function ProductPage() {
       className: 'hover:text-[#0F76D7]',
     },
   ];
+
+  function showReviewInput(): void {
+    reviewPopup.current?.classList.remove("hidden");
+    reviewPopup.current?.classList.add("flex");
+  }
+
+  function hideReviewInput(): void {
+    reviewPopup.current?.classList.add("hidden");
+    reviewPopup.current?.classList.remove("flex");
+  }
+
+  // Also hide review input if Esc is pressed.
+  document.addEventListener("keyup", e => {
+    if (e.key === "Escape") {
+      if (reviewPopup.current) {
+        hideReviewInput();
+      }
+    }
+  })
+
+  /**
+   * Displays the rating on the review input form.
+   * @param e The event form
+   */
+  function displayRating(e: React.MouseEvent<HTMLSpanElement>): void {
+
+    // Fetch data
+    const rating: number = Number(e.target?.dataset.value);
+    // console.log(e.target);
+    // console.log(e.target.dataset.value);
+    const stars: string = displayStars(rating);
+    const container: HTMLSpanElement = e.target.parentNode;
+    // console.log(container);
+    
+    // Update the value.
+    setRating(rating);
+    // console.log(rating);
+
+    // For every star,
+    for(let i = 0; i < container.children.length; i++){
+
+      // Update the stars.
+      container.children[i].textContent = stars[i];
+
+    }
+
+  }
+
+  /**
+   * Submits the review to the database.
+   * @param event The submit event.
+   */
+  function submitReview(event: FormEvent<HTMLFormElement>): void {
+
+    // Stop the submission.
+    event.preventDefault();
+
+    // Get values.
+    const form: FormData = new FormData(event.currentTarget);
+    const title: FormDataEntryValue = form.get("title");
+    const desc: FormDataEntryValue = form.get("desc");
+    const rate: number = rating;
+    
+    // console.log(title);
+    // console.log(desc);
+    // console.log(rate);
+
+
+
+  }
 
   return (
     <div className='bg-[#F9FAFB] min-h-screen'>
@@ -600,10 +674,10 @@ export default function ProductPage() {
                     onClick={handleToggleBookmark}
                     disabled={bookmarking}
                     className={`px-6 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${bookmarking
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : isBookmarked
-                          ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                          : 'bg-[#007FB5] hover:bg-[#006B9E] text-white'
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : isBookmarked
+                        ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                        : 'bg-[#007FB5] hover:bg-[#006B9E] text-white'
                       }`}
                   >
                     <span className='text-xl'>{isBookmarked ? '★' : '☆'}</span>
@@ -656,11 +730,69 @@ export default function ProductPage() {
 
         {/* Reviews */}
         <section className='p-10'>
-          <h2 className='text-2xl font-bold mb-4'>Reviews</h2>
-          <p className='text-2xl mb-6'>
+          <h2 className='text-2xl font-bold'>Reviews</h2>
+          <p className='text-2xl my-2'>
             <span className='text-3xl'>{displayStars(avgRating)}</span> (
             {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})
           </p>
+
+          <button
+            ref={reviewBtn}
+            className="hover:cursor-pointer bg-yellow-300 border-yellow-500 border p-3 rounded mb-4 text-[#0B2545] font-semibold transition-colors hover:bg-yellow-400"
+            onClick={showReviewInput}
+          >Write a review</button>
+
+          <div
+            ref={reviewPopup}
+            className="hidden items-center justify-center fixed top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.6)]"
+            onClick={hideReviewInput}
+          >
+            <div
+              ref={reviewContent}
+              className="bg-white h-[75%] w-[75%] rounded-2xl p-8"
+              onClick={e => { e.stopPropagation() }}
+            >
+              <div className="flex justify-between">
+                <h3 className="text-3xl font-bold mb-2">Write a Review</h3>
+                <button
+                  id="reviewExitBtn"
+                  className="bg-gray-200 w-10 h-10 rounded-full flex items-center cursor-pointer"
+                  onClick={hideReviewInput}
+                >
+                  <p className="text-center w-full font-bold text-gray-700">✕</p>
+                </button>
+              </div>
+              <form
+              onSubmit={submitReview}
+              >
+                <label>
+                  <p className="text-xl my-2">Title:</p>
+                  <input name="title" type="text" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-[50%] min-w-60"></input>
+                </label>
+                <label>
+                  <p className="text-xl my-2">Rate: &nbsp;
+                  <span id="reviewRating" className="text-2xl my-2 text-yellow-400">
+                    <span data-value="1" onClick={displayRating}>☆</span>
+                    <span data-value="2" onClick={displayRating}>☆</span>
+                    <span data-value="3" onClick={displayRating}>☆</span>
+                    <span data-value="4" onClick={displayRating}>☆</span>
+                    <span data-value="5" onClick={displayRating}>☆</span>
+                  </span>
+                  </p>
+                </label>
+                <label>
+                  <p className="text-xl my-2">Description:</p>
+                  <textarea name="desc" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-full h-40 resize-none"></textarea>
+                </label>
+                <div className="py-5">
+                  <button 
+                  type="submit" 
+                  className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Submit</button>
+                  <button type="reset" className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Clear</button>
+                </div>
+              </form>
+            </div>
+          </div>
 
           {reviews.length === 0 ? (
             <p className='text-gray-600'>

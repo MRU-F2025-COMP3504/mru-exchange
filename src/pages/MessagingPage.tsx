@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
-// import { useState, type FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@shared/contexts';
-import { UserChatting, UserMessaging } from '@features/messaging/api';
-import { useChat, useChats } from '@features/messaging/hooks';
+import { supabase } from '@shared/api';
 import Header from './Header';
 import Footer from './Footer';
-import { supabase } from '@shared/api';
 
 interface Chat {
   id: number;
@@ -14,6 +11,18 @@ interface Chat {
   user_id_1: string;
   user_id_2: string;
   visible: boolean | null;
+  user1: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    supabase_id: string;
+  } | null
+  user2: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    supabase_id: string;
+  } | null
 }
 
 interface UserMessage {
@@ -28,83 +37,139 @@ interface UserMessage {
 export default function MessagingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const currentUserId = user.ok ? user.data.id : null!;
-  // const [chats, setChats] = useState<Chat[]>([]);
-  const [messages, setMessages] = useState<UserMessage[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { loading: chatsLoading, chats } = useChats({
-    supabase_id: currentUserId,
+  const currentUserId = user.ok ? user.data.id : null;
+  const [chats, setChats] = useState<Chat[]>(() => {
+    const savedChats = localStorage.getItem('chats');
+    return savedChats ? JSON.parse(savedChats) : [];
   });
-  const [selectedChat, setSelectedChat] = useState<number | null>(null);
+  const [messages, setMessages] = useState<UserMessage[]>(() => {
+    const savedMessages = localStorage.getItem('messages');
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
+  // const [messages, setMessages] = useState<UserMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [chatLoading, setChatLoading] = useState(true);
 
-  const chatHook = selectedChat
-    ? useChat({ supabase_id: currentUserId }, { id: selectedChat })
-    : null;
-  // if(!user.ok) return;
-  // void getByUser({ supabase_id: user.data.id })
-  // .then((chats) => {
-  // if(chats.ok) {
-  // console.log("Chats: ", chats.data);
-  // setChats(chats.data);
-  // }
-  // else console.error("Error: ", chats.error);
-  // });
+  useEffect(() => {
+    if (currentUserId && chats.length === 0) {
+      fetchChats();
+    }
+    if (currentUserId && chats.length > 0 && messages.length === 0) {
+      console.log("Messages going")
+      fetchFirstMessages();
+    }
+  }, [currentUserId, chats]);
 
-  // useEffect(() => {
-  //     if (!user?.ok) return;
-  //     const supabaseID = user.data.id;
 
-  //     (async () => {
-  //         const chatResults = await getByUser({ supabase_id: supabaseID })
-  //         if (chatResults.ok) {
-  //             console.log("Chats: ", chatResults.data);
-  //             setChats(chatResults.data);
-  //         }
-  //         else console.error("Error fetching chats: ", chatResults.error);
-  //     })();
-  // }, [user]);
+  useEffect(() => {
+    localStorage.setItem('chats', JSON.stringify(chats));
+    localStorage.setItem('messages', JSON.stringify(messages));
+    if (chats.length > 0) setLoading(false);
+  }, [chats]);
 
   // useEffect(() => {
-  //     if (chats.length === 0) return;
+  //   if (selectedChatId) {
+  //     fetchMessages(selectedChatId);
+  //   }
+  // },[selectedChatId]);
 
-  //     (async () => {
-  //         const allMessages: UserMessage[] = [];
-  //         for (const chat of chats) {
-  //             const messageResults = await getByChat({ id: chat.id })
-  //             if (messageResults.ok) {
-  //                 console.log("Messages: ", messageResults.data);
-  //                 setMessages(messageResults.data);
-  //             }
-  //             else console.error("Error fetching messages : ", messageResults.error);
-  //         }
-  //     })();
-  // }, [chats]);
+  const fetchChats = async () => {
+    if (!currentUserId) return;
 
-  // chats.forEach(chat => {
-  // void getByChat({ id: chat.id })
-  // .then((messages) => {
-  //     if(messages.ok) {
-  //         console.log("Chats: ", messages.data);
-  //         setMessages(messages.data);
-  //     }
-  //     else console.error("Error: ", messages.error);
-  //   });
-  // });
-
-  const getUserName = async (userID: string) => {
     try {
-      // Get the user names of users in chats that are visible
+      console.log("Attempting to fetch chats")
       const { data, error } = await supabase
-        .from('User_Information')
-        .select('id, supabase_id, first_name, last_name')
-        .eq('currentUserId', userID)
-        .eq('visible', true)
+        .from('Chats')
+        .select(`
+          id,
+          user_id_1,
+          user_id_2,
+          created_at,
+          visible,
+          user1:User_Information!Chats_user_id_1_fkey (
+          id,
+          first_name,
+          last_name,
+          supabase_id
+        ),
+        user2:User_Information!Chats_user_id_2_fkey (
+          id,
+          first_name,
+          last_name,
+          supabase_id
+        )        
+        `)
+        // recentMessage:Messages!Messages_chat_id_fkey (
+        // )
+        .or(`user_id_1.eq.${currentUserId},user_id_2.eq.${currentUserId}`)
         .order('created_at', { ascending: false });
+
       if (error) throw error;
+      console.log("No error thrown");
+      // console.log("Data", data)
+      setChats(data as Chat[]);
+    } catch (err: any) {
+      console.error('Error fetching user profile:', err);
+    }
+  }
+
+  const fetchFirstMessages = async () => {
+    if (!currentUserId) return;
+
+    const chat_ids = chats.map(chat => chat.id);
+    console.log("ChatIds ", chat_ids)
+    try {
+      const { data, error } = await supabase
+        .from('Messages')
+        .select(`
+          id,
+          chat_id,
+          created_at,
+          logged_message,
+          sender_id,
+          visible
+        `)
+        .in('chat_id', chat_ids)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setMessages(data as UserMessage[]);
     } catch (err: any) {
       console.error('Error fetching user profile:', err);
     }
   };
+
+  const fetchMessages = async (chat_id: Chat['id']) => {
+    if (!currentUserId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('Messages')
+        .select(`
+          id,
+          chat_id,
+          created_at,
+          logged_message,
+          sender_id,
+          visible,
+          sender:User_Information!Messages_sender_id_fkey (
+          id,
+          first_name,
+          last_name,
+          supabase_id
+        )
+        `)
+        .eq('chat_id', chat_id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setMessages(data as UserMessage[]);
+    } catch (err: any) {
+      console.error('Error fetching user profile:', err);
+    }
+  }
+
+
   const ChatCard = ({
     chat,
     showRemove = false,
@@ -112,43 +177,38 @@ export default function MessagingPage() {
   }: {
     chat: Chat;
     showRemove?: boolean;
-    showSold?: boolean;
+    showVisible?: boolean;
   }) => {
-    const userName = getUserName(chat.user_id_2);
+    const [currentUser, otherUser] = chat.user_id_1 === currentUserId ? [chat.user1, chat.user2] : [chat.user2, chat.user1];
+    const firstMessage = messages.find(msg => (msg.chat_id === chat.id))
     const isVisible = chat.visible;
+
+    const messageDate = new Date(firstMessage?.created_at)
+    let date;
+
+    const yesterdayStart = new Date();
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+    yesterdayStart.setHours(0, 0, 0, 0);
+
+    const yesterdayEnd = new Date();
+    yesterdayEnd.setDate(yesterdayEnd.getDate() - 1);
+    yesterdayEnd.setHours(23, 59, 59, 999);
+
+    if (messageDate > yesterdayEnd) date = `${messageDate.getHours()}: ${messageDate.getMinutes()}`;
+    else if (messageDate >= yesterdayEnd && messageDate < yesterdayStart) date = "Yesterday";
+    else date = messageDate.toLocaleDateString();
 
     return (
       <div
         className={`bg-white rounded-lg shadow hover:shadow-lg transition-shadow ${isVisible ? 'opacity-60' : 'cursor-pointer'}`}
-        onClick={() => !isVisible && navigate(`/chat/${chat.id}`)}
+        onClick={() => isVisible && navigate('/home')}
       >
         <div className='relative'></div>
-        <div className='p-4'></div>
+        <div className='p-4'>{otherUser?.first_name}</div>
+        <div className='p-4 text-sm'>{date} {firstMessage?.logged_message}</div>
       </div>
     );
   };
-
-  if (!currentUserId) {
-    return (
-      <div className='bg-[#F9FAFB] min-h-screen'>
-        <Header />
-        <main className='flex items-center justify-center min-h-[60vh]'>
-          <div className='text-center'>
-            <p className='text-xl text-gray-600 mb-4'>
-              Please log in to view your chats
-            </p>
-            <button
-              onClick={() => { navigate('/signin'); }}
-              className='px-6 py-2 bg-[#007FB5] text-white rounded-lg hover:bg-[#006B9E]'
-            >
-              Sign In
-            </button>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   if (loading) {
     return (
@@ -162,144 +222,64 @@ export default function MessagingPage() {
     );
   }
 
-  return (
-    <div className='bg-[#F9FAFB] min-h-screen'>
-      <Header />
+  if (!loading) {
+    // console.log(currentUserId)
+    // chats.length === 0 ? console.log("no chats found") : console.log("chats", chats)
+    chats.forEach(c => {
+      // console.log(c.user1?.first_name);
+      const [currentUser, otherUser] = c.user_id_1 === currentUserId ? [c.user1, c.user2] : [c.user2, c.user1];
+      console.log("currentUser: ", currentUser)
+      console.log("otherUser: ", otherUser)
+    });
 
-      {/* Left aside - Chats list */}
-      <aside
-        style={{
-          width: '300px',
-          borderRight: '1px solid #ddd',
-          padding: '1rem',
-          overflowY: 'auto',
-        }}
-      >
-        <h2>Chats</h2>
-        {chatsLoading ? (
-          <p>Loading chats...</p>
-        ) : (
-          chats.map((chat) => (
-            <div
-              key={chat.id}
-              onClick={() => { setSelectedChat(chat.id); }}
-              style={{
-                padding: '0.75rem',
-                marginBottom: '0.5rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                backgroundColor:
-                  chat.id === selectedChat ? '#e5e7eb' : 'transparent',
-              }}
-            >
-              Chat #{chat.id}
-            </div>
-          ))
-        )}
-        {chats.length === 0 ? (
-          <div className='bg-white rounded-lg shadow p-8 text-center'>
-            <p className='text-gray-600 mb-4'>You do not have any chats yet</p>
-          </div>
-        ) : (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-            {chats.map((chat) => (
-              <ChatCard key={chat.id} chat={chat} showRemove={true} />
-            ))}
-          </div>
-        )}
-      </aside>
 
-      <main className='max-w-7xl mx-auto px-4 py-8'>
-        <div style={{ minHeight: '100vh', backgroundColor: '#F9FAFB' }}>
-          <h2>Choose a chat to see it's messages</h2>
-
-          <div>
-            {chats.map((chat) => (
-              <p key={chat.id}>{chat.user_id_2}</p>
-            ))}
-            {messages.map((messages) => (
-              <p key={messages.id}>{messages.logged_message}</p>
-            ))}
-          </div>
-        </div>
-        {!selectedChat ? (
-          <p style={{ color: '#555' }}>Select a chat to view messages</p>
-        ) : chatHook?.loading ? (
-          <p>Loading messages...</p>
-        ) : (
-          <>
-            <h2>Messages for Chat #{selectedChat}</h2>
-            <div
-              style={{
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                padding: '1rem',
-                height: '70vh',
-                overflowY: 'auto',
-                backgroundColor: '#fff',
-              }}
-            >
-              {chatHook?.messages?.length ? (
-                chatHook.messages.map((msg) => (
-                  <div key={msg.id} style={{ marginBottom: '1rem' }}>
-                    <strong>
-                      {msg.sender_id === currentUserId ? 'You' : msg.sender_id}
-                    </strong>
-                    : {msg.logged_message}
-                  </div>
-                ))
-              ) : (
-                <p>No messages yet</p>
-              )}
-            </div>
-
-            {/* Send Message Input */}
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const form = e.target as HTMLFormElement;
-                const input = form.elements.namedItem(
-                  'message',
-                ) as HTMLInputElement;
-                const message = input.value.trim();
-                if (message && chatHook) {
-                  const result = await chatHook.send(message);
-                  if (!result.ok) console.error(result.error);
-                  input.value = '';
-                }
-              }}
-              style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}
-            >
-              <input
-                type='text'
-                name='message'
-                placeholder='Type a message...'
-                style={{
-                  flex: 1,
-                  padding: '0.75rem',
-                  borderRadius: '8px',
-                  border: '1px solid #ccc',
-                }}
-              />
+    return (
+      <div className='bg-[#F9FAFB] min-h-screen'>
+        <Header />
+        { /* Left aside for chat messages */}
+        <aside className="flex flex-col w-1/3">
+          <p className='text-xl text-gray-600 text-center'>Chats</p>
+          {chats.length === 0 ? (
+            <div className='bg-white rounded-lg shadow p-8 text-center'>
+              <p className='text-gray-600 mb-4'>
+                You don't have any chats yet
+              </p>
               <button
-                type='submit'
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: '#2563eb',
-                  color: 'white',
-                  cursor: 'pointer',
-                }}
+                onClick={() => navigate('/product-search')}
+                className='px-6 py-2 bg-[#007FB5] text-white rounded-lg hover:bg-[#006B9E]'
               >
-                Send
+                Browse Products
               </button>
-            </form>
-          </>
-        )}
-      </main>
+            </div>
+          ) : (
+            <div className='flex flex-col gap-6 min-w-[20vw]'>
+              {chats.map((chat) => (
+                <ChatCard
+                  key={chat.id}
+                  chat={chat}
+                  showRemove={true}
+                />
+              ))}
+            </div>
+            //   {!messageSelected ? (
 
-      <Footer />
-    </div>
-  );
-}
+            // ): (
+
+            //   )}
+          )}
+        </aside>
+
+        <main className='flex flex-col items-center min-h-[60vh]'>
+          { /* Main area for the selected chat */}
+
+
+
+
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+};
+

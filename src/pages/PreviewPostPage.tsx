@@ -1,10 +1,8 @@
-import Header from './Header';
-import Footer from './Footer';
 import { useLocation } from 'react-router-dom';
 import { ProductListing } from '../features/listing/api';
 import { ok, err } from '../shared/utils';
 import { supabase } from '@shared/api';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@shared/contexts';
 import type { ProductImage } from '@shared/types';
 import { useNavigate } from 'react-router-dom';
@@ -32,6 +30,9 @@ export default function PreviewPostPage() {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const navigate = useNavigate();
+
+  const imageUrls = images?.map((file: Blob | MediaSource) => URL.createObjectURL(file)) || [];
+  const mainImgRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     fetchUserName();
@@ -176,32 +177,68 @@ export default function PreviewPostPage() {
             <section id='details' className='p-8 bg-[#A7E2FC] text-[#003A5F]'>
               {/* Product Information */}
               <section className='p-5 flex flex-col sm:flex-row gap-5'>
-                <div className='w-full lg:w-1/3 flex justify-center lg:justify-start'>
-                  <div className='inline-block rounded-2x1 shadow-x1 overflow-hidden'>
-                    {images && images.length > 0 ? (
+
+                {/* Image Box & Selector */}
+                <div className='lg:w-1/3'>
+                  <div className='bg-white rounded-2xl shadow-xl overflow-hidden'>
+                    {imageUrls ? (
                       <img
-                        src={URL.createObjectURL(images[0])}
-                        alt={product.title}
-                        className='w-[300px] h-[200px] object-cover rounded-2xl shadow-xl'
+                        ref={mainImgRef}
+                        src={imageUrls[0]}
+                        alt={product.title || 'Product'}
+                        className='w-full h-[300px] object-cover'
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLImageElement;
+                          target.style.display = 'none';
+                          if (target.parentElement) {
+                            target.parentElement.innerHTML =
+                              '<div class="w-full h-[300px] flex items-center justify-center bg-gray-200"><span class="text-gray-500">Image unavailable</span></div>';
+                          }
+                        }}
                       />
                     ) : (
-                      <div
-                        style={{
-                          width: '250px',
-                          height: '250px',
-                          backgroundColor: 'white',
-                          borderRadius: '0.5rem',
-                          fontSize: '1rem',
-                          fontWeight: '500',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        No Image Selected
+                      <div className='w-full h-[300px] flex items-center justify-center bg-gray-200'>
+                        <span className='text-gray-500'>No Image Available</span>
                       </div>
-                    )}
-                  </div>
+                  )}
                 </div>
+              <div className='flex'>
+                {imageUrls
+                  ? imageUrls.map((value: string, i: number) => (
+                    <>
+                      <div className='my-2 mr-1'>
+                        <img
+                          id={'img' + i}
+                          src={imageUrls[i]}
+                          alt={product.title || 'Product'}
+                          className='w-[50px] h-[50px] object-cover rounded-lg cursor-pointer'
+                          onClick={(e) => {
+                            // Get elements.
+                            const thisImg: HTMLImageElement =
+                              e.target as HTMLImageElement;
 
+                            // If it exists,
+                            if (mainImgRef.current) {
+                              // Update its link.
+                              mainImgRef.current.src = thisImg.src;
+                            }
+                          }}
+                          onError={(e) => {
+                            const target =
+                              e.currentTarget as HTMLImageElement;
+                            target.style.display = 'none';
+                            if (target.parentElement) {
+                              target.parentElement.innerHTML =
+                                '<div class="w-full h-[300px] flex items-center justify-center bg-gray-200"><span class="text-gray-500">Image unavailable</span></div>';
+                            }
+                          }}
+                        />
+                      </div>
+                    </>
+                  ))
+                  : null}
+                </div>
+              </div>
                 <div className='lg:w-2/3'>
                   <div className='flex flex-col gap-2'>
                     <h1 className='text-3x1 font-bold'>{product.title}</h1>
@@ -247,7 +284,27 @@ export default function PreviewPostPage() {
               </p>
             </section>
           </div>
-          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+          <div style={{ 
+            display: "flex",
+            marginTop: '2rem',
+            justifyContent: "center",
+            gap: "0.5rem"
+          }}>
+            <button 
+              onClick={() => navigate('/post-product', { state: { product, images} }) }
+              style={{
+                padding: '0.75rem 2rem',
+                background: "none",
+                border: "none",
+                borderRadius: '0.5rem',
+                backgroundColor: "#007fb5",
+                color: "white",
+                fontSize: "1rem",
+                cursor: "pointer",
+              }}
+            >
+              ← Continue Editing
+            </button>
             <button
               onClick={handleProductPosting}
               style={{
@@ -263,18 +320,7 @@ export default function PreviewPostPage() {
             >
               Post Product
             </button>
-            <button 
-              onClick={() => navigate(-1)}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#007fb5",
-                fontSize: "1rem",
-                cursor: "pointer",
-              }}
-            >
-              ← Back
-            </button>
+            
           </div>
         </div>
       </main>

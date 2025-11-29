@@ -1,251 +1,125 @@
+import { useAuth } from '@shared/contexts';
+import type { NullableResult } from '@shared/types';
+import { empty, err } from '@shared/utils';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@shared/contexts';
+
+interface SigninForm {
+  email: NullableResult<string>;
+  password: NullableResult<string>;
+}
 
 export default function SignInPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submit, setSubmit] = useState<NullableResult<null>>(() => empty());
+  const [form, setForm] = useState<SigninForm>(() => ({
+    email: empty(),
+    password: empty(),
+  }));
   const navigate = useNavigate();
   const { signin } = useAuth();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!formData.email.endsWith('@mtroyal.ca')) {
-      newErrors.email = 'Please use a valid @mtroyal.ca address';
-    }
+    const form = new FormData(event.currentTarget);
+    const signer = signin();
 
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    }
+    const result = {
+      email: signer.email(form),
+      password: signer.password(form),
+    };
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setForm(result);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+    if (!signer.isValid()) {
+      setSubmit(err('Invalid email or password', result));
+    } else {
+      setIsSubmitting(true);
 
-    setIsSubmitting(true);
-    try {
-      const signer = signin();
+      const submit = await signer.submit();
 
-      signer.email(formData.email);
-      signer.password(formData.password);
-
-      const result = await signer.submit();
-
-      if (!result.ok) {
-        setErrors({ general: 'Invalid email or password' });
-        return;
-      }
-
-      navigate('/home');
-    } catch (error: any) {
-      console.error('Error signing in:', error);
-      setErrors({ general: 'An error occurred. Please try again.' });
-    } finally {
+      setSubmit(submit);
       setIsSubmitting(false);
+
+      if (submit.ok) {
+        navigate('/home');
+      }
     }
-  };
-
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
-
-  const inputStyle = (hasError: boolean) => ({
-    width: '100%',
-    padding: '0.5rem 0.75rem',
-    fontSize: '0.875rem',
-    border: `1px solid ${hasError ? '#EF4444' : '#E5E7EB'}`,
-    borderRadius: '0.375rem',
-    backgroundColor: hasError ? '#FEF2F2' : '#F9FAFB',
-    outline: 'none',
-  });
-
-  const labelStyle = {
-    display: 'block',
-    fontSize: '0.875rem',
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: '0.25rem',
-  };
-
-  const errorStyle = {
-    marginTop: '0.25rem',
-    fontSize: '0.75rem',
-    color: '#DC2626',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.25rem',
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(to bottom right, #EFF6FF, #E0E7FF)',
-        padding: '3rem 1rem',
-      }}
-    >
-      <div style={{ width: '100%', maxWidth: '24rem' }}>
-        <div
-          style={{
-            backgroundColor: 'white',
-            borderRadius: '0.75rem',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-            padding: '2rem',
-          }}
-        >
-          <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+    <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-200 px-4 py-12'>
+      <div className='w-full max-w-sm'>
+        <div className='bg-white rounded-xl shadow-lg p-8'>
+          <div className='mb-6 text-center'>
             <img
               src='/MruExchangeLogo.png'
               alt='MRU Exchange Logo'
-              style={{
-                width: '100px',
-                height: 'auto',
-                marginBottom: '1rem',
-                margin: '0 auto 1rem',
-              }}
+              className='w-24 h-auto mx-auto mb-4'
             />
-            <h2
-              style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#111827',
-                marginBottom: '0.25rem',
-              }}
-            >
-              Sign In
-            </h2>
-            <p style={{ color: '#6B7280', fontSize: '0.875rem' }}>
+            <h2 className='text-2xl font-bold text-gray-900 mb-1'>Sign In</h2>
+            <p className='text-gray-500 text-sm'>
               Sign in to your MRU Exchange account
             </p>
           </div>
 
           <form
-            onSubmit={handleSubmit}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.875rem',
+            onSubmit={(event) => {
+              void handleSubmit(event);
             }}
+            className='flex flex-col gap-4'
           >
             <div>
-              <label htmlFor='email' style={labelStyle}>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>
                 Email
+                <input
+                  type='text'
+                  name='email'
+                  placeholder='yourname@mtroyal.ca'
+                  className={`w-full px-3 py-2 text-sm border rounded-md outline-none ${form.email.error
+                      ? 'border-red-500 bg-red-50'
+                      : 'border-gray-300 bg-gray-50'
+                    }`}
+                />
               </label>
-              <input
-                id='email'
-                type='email'
-                value={formData.email}
-                onChange={(e) => {
-                  handleChange('email', e.target.value);
-                }}
-                placeholder='yourname@mtroyal.ca'
-                style={inputStyle(!!errors.email)}
-              />
-              {errors.email && (
-                <p style={errorStyle}>
-                  <span>✕</span> {errors.email}
+              {form.email.error && (
+                <p className='mt-1 text-xs text-red-600 flex items-center gap-1'>
+                  <span>✕</span> {form.email.error.message}
                 </p>
               )}
             </div>
 
             <div>
-              <label htmlFor='password' style={labelStyle}>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>
                 Password
+                <input
+                  type='password'
+                  name='password'
+                  placeholder='Enter your password'
+                  className={`w-full px-3 py-2 text-sm border rounded-md outline-none ${form.password.error
+                      ? 'border-red-500 bg-red-50'
+                      : 'border-gray-300 bg-gray-50'
+                    }`}
+                />
               </label>
-              <input
-                id='password'
-                type='password'
-                value={formData.password}
-                onChange={(e) => {
-                  handleChange('password', e.target.value);
-                }}
-                placeholder='Enter your password'
-                style={inputStyle(!!errors.password)}
-              />
-              {errors.password && (
-                <p style={errorStyle}>
-                  <span>✕</span> {errors.password}
+              {form.password.error && (
+                <p className='mt-1 text-xs text-red-600 flex items-center gap-1'>
+                  <span>✕</span> {form.password.error.message}
                 </p>
               )}
-            </div>
-
-            {errors.general && (
-              <div
-                style={{
-                  backgroundColor: '#FEF2F2',
-                  border: '1px solid #FEE2E2',
-                  borderRadius: '0.375rem',
-                  padding: '0.625rem',
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: '0.75rem',
-                    color: '#DC2626',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
-                  }}
-                >
-                  <span>✕</span> {errors.general}
-                </p>
-              </div>
-            )}
-
-            <div style={{ marginTop: '0.5rem' }}>
-              <button
-                type='submit'
-                disabled={isSubmitting}
-                style={{
-                  width: '100%',
-                  padding: '0.625rem 1rem',
-                  backgroundColor: isSubmitting ? '#93C5FD' : '#2563EB',
-                  color: 'white',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  borderRadius: '0.375rem',
-                  border: 'none',
-                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {isSubmitting ? 'Signing In...' : 'Sign In'}
-              </button>
-            </div>
-
-            <p
+              <p
               style={{
-                textAlign: 'center',
                 fontSize: '0.75rem',
                 color: '#6B7280',
-                marginTop: '0.25rem',
+                marginTop: '0.3rem',
               }}
             >
-              Don't have an account?{' '}
+              {' '}
               <button
                 type='button'
                 onClick={() => {
-                  navigate('/create-account');
+                  navigate('/forgot-password');
                 }}
                 style={{
                   color: '#2563EB',
@@ -255,6 +129,41 @@ export default function SignInPage() {
                   cursor: 'pointer',
                   textDecoration: 'underline',
                 }}
+              >
+                Forgot Password?
+              </button>
+            </p>
+            </div>           
+
+            {submit.error && (
+              <div className='bg-red-50 border border-red-200 rounded-md p-2'>
+                <p className='text-xs text-red-600 flex items-center gap-1'>
+                  <span>✕</span> {submit.error.message}
+                </p>
+              </div>
+            )}
+
+            <div className='mt-2'>
+              <button
+                type='submit'
+                disabled={isSubmitting}
+                className={`w-full px-4 py-2 text-white text-sm font-medium rounded-md border-none ${isSubmitting
+                    ? 'bg-blue-400 cursor-not-allowed'
+                    : 'bg-blue-600 cursor-pointer hover:bg-blue-700'
+                  }`}
+              >
+                {isSubmitting ? 'Signing In...' : 'Sign In'}
+              </button>
+            </div>
+
+            <p className='text-center text-xs text-gray-500 mt-1'>
+              Don't have an account?{' '}
+              <button
+                type='button'
+                onClick={() => {
+                  navigate('/create-account');
+                }}
+                className='text-blue-600 font-medium bg-transparent border-none cursor-pointer underline hover:text-blue-700'
               >
                 Create account.
               </button>

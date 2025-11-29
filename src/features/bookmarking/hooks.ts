@@ -7,7 +7,7 @@ import type {
   DatabaseQueryResult,
   UserProfile,
 } from '@shared/types';
-import { empty, HookUtils } from '@shared/utils';
+import { empty, err, HookUtils } from '@shared/utils';
 import { useState, useCallback, useEffect } from 'react';
 import { ProductBookmarking } from '@features/bookmarking';
 
@@ -111,7 +111,9 @@ export function useBookmarker(
   buyer: RequireProperty<UserProfile, 'supabase_id'>,
 ): UseBookmarker {
   const [loading, setLoading] = useState<boolean>(true);
-  const [bookmarker, setBookmarker] = useState<BookmarkerResult>(() => empty());
+  const [bookmarker, setBookmarker] = useState<BookmarkerResult>(() =>
+    err('No bookmarker found'),
+  );
   const [products, setProducts] = useState<BookmarkedProduct[]>([]);
 
   /**

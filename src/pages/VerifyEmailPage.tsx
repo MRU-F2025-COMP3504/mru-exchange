@@ -1,79 +1,50 @@
-import { UserAuthentication } from '@shared/api';
+import { useAuth } from '@shared/contexts';
+import type { Result } from '@shared/types';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+interface SignupState {
+  email: Result<string>;
+}
+
 export default function VerifyEmailPage() {
+  const [isResending, setIsResending] = useState(false);
+  const [message, setMessage] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
-  const email = location.state?.email || '';
-  const [isResending, setIsResending] = useState(false);
-  const [resendMessage, setResendMessage] = useState('');
+  const { resend } = useAuth();
 
-  const handleResendLink = async () => {
-    if (!email) {
-      setResendMessage('Email address not found. Please try signing up again.');
+  const email = (location.state as SignupState).email;
+
+  const handleResend = async () => {
+    if (!email.ok) {
+      setMessage('Email address not found. Please try signing up again.');
+
       return;
     }
 
     setIsResending(true);
-    setResendMessage('');
 
-    const signup = UserAuthentication.signUp();
-
-    signup.email(email);
-    const result = await signup.reverify();
+    const result = await resend().email('signup', email);
 
     if (!result.ok) {
-      setResendMessage('Failed to resend link. Please try again.');
+      setMessage('Failed to resend link. Please try again.');
     } else {
-      setResendMessage('Verification link sent successfully!');
+      setMessage('Verification link sent successfully!');
     }
 
     setIsResending(false);
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(to bottom right, #EFF6FF, #E0E7FF)',
-        padding: '3rem 1rem',
-      }}
-    >
-      <div style={{ width: '100%', maxWidth: '28rem' }}>
-        <div
-          style={{
-            backgroundColor: 'white',
-            borderRadius: '0.75rem',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-            padding: '2.5rem',
-            textAlign: 'center',
-          }}
-        >
+    <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4'>
+      <div className='w-full max-w-md'>
+        <div className='bg-white rounded-xl shadow-lg p-10 text-center'>
           {/* Success Icon */}
-          <div
-            style={{
-              marginBottom: '1.5rem',
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            <div
-              style={{
-                width: '5rem',
-                height: '5rem',
-                backgroundColor: '#10B981',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
+          <div className='mb-6 flex justify-center'>
+            <div className='w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center'>
               <svg
-                style={{ width: '3rem', height: '3rem', color: 'white' }}
+                className='w-12 h-12 text-white'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
@@ -88,91 +59,56 @@ export default function VerifyEmailPage() {
             </div>
           </div>
 
-          <h2
-            style={{
-              fontSize: '1.5rem',
-              fontWeight: 'bold',
-              color: '#111827',
-              marginBottom: '0.75rem',
-            }}
-          >
+          <h2 className='text-2xl font-bold text-gray-900 mb-3'>
             Check your email
           </h2>
 
-          <p
-            style={{
-              color: '#6B7280',
-              marginBottom: '1.5rem',
-              lineHeight: '1.5',
-            }}
-          >
+          <p className='text-gray-500 mb-6 leading-6'>
             We've sent a link to verify your @mtroyal.ca email address.
           </p>
 
-          {email && (
-            <p
-              style={{
-                fontSize: '0.875rem',
-                color: '#4B5563',
-                marginBottom: '1.5rem',
-              }}
-            >
-              Sent to: <strong>{email}</strong>
+          {email.ok && (
+            <p className='text-sm text-gray-600 mb-6'>
+              Sent to: <strong>{email.data}</strong>
             </p>
           )}
 
           {/* Resend Link */}
-          <div
-            style={{
-              paddingTop: '1rem',
-              borderTop: '1px solid #E5E7EB',
-            }}
-          >
-            <p style={{ fontSize: '0.875rem', color: '#6B7280' }}>
+          <div className='pt-4 border-t border-gray-200'>
+            <p className='text-sm text-gray-500'>
               Didn't receive it?{' '}
               <button
-                onClick={handleResendLink}
-                disabled={isResending}
-                style={{
-                  color: isResending ? '#93C5FD' : '#2563EB',
-                  fontWeight: '500',
-                  background: 'none',
-                  border: 'none',
-                  cursor: isResending ? 'not-allowed' : 'pointer',
-                  textDecoration: 'underline',
+                onClick={() => {
+                  void handleResend();
                 }}
+                disabled={isResending}
+                className={`font-medium bg-transparent border-none underline ${isResending
+                    ? 'text-blue-300 cursor-not-allowed'
+                    : 'text-blue-600 cursor-pointer'
+                  }`}
               >
                 {isResending ? 'Sending...' : 'Resend link.'}
               </button>
             </p>
 
-            {resendMessage && (
+            {message && (
               <p
-                style={{
-                  fontSize: '0.875rem',
-                  marginTop: '0.75rem',
-                  color: resendMessage.includes('successfully')
-                    ? '#10B981'
-                    : '#DC2626',
-                }}
+                className={`text-sm mt-3 ${message.includes('successfully')
+                    ? 'text-emerald-500'
+                    : 'text-red-600'
+                  }`}
               >
-                {resendMessage}
+                {message}
               </p>
             )}
           </div>
 
           {/* Back to Sign In */}
           <button
-            onClick={() => { navigate('/signin'); }}
-            style={{
-              marginTop: '1.5rem',
-              fontSize: '0.875rem',
-              color: '#6B7280',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              textDecoration: 'underline',
+            onClick={() => {
+              navigate('/signin');
             }}
+            className='mt-6 text-sm text-gray-500 bg-transparent border-none cursor-pointer underline'
           >
             ← Back to Sign In
           </button>

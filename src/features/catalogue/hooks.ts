@@ -7,7 +7,7 @@ import type {
   Product,
   UserProfile,
 } from '@shared/types';
-import { empty, HookUtils } from '@shared/utils';
+import { empty, err, HookUtils } from '@shared/utils';
 import { useState, useEffect } from 'react';
 import { CategoryCatalogue, ProductCatalogue } from './api';
 import type { ProductFilter } from './types';
@@ -48,7 +48,9 @@ type UseCategoriesResult = DatabaseQueryResult<Category[], '*'>;
  */
 export function useCategories(): UseCategories {
   const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<UseCategoriesResult>(() => empty());
+  const [result, setResult] = useState<UseCategoriesResult>(() =>
+    err('No categories found'),
+  );
 
   /**
    * Loads the category tags once per invocation.
@@ -108,7 +110,7 @@ export function useCategorizedProducts(
 ): UseCategorizedProducts {
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<UseCategorizedProductsResult>(() =>
-    empty(),
+    err('No categorized products found'),
   );
 
   /**
@@ -167,7 +169,9 @@ export function useCategory(
   category: RequireProperty<Category, 'id'>,
 ): UseCategory {
   const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<UseCategoryResult>(() => empty());
+  const [result, setResult] = useState<UseCategoryResult>(() =>
+    err('No category found'),
+  );
 
   /**
    * Loads the category tag once per invocation.
@@ -224,7 +228,9 @@ export function useProductFilter(
   run: (filter: ProductFilter) => DatabaseQuery<Product[], 'id'>,
 ): UseProductFilter {
   const [loading, setLoading] = useState<boolean>(true);
-  const [result, setResult] = useState<UseProductFilterResult>(() => empty());
+  const [result, setResult] = useState<UseProductFilterResult>(() =>
+    err('No products found'),
+  );
 
   /**
    * Creates a new product filter once per invocation.
@@ -279,7 +285,9 @@ type UseProductSearchResult = DatabaseQueryResult<Product[], '*'>;
  */
 export function useProductSearch(text: string): UseProductSearch {
   const [loading, setLoading] = useState<boolean>(true);
-  const [result, setResult] = useState<UseProductSearchResult>(() => empty());
+  const [result, setResult] = useState<UseProductSearchResult>(() =>
+    err('No products found'),
+  );
 
   /**
    * Loads the products that matches the search query once per invocation.
@@ -336,7 +344,9 @@ export function useProducts(
   products: RequireProperty<Product, 'id'>[],
 ): UseProducts {
   const [loading, setLoading] = useState<boolean>(true);
-  const [result, setResult] = useState<UseProductsResult>(() => empty());
+  const [result, setResult] = useState<UseProductsResult>(() =>
+    err('No products found'),
+  );
 
   /**
    * Loads the products once per invocation.
@@ -394,7 +404,7 @@ export function useSellerProducts(
 ): UseProductsBySeller {
   const [loading, setLoading] = useState<boolean>(true);
   const [result, setResult] = useState<UseProductsBySellerResult>(() =>
-    empty(),
+    err('No products found'),
   );
 
   /**
