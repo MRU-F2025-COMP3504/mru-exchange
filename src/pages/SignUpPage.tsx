@@ -57,7 +57,7 @@ export default function SignUpPage() {
 
     setForm(result);
 
-    if (!signer.isValid()) {
+    if (!signer.isSatisfied()) {
       setSubmit(err('Invalid user credentials', result));
     } else if (result.password.original.data !== result.password.confirm.data) {
       setSubmit(err('Passwords do not match', { password: result.password }));

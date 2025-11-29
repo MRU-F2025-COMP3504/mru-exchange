@@ -32,7 +32,7 @@ export default function SignInPage() {
 
     setForm(result);
 
-    if (!signer.isValid()) {
+    if (!signer.isSatisfied()) {
       setSubmit(err('Invalid email or password', result));
     } else {
       setIsSubmitting(true);
@@ -109,31 +109,31 @@ export default function SignInPage() {
                 </p>
               )}
               <p
-              style={{
-                fontSize: '0.75rem',
-                color: '#6B7280',
-                marginTop: '0.3rem',
-              }}
-            >
-              {' '}
-              <button
-                type='button'
-                onClick={() => {
-                  navigate('/forgot-password');
-                }}
                 style={{
-                  color: '#2563EB',
-                  fontWeight: '500',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textDecoration: 'underline',
+                  fontSize: '0.75rem',
+                  color: '#6B7280',
+                  marginTop: '0.3rem',
                 }}
               >
-                Forgot Password?
-              </button>
-            </p>
-            </div>           
+                {' '}
+                <button
+                  type='button'
+                  onClick={() => {
+                    navigate('/forgot-password');
+                  }}
+                  style={{
+                    color: '#2563EB',
+                    fontWeight: '500',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Forgot Password?
+                </button>
+              </p>
+            </div>
 
             {submit.error && (
               <div className='bg-red-50 border border-red-200 rounded-md p-2'>
