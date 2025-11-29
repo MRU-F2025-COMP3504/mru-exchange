@@ -16,41 +16,43 @@ export interface UserReporter {
   /**
    * Initializes the description property.
    * If the given description is empty, the function returns an error.
+   * By default, the form `key` parameter is `description`.
    *
    * **The description property must be initialized to publish the report.**
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param description the given report title
+   * @param form the given {@link FormData}
+   * @param key the given key (`description`) to {@link FormDataEntryValue}
    * @returns a result that validates the given input
    */
-  description: (description: string) => Result<this>;
+  description: (form: FormData, key?: string) => Result<string>;
 
   /**
    * Initializes the link property.
    * If the given link is invalid, the function returns an error.
+   * By default, the form `key` parameter is `link`.
    *
    * **The link property must be initialized to publish the report.**
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param link the given report link
+   * @param form the given {@link FormData}
+   * @param key the given key (`link`) to {@link FormDataEntryValue}
    * @returns a result that validates the given input
    */
-  link: (link: string) => Result<this>;
+  link: (form: FormData, key?: string) => Result<string>;
+
+  /**
+   * Scans the reporter for any `undefined` required report properties.
+   * The {@link isSatisfied()} does not evaluate any form inputs.
+   *
+   * @returns if the user reporter has all the required properties evaluated
+   */
+  isSatisfied: () => boolean;
 
   /**
    * Finalizes the reporter and inserts the new user report to the database.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @returns a promise that resolves to the corresponding new user report
    */
-  report: (
+  submit: (
     target: RequireProperty<UserProfile, 'supabase_id'>,
   ) => DatabaseQuery<UserReport, 'id'>;
 }
