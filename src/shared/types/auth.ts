@@ -56,11 +56,11 @@ export interface Username {
 export interface UserCredentialsSigner {
   /**
    * Scans the signer for any `undefined` required credentials.
-   * The {@link isValid()} does not evaluate any form inputs.
+   * The {@link isSatisfied()} does not evaluate any form inputs.
    *
    * @returns if the signer has all the required credentials evaluated
    */
-  isValid: () => boolean;
+  isSatisfied: () => boolean;
 
   /**
    * Submits the provided credentials to Supabase's authentication system.
