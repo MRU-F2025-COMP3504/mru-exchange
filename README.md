@@ -267,7 +267,7 @@ Otherwise, the system can be run on `vite` directly using:
 $ npm run dev
 ```
 
-## Directory Sturcure 
+## Directory Sturcture 
 
 ### 1. database
 - Database schema source code  
