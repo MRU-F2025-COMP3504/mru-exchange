@@ -18,13 +18,21 @@ export default function HomePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState<string>('');
-  const [recentProducts, setRecentProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [recentProducts, setRecentProducts] = useState<Product[]>(() => {
+    const savedProducts = localStorage.getItem('recentProducts');
+    return savedProducts ? JSON.parse(savedProducts) : [];
+  });
+  const [loading, setLoading] = useState(true);  
 
   useEffect(() => {
     fetchUserName();
-    fetchRecentProducts();
+    if (recentProducts.length === 0) fetchRecentProducts();
   }, [user]);
+
+  useEffect(() => {
+    localStorage.setItem('recentProducts', JSON.stringify(recentProducts));
+    if (recentProducts.length > 0) setLoading(false);
+  }, [recentProducts]);
 
   // Get user first name
   const fetchUserName = async () => {
@@ -74,39 +82,39 @@ export default function HomePage() {
    */
   function getImageUrls(imageData: { images: string[] }): string[] | null {
 
-      try {
+    try {
 
-          // Create an array.
-          const imagesArray = [];
+      // Create an array.
+      const imagesArray = [];
 
-          // For every image,
-          for (const imagePath of imageData.images) {
+      // For every image,
+      for (const imagePath of imageData.images) {
 
-              if (!imagePath) return null;
+        if (!imagePath) return null;
 
-              if (imagePath.startsWith('http')) {
-                  imagesArray.push(imagePath);
-              }
+        if (imagePath.startsWith('http')) {
+          imagesArray.push(imagePath);
+        }
 
-              const filename = imagePath.replace('database/images/', '').split('/').pop();
+        const filename = imagePath.replace('database/images/', '').split('/').pop();
 
-              if (!filename) return null;
+        if (!filename) return null;
 
-              const { data } = supabase.storage
-                  .from('product-images')
-                  .getPublicUrl(filename);
+        const { data } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(filename);
 
-              imagesArray.push(data.publicUrl);
+        imagesArray.push(data.publicUrl);
 
-          }
-          // console.log(imagesArray);
-          // Return
-          return imagesArray;
-
-      } catch (error) {
-          console.error('Error getting image URL:', error);
-          return null;
       }
+      // console.log(imagesArray);
+      // Return
+      return imagesArray;
+
+    } catch (error) {
+      console.error('Error getting image URL:', error);
+      return null;
+    }
   };
 
   return (

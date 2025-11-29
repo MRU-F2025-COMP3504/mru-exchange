@@ -96,55 +96,23 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(to bottom right, #EFF6FF, #E0E7FF)',
-        padding: '3rem 1rem',
-      }}
-    >
-      <div style={{ width: '100%', maxWidth: '24rem' }}>
-        <div
-          style={{
-            backgroundColor: 'white',
-            borderRadius: '0.75rem',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-            padding: '2rem',
-          }}
-        >
-          <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+    <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-200 px-4 py-12'>
+      <div className='w-full max-w-sm'>
+        <div className='bg-white rounded-xl shadow-lg p-8'>
+          <div className='mb-6 text-center'>
             <img
               src='/MruExchangeLogo.png'
               alt='MRU Exchange Logo'
-              style={{
-                width: '100px',
-                height: 'auto',
-                marginBottom: '1rem',
-                margin: '0 auto 1rem',
-              }}
+              className='w-24 h-auto mx-auto mb-4'
             />
-            <h2
-              style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                color: '#111827',
-                marginBottom: '0.25rem',
-              }}
-            >
-              Reset your password
-            </h2>
+            <h2 className='text-2xl font-bold text-gray-900 mb-1'>Reset Your Password</h2>
           </div>
 
           <form
-            onSubmit={handleSubmit}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.875rem',
+            onSubmit={(event) => {
+              void handleSubmit(event);
             }}
+            className='flex flex-col gap-4'
           >
             <div>
               <label htmlFor='password' style={labelStyle}>
@@ -235,28 +203,14 @@ export default function ForgotPasswordPage() {
               </button>
             </div>
 
-            <p
-              style={{
-                textAlign: 'center',
-                fontSize: '0.75rem',
-                color: '#6B7280',
-                marginTop: '0.25rem',
-              }}
-            >
+            <p className='text-center text-xs text-gray-500 mt-1'>
               Don't have an account?{' '}
               <button
                 type='button'
                 onClick={() => {
                   navigate('/create-account');
                 }}
-                style={{
-                  color: '#2563EB',
-                  fontWeight: '500',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textDecoration: 'underline',
-                }}
+                className='text-blue-600 font-medium bg-transparent border-none cursor-pointer underline hover:text-blue-700'
               >
                 Create account.
               </button>

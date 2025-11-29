@@ -22,21 +22,37 @@ interface Category {
 
 export default function ProductSearchPage() {
   const navigate = useNavigate();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>(() => {
+    const savedProducts = localStorage.getItem('products');
+    return savedProducts ? JSON.parse(savedProducts) : [];
+  });
+  const [categories, setCategories] = useState<Category[]>(() => {
+    const savedCategories = localStorage.getItem('categories');
+    return savedCategories ? JSON.parse(savedCategories) : [];
+  });
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetchCategories();
+    if (categories.length === 0) fetchCategories();
     fetchProducts();
   }, []);
 
   useEffect(() => {
-    fetchProducts();
+    if (products.length === 0) fetchProducts();
   }, [selectedCategories]);
+
+  useEffect(() => {
+    localStorage.setItem('categories', JSON.stringify(categories));
+    if (categories.length > 0) setLoading(false);
+  }, [categories]);
+
+  useEffect(() => {
+    localStorage.setItem('products', JSON.stringify(products));
+    if (products.length > 0) setLoading(false);
+  }, [products]);
 
   const fetchCategories = async () => {
     try {
@@ -169,39 +185,39 @@ export default function ProductSearchPage() {
 
   function getImageUrls(imageData: { images: string[] }): string[] | null {
 
-      try {
+    try {
 
-          // Create an array.
-          const imagesArray = [];
+      // Create an array.
+      const imagesArray = [];
 
-          // For every image,
-          for (const imagePath of imageData.images) {
+      // For every image,
+      for (const imagePath of imageData.images) {
 
-              if (!imagePath) return null;
+        if (!imagePath) return null;
 
-              if (imagePath.startsWith('http')) {
-                  imagesArray.push(imagePath);
-              }
+        if (imagePath.startsWith('http')) {
+          imagesArray.push(imagePath);
+        }
 
-              const filename = imagePath.replace('database/images/', '').split('/').pop();
+        const filename = imagePath.replace('database/images/', '').split('/').pop();
 
-              if (!filename) return null;
+        if (!filename) return null;
 
-              const { data } = supabase.storage
-                  .from('product-images')
-                  .getPublicUrl(filename);
+        const { data } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(filename);
 
-              imagesArray.push(data.publicUrl);
+        imagesArray.push(data.publicUrl);
 
-          }
-          // console.log(imagesArray);
-          // Return
-          return imagesArray;
-
-      } catch (error) {
-          console.error('Error getting image URL:', error);
-          return null;
       }
+      // console.log(imagesArray);
+      // Return
+      return imagesArray;
+
+    } catch (error) {
+      console.error('Error getting image URL:', error);
+      return null;
+    }
   };
 
   return (

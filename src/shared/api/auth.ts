@@ -260,7 +260,7 @@ export const UserAuthentication: UserAuthentication = {
         );
 
         if (error) {
-          return err('Faild to reset the password', error);
+          return err('Failed to send reset password email', error);
         } else {
           return ok(null);
         }
