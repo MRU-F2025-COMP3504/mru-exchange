@@ -1,122 +1,30 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { supabase, UserAuthentication } from '@shared/api'
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@shared/contexts';
+import type { NullableResult } from '@shared/types';
+import { empty } from '@shared/utils';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-export default function ResetPasswordPage() {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
-  const formData = { email };
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
+export default function ForgotPasswordPage() {
+  const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
+  const [submit, setSubmit] = useState<NullableResult<null>>(() => empty());
+  const { password } = useAuth();
 
-  const validateForm = () => {
-    console.log('validating')
-    const newErrors: Record<string, string> = {};
-
-    console.log(formData.email)
-
-    console.log("Email coming into form:", formData.email);
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!formData.email.endsWith('@mtroyal.ca')) {
-      newErrors.email = 'Please use a valid @mtroyal.ca address';
-      setIsLoading(false);
-    }
-
-    setErrors(newErrors);
-    console.log(newErrors)
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    console.log('submitting')
-    e.preventDefault();
-
-    setError('');
-    setSuccessMessage('');
-    setIsLoading(true);
-    setIsSubmitting(true);
-
-    if (!validateForm()) {
-      setIsLoading(false);
-      return;
-    }
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
     setIsSubmitting(true);
 
-    const passwordRes = UserAuthentication.password();
+    const form = new FormData(event.currentTarget);
+    const result = await password().reset(form);
 
-    // const email = user.ok ? user.data.email : undefined;
-
-    if (!email) {
-      setErrors({ general: "Email is missing." });
-      setIsSubmitting(false);
-      setIsLoading(false);
-      return;
-    }
-
-    const result = await passwordRes.reset({ email });
-
-    // Handle failure
-    if (!result.ok) {
-      setError(result.error.message);
-      setIsSubmitting(false);
-      setIsLoading(false);
-      return;
-    }
-    console.log("Sending reset email for:", email);
-
-    // Success
-    setSuccessMessage(
-      'Password reset link has been sent to your email. Please check your inbox.'
-    );
-    setEmail('');
-
-    navigate('/verify-email', { state: { email: formData.email } });
-
+    setSubmit(result);
     setIsSubmitting(false);
-    setIsLoading(false);
-  };
 
-  useEffect(() => {
-      if (email) {
-        fetchEmail();
-      }
-    }, [email]);
-
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
-
-  const fetchEmail = async () => {
-
-    try {
-      const { data, error } = await supabase
-        .from('User_Information')
-        .select('email')
-        .eq('email', email)
-        .single();
-
-      if (!error) {
-        setEmail(data.email || '');
-      }
-    } catch (error) {
-      console.error('Error fetching user name:', error);
+    if (result.ok) {
+      setMessage(
+        'Password reset link has been sent to your email. Please check your inbox.',
+      );
     }
   };
 
@@ -142,54 +50,48 @@ export default function ResetPasswordPage() {
             password.
           </p>
 
-          <form onSubmit={handleSubmit} className='space-y-6'>
+          <form
+            onSubmit={(event) => {
+              void handleSubmit(event);
+            }}
+            className='space-y-6'
+          >
             {/* Email Input */}
             <div>
-              <label
-                htmlFor='email'
-                className='block text-sm font-medium text-gray-700 mb-2'
-              >
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
                 Email Address
+                <input
+                  name='email'
+                  type='email'
+                  placeholder='student@mtroyal.ca'
+                  required
+                  className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
+                  disabled={isSubmitting}
+                />
               </label>
-              <input
-                id='email'
-                name='email'
-                type='email'
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-                placeholder='student@mtroyal.ca'
-                required
-                className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors'
-                disabled={isLoading}
-              />
-              <p className='mt-1 text-xs text-gray-500'>
-                Must be a valid @mtroyal.ca email
-              </p>
             </div>
 
             {/* Error Message */}
-            {error && (
+            {submit.error && (
               <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm'>
-                {error}
+                {submit.error.message}
               </div>
             )}
 
             {/* Success Message */}
-            {successMessage && (
+            {message && (
               <div className='bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm'>
-                {successMessage}
+                {message}
               </div>
             )}
 
             {/* Submit Button */}
             <button
               type='submit'
-              disabled={isLoading}
+              disabled={isSubmitting}
               className='w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed'
             >
-              {isLoading ? 'Sending...' : 'Send Reset Link'}
+              {isSubmitting ? 'Sending...' : 'Send Reset Link'}
             </button>
           </form>
 
@@ -225,4 +127,3 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
-
