@@ -59,7 +59,7 @@ export default function MessagingPage() {
   const [loading, setLoading] = useState(true);
   const [chatLoading, setChatLoading] = useState(true);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
-  const [chatName, setChatName] = useState();
+  const [chatWith, setChatWith] = useState();
 
   useEffect(() => {
     if (currentUserId && chats.length === 0) fetchChats();
@@ -221,27 +221,43 @@ export default function MessagingPage() {
     if (!validateForm()) return;
 
     const form = new FormData(event.currentTarget);
-    console.log(formData)
 
     setIsSubmitting(true);
     try {
-      console.log(form)
-      const update = await password.update(form, formData.password);
+      const update = await text.update(form, formData.text);
 
       if (!update.ok) {
-        setErrors({ general: 'Password update failed' });
+        setErrors({ general: 'Message failed to send' });
         return;
       }
 
       navigate('/signin');
     } catch (error: any) {
-      console.error('Error confirming password:', error);
+      console.error('Error sending message:', error);
       setErrors({ general: 'An error occurred. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const getAnyDate = (message) => {
+    const messageDate = new Date(message?.created_at)
+    let date;
+
+    const yesterdayStart = new Date();
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+    yesterdayStart.setHours(0, 0, 0, 0);
+
+    const yesterdayEnd = new Date();
+    yesterdayEnd.setDate(yesterdayEnd.getDate() - 1);
+    yesterdayEnd.setHours(23, 59, 59, 999);
+
+    if (messageDate > yesterdayEnd) date = `${messageDate.getHours()}: ${messageDate.getMinutes()}`;
+    else if (messageDate >= yesterdayStart && messageDate < yesterdayEnd) date = "Yesterday";
+    else date = messageDate.toLocaleDateString();
+
+    return date;
+  }
 
   const ChatCard = ({
     chat,
@@ -257,20 +273,8 @@ export default function MessagingPage() {
     const isVisible = chat.visible;
     const imageUrl = getImageUrl(otherUser?.profile_image);
 
-    const messageDate = new Date(firstMessage?.created_at)
-    let date;
+    const date = getAnyDate(firstMessage);
 
-    const yesterdayStart = new Date();
-    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
-    yesterdayStart.setHours(0, 0, 0, 0);
-
-    const yesterdayEnd = new Date();
-    yesterdayEnd.setDate(yesterdayEnd.getDate() - 1);
-    yesterdayEnd.setHours(23, 59, 59, 999);
-
-    if (messageDate > yesterdayEnd) date = `${messageDate.getHours()}: ${messageDate.getMinutes()}`;
-    else if (messageDate >= yesterdayStart && messageDate < yesterdayEnd) date = "Yesterday";
-    else date = messageDate.toLocaleDateString();
 
     return (
       <div
@@ -278,14 +282,15 @@ export default function MessagingPage() {
         onClick={() => {
           setChatLoading(!chatLoading);
           setSelectedChat(chat);
+          setChatWith(otherUser);
         }}
       >
-        <div className='grid grid-cols-[10%_90%] p-4'>
+        <div className='grid grid-cols-[1fr_10fr] p-4'>
           <div className='relative'>
             {imageUrl ? (
               <img
                 src={imageUrl}
-                className={`w-full h-full object-cover`}
+                className={`aspect-square object-cover`}
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/profile/${otherUser.id}`)
@@ -297,7 +302,7 @@ export default function MessagingPage() {
                 }}
               />
             ) : (
-              <div className='aspect-square h-full bg-gray-200 flex items-center justify-center rounded-4xl'>
+              <div className='aspect-square bg-gray-200 flex items-center justify-center rounded-4xl'>
                 <span
                   onClick={(e) => {
                     e.stopPropagation();
@@ -338,31 +343,21 @@ export default function MessagingPage() {
     const isVisible = message.visible;
     const imageUrl = getImageUrl(message.sender?.profile_image);
 
-    const messageDate = new Date(message?.created_at)
-    let date;
+    const date = getAnyDate(message);
 
-    const yesterdayStart = new Date();
-    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
-    yesterdayStart.setHours(0, 0, 0, 0);
-
-    const yesterdayEnd = new Date();
-    yesterdayEnd.setDate(yesterdayEnd.getDate() - 1);
-    yesterdayEnd.setHours(23, 59, 59, 999);
-
-    if (messageDate > yesterdayEnd) date = `${messageDate.getHours()}: ${messageDate.getMinutes()}`;
-    else if (messageDate >= yesterdayStart && messageDate < yesterdayEnd) date = "Yesterday";
-    else date = messageDate.toLocaleDateString();
-    const senderBool = message.sender?.supabase_id === currentUserId; 
-    const bgColor = senderBool ? 'bg-message-sender' :  'bg-white';
-    const textColor = senderBool ? 'text-white' :  'text-black';
-    const name = senderBool ? '' :  message?.sender?.first_name;
-    const image = senderBool ? '' :  message?.sender?.first_name;
+    const senderBool = message.sender?.supabase_id === currentUserId;
+    const bgColor = senderBool ? 'bg-message-sender' : 'bg-white';
+    const textColor = senderBool ? 'text-white' : 'text-black';
+    const dateAlign = senderBool ? 'text-end' : 'text-start pl-12';
+    const grid = senderBool ? '' : 'grid-cols-[auto_auto]';
+    const name = senderBool ? '' : message?.sender?.first_name;
+    const image = senderBool ? '' : message?.sender?.first_name;
 
     return (
-      <div className={`${bgColor} rounded-2xl shadow flex justify-end`}>
-        <div className='grid grid-cols-[10%_90%] p-2'>
-          <div className='relative flex items-center justify-center'>
-            {imageUrl ? (
+      <div className={`grid ${grid} p-2`}>
+        <div className='relative flex items-end'>
+          {!senderBool ? (
+            imageUrl ? (
               <img
                 src={imageUrl}
                 className={`w-full h-full object-cover`}
@@ -373,22 +368,25 @@ export default function MessagingPage() {
                 }}
               />
             ) : (
-              <div className='aspect-square h-1/2 bg-gray-200 flex items-center justify-center rounded-4xl'>
+              <div className='aspect-square h-[3vh] mr-2 bg-gray-200 flex items-center justify-center rounded-4xl'>
                 <span className='text-gray-500 text-xs'>n/a</span>
               </div>
-            )}
-          </div>
-          <div>
-            <div className='px-4 font-semibold'>{name}</div>
-            <div className='flex items-start h-full px-4 text-sm'>
-
-              <div className='flex-1 overflow-hidden'>
-                <div className={`${textColor}`}> {message?.logged_message} </div>
-                <div className='text-gray-500 text-xs'>{date}</div>
+            )
+          ) : null}
+        </div>
+        <div className='flex flex-col'>
+          <div className={`${bgColor} rounded-2xl py-1.5 shadow flex items-center`}>
+            <div>
+              <div className='px-4 font-semibold'>{name}</div>
+              <div className='flex items-start h-full px-4 text-sm'>
+                <div className='flex-1 overflow-hidden'>
+                  <div className={`${textColor}`}> {message?.logged_message} </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <div className={`text-gray-500 text-xs ${dateAlign} col-span-2 px-3`}>{date}</div>
       </div>
     );
   };
@@ -406,15 +404,6 @@ export default function MessagingPage() {
   }
 
   if (!loading) {
-    // console.log(currentUserId)
-    // chats.length === 0 ? console.log("no chats found") : console.log("chats", chats)
-    chats.forEach(c => {
-      // console.log(c.user1?.first_name);
-      const [currentUser, otherUser] = c.user_id_1 === currentUserId ? [c.user1, c.user2] : [c.user2, c.user1];
-      console.log("currentUser: ", currentUser)
-      console.log("otherUser: ", otherUser)
-    });
-
     return (
       <div className='bg-[#F9FAFB] min-h-screen'>
         <Header />
@@ -440,19 +429,20 @@ export default function MessagingPage() {
               </div>
             )}
           </aside>
-          <main className='flex flex-col w-2/3 items-center min-h-[60vh] rounded-2xl p-5 bg-blue-300'>{selectedChat ? selectedChat.user2?.first_name: 'false'}
+          <main className='flex flex-col w-2/3 items-center min-h-[60vh] rounded-2xl pb-5 bg-blue-300 relative'>
+            <div className='bg-white w-full rounded-t-2xl border-b-1 pl-3 '>{chatWith ? `Chat with ${chatWith.first_name}` : ''}</div>
             {chatLoading ? (<div className='flex items-center justify-center text-xl'>Select a chat to view messages</div>
             ) : (
               <>
                 {/* Main area for the selected chat */}
-                <div className='flex flex-col gap-6 overflow-y-auto max-h-[70vh]'>
+                <div className='flex flex-col gap-6 overflow-y-auto max-h-[70vh] w-full p-3 h-full'>
                   {messages
                     .filter(message => message.visible && message.chat_id === selectedChat?.id)
                     .map((message) => {
                       const alignment =
                         message.sender.supabase_id === currentUserId
-                          ? 'items-end'
-                          : 'items-start';
+                          ? 'justify-end'
+                          : 'justify-start';
                       return (
                         <div
                           key={message.id}
@@ -463,7 +453,7 @@ export default function MessagingPage() {
                       );
                     })}
                 </div>
-                <div>
+                <div className=''>
                   <form onSubmit={handleSubmit} className='space-y-6'>
                     {/* handle message input */}
                     <div>
@@ -472,7 +462,7 @@ export default function MessagingPage() {
                         className='block font-medium text-gray-700 mb-2 w-full'>
                         Send Message
                       </label>
-                      <input className='bg-white rounded-2xl w-[40vw] p-2'
+                      <input className='bg-white rounded-l-2xl w-[40vw] p-2'
                         id='text'
                         type='text'
                         name='text'
@@ -481,8 +471,9 @@ export default function MessagingPage() {
                           handleChange('text', e.target.value);
                         }}
                         placeholder='Send a message'
-                        >
+                      >
                       </input>
+                      <button className='bg-white p-2 rounded-r-2xl'>Send</button>
                     </div>
                   </form>
                 </div>
