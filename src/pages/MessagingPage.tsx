@@ -4,13 +4,17 @@ import { useAuth } from '@shared/contexts';
 import { supabase } from '@shared/api';
 import Header from './Header';
 import Footer from './Footer';
+import { UserChatting, UserMessaging } from '@features/messaging/index.ts';
+import type {
+  UserChat, UserProfile
+} from '@shared/types';
 
 interface Chat {
   id: number;
-  created_at: string | null;
+  created_at: string;
   user_id_1: string;
   user_id_2: string;
-  visible: boolean | null;
+  visible: boolean;
   user1: {
     id: number;
     first_name: string;
@@ -46,6 +50,7 @@ interface UserMessage {
 export default function MessagingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [userInfo, setUserInfo] = useState<UserProfile | null>(null);
   const currentUserId = user.ok ? user.data.id : null;
   const [chats, setChats] = useState<Chat[]>(() => {
     const savedChats = localStorage.getItem('chats');
@@ -56,15 +61,25 @@ export default function MessagingPage() {
     return savedMessages ? (JSON.parse(savedMessages) as UserMessage[]) : [];
   });
   // const [messages, setMessages] = useState<UserMessage[]>([]);
+  const [error, setErrors] = useState('');
   const [loading, setLoading] = useState(true);
   const [chatLoading, setChatLoading] = useState(true);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [chatWith, setChatWith] = useState();
+  const [text, setText] = useState('');
 
   useEffect(() => {
-    if (currentUserId && chats.length === 0) fetchChats();
-    if (currentUserId && chats.length > 0 && messages.length === 0) fetchMessages();
-  }, [currentUserId, chats]);
+    fetchUserProfile();
+  }, [currentUserId]);
+
+  useEffect(() => {
+    fetchChats();
+    if (chats.length > 0) setLoading(false);
+  }, [chats])
+  
+  useEffect(() => {
+    fetchMessages();
+  }, [messages]);
 
 
   useEffect(() => {
@@ -73,11 +88,63 @@ export default function MessagingPage() {
     if (chats.length > 0) setLoading(false);
   }, [chats]);
 
+
   // useEffect(() => {
-  //   if (selectedChatId) {
-  //     fetchMessages(selectedChatId);
-  //   }
-  // },[selectedChatId]);
+  //     if(!currentUserId) return;
+  //     const initialize = async () => {
+  //       if (!userInfo) await fetchUserProfile();
+  //       if (!localStorage.getItem('chats')) await fetchChats();
+  //       if (!localStorage.getItem('messages')) await fetchMessages();
+  //     }
+  //     initialize();
+  //   }, [currentUserId]);
+  
+  
+  //   useEffect(() => {
+  //     localStorage.setItem('chats', JSON.stringify(chats));
+  //     if (chats.length > 0) setLoading(false);
+  //   }, [chats]);
+  
+  //   useEffect(() => {
+  //     localStorage.setItem('messages', JSON.stringify(messages));
+  //   }, [messages]);
+  
+  //   useEffect(() => {
+  //     if (!userInfo) return;
+  //     const channel = UserChatting.subscribe(userInfo, (payload) => {
+  //       setChats((chats) => [...chats, payload.new]);
+  //     });
+  
+  //     return () => channel.unsubscribe();
+  //   }, [userInfo]);
+  
+  //   useEffect(() => {
+  //     if (!selectedChat) return;
+  //     const channel = UserMessaging.subscribe(selectedChat, (payload) => {
+  //       setMessages((messages) => [...messages, payload.new]);
+  //     });
+  
+  //     return () => channel.unsubscribe();
+  //   }, [selectedChat]);
+
+  const fetchUserProfile = async () => {
+    if (!currentUserId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('User_Information')
+        .select(
+          '*'
+        )
+        .eq('supabase_id', currentUserId)
+        .single();
+
+      if (error) throw error;
+      setUserInfo(data);
+    } catch (err: any) {
+      console.error('Error fetching user profile:', err);
+    }
+  };
 
   const fetchChats = async () => {
     if (!currentUserId) return;
@@ -170,7 +237,7 @@ export default function MessagingPage() {
         )
         `)
         .in('chat_id', chat_ids)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
       setMessages(data as UserMessage[]);
@@ -216,27 +283,41 @@ export default function MessagingPage() {
     }
   };
 
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!validateForm()) return;
+    // if (!validateForm()) return;
+    if (!selectedChat) return;
+    if (!userInfo) return;
 
     const form = new FormData(event.currentTarget);
+    const sendText = form.get(text);
+    if (!sendText) return;
 
-    setIsSubmitting(true);
+    const chatToSend: UserChat = {
+      created_at: selectedChat.created_at,
+      id: selectedChat.id,
+      user_id_1: selectedChat.user_id_1,
+      user_id_2: selectedChat.user_id_1,
+      visible: selectedChat.visible,
+    }
+    // setIsSubmitting(true);
     try {
-      const update = await text.update(form, formData.text);
+
+      const update = await UserMessaging.send(chatToSend, userInfo, text);
 
       if (!update.ok) {
         setErrors({ general: 'Message failed to send' });
         return;
       }
 
-      navigate('/signin');
+      // navigate('/signin');
     } catch (error: any) {
       console.error('Error sending message:', error);
       setErrors({ general: 'An error occurred. Please try again.' });
     } finally {
-      setIsSubmitting(false);
+      // setIsSubmitting(false);
+      setText('');
     }
   };
 
@@ -280,7 +361,7 @@ export default function MessagingPage() {
       <div
         className={`bg-white rounded-lg shadow hover:shadow-lg transition-shadow ${!isVisible ? 'opacity-60' : 'cursor-pointer'}`}
         onClick={() => {
-          setChatLoading(!chatLoading);
+          setChatLoading(false);
           setSelectedChat(chat);
           setChatWith(otherUser);
         }}
@@ -405,10 +486,10 @@ export default function MessagingPage() {
 
   if (!loading) {
     return (
-      <div className='bg-[#F9FAFB] min-h-screen'>
+      <div className='bg-[#F9FAFB] grid grid-rows-[auto_1fr_auto] min-h-screen'>
         <Header />
         { /* Left aside for chats */}
-        <div className='flex min-w-full p-5 gap-5'>
+        <div className='flex p-5 gap-5'>
           <aside className="flex flex-col w-1/3">
             <p className='text-xl text-gray-600 text-center'>Chats</p>
             {chats.length === 0 ? (
@@ -429,10 +510,14 @@ export default function MessagingPage() {
               </div>
             )}
           </aside>
-          <main className='flex flex-col w-2/3 items-center min-h-[60vh] rounded-2xl pb-5 bg-blue-300 relative'>
-            <div className='bg-white w-full rounded-t-2xl border-b-1 pl-3 '>{chatWith ? `Chat with ${chatWith.first_name}` : ''}</div>
-            {chatLoading ? (<div className='flex items-center justify-center text-xl'>Select a chat to view messages</div>
-            ) : (
+          {chatLoading ? (
+            <main className='flex flex-col w-2/3 justify-center items-center min-h-[60vh] rounded-2xl pb-5 bg-blue-300'>
+              <div className='text-xl'>Select a chat to view messages</div>
+            </main>
+          ) : (
+            <main className='flex flex-col w-2/3 items-center min-h-[60vh] rounded-2xl pb-5 bg-blue-300 relative'>
+              <div className='bg-white w-full rounded-t-2xl border-b-1 pl-3 '>{chatWith ? `Chat with ${chatWith.first_name}` : ''}</div>
+
               <>
                 {/* Main area for the selected chat */}
                 <div className='flex flex-col gap-6 overflow-y-auto max-h-[70vh] w-full p-3 h-full'>
@@ -458,28 +543,28 @@ export default function MessagingPage() {
                     {/* handle message input */}
                     <div>
                       <label
-                        htmlFor='text'
+                        htmlFor='message'
                         className='block font-medium text-gray-700 mb-2 w-full'>
                         Send Message
                       </label>
-                      <input className='bg-white rounded-l-2xl w-[40vw] p-2'
-                        id='text'
+                      <input                        
+                        id='message'
                         type='text'
-                        name='text'
+                        name={text}
                         value={FormData.text}
-                        onChange={(e) => {
-                          handleChange('text', e.target.value);
-                        }}
-                        placeholder='Send a message'
+                        onChange={(e) => setText(e.target.value)}
+                        className='bg-white rounded-l-2xl w-[40vw] p-2'
+                        placeholder='Type your message...'
                       >
                       </input>
-                      <button className='bg-white p-2 rounded-r-2xl'>Send</button>
+                      <button type='submit' name='submit'
+                        className='bg-gray-200 p-2 rounded-r-2xl shadow cursor-pointer hover:shadow-lg transition-shadow hover:text-pink-600'>Send</button>
                     </div>
                   </form>
                 </div>
               </>
-            )}
-          </main>
+            </main>
+          )}
         </div >
         <Footer />
       </div >
