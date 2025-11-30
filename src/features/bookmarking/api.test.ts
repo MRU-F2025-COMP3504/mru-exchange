@@ -63,8 +63,8 @@ describe('Product Bookmarking', () => {
     });
 
     const bookmarker = { id: 0 };
-    const products = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ProductBookmarking.store(bookmarker, products);
+    const product = { id: 3 };
+    const query = ProductBookmarking.store(bookmarker, product);
     const result = await query;
 
     expect(result.ok, 'store() failed').toBe(true);
@@ -84,8 +84,8 @@ describe('Product Bookmarking', () => {
     });
 
     const bookmarker = { id: 0 };
-    const products = [{ id: 0 }, { id: 1 }, { id: 2 }];
-    const query = ProductBookmarking.remove(bookmarker, products);
+    const product = { id: 1 };
+    const query = ProductBookmarking.remove(bookmarker, product);
     const result = await query;
 
     expect(result.ok, 'remove() failed').toBe(true);

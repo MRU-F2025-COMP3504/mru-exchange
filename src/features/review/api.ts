@@ -243,7 +243,7 @@ export const UserReviewing: UserReviewing = {
 
         return true;
       },
-      async submit(): DatabaseQuery<Review, 'id'> {
+      async submit(): DatabaseQuery<Review, '*'> {
         return query(
           await supabase
             .from('Reviews')
