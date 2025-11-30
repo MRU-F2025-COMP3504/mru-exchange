@@ -54,7 +54,7 @@ export default function ContactUsPage() {
                   fontWeight: "600"
                 }}
                 >
-                  Thank you for your inqury. 
+                  Thank you for your inquiry. 
                   We will contact you in 3 to 5 business days!
                 </p>
             ) : (
