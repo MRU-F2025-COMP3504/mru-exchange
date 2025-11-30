@@ -39,7 +39,20 @@ interface UserChatting {
   get: (chat: RequireProperty<UserChat, 'id'>) => DatabaseQuery<UserChat, '*'>;
 
   /**
-   * Retrieves chat that involves the given user.
+   * Retrieves the given chat that involves the given two user.
+   * Selects all columns.
+   *
+   * @param a the given user identifier
+   * @param b the given user identifier
+   * @returns the {@link Promise} that resolves to the corresponding chat
+   */
+  getByUsers: (
+    a: RequireProperty<UserProfile, 'supabase_id'>,
+    b: RequireProperty<UserProfile, 'supabase_id'>,
+  ) => DatabaseQuery<UserChat, '*'>;
+
+  /**
+   * Retrieves chats that involves the given user.
    * Selects all columns.
    *
    * @param user the given user identifier
@@ -72,7 +85,7 @@ interface UserChatting {
   register: (
     a: RequireProperty<UserProfile, 'supabase_id'>,
     b: RequireProperty<UserProfile, 'supabase_id'>,
-  ) => DatabaseQuery<UserChat, 'id'>;
+  ) => DatabaseQuery<UserChat, '*'>;
 }
 
 /**
@@ -116,6 +129,20 @@ export const UserChatting: UserChatting = {
       await supabase.from('Chats').select('*').eq('id', chat.id).single(),
     );
   },
+  async getByUsers(
+    a: RequireProperty<UserProfile, 'supabase_id'>,
+    b: RequireProperty<UserProfile, 'supabase_id'>,
+  ): DatabaseQuery<UserChat, '*'> {
+    return query(
+      await supabase
+        .from('Chats')
+        .select('*')
+        .or(
+          `and(user_id_1.eq.${a.supabase_id},user_id_2.eq.${b.supabase_id}),and(user_id_1.eq.${b.supabase_id},user_id_2.eq.${a.supabase_id})`,
+        )
+        .single(),
+    );
+  },
   async getByUser(
     user: RequireProperty<UserProfile, 'supabase_id'>,
   ): DatabaseQuery<UserChat[], '*'> {
@@ -146,7 +173,7 @@ export const UserChatting: UserChatting = {
   async register(
     a: RequireProperty<UserProfile, 'supabase_id'>,
     b: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<UserChat, 'id'> {
+  ): DatabaseQuery<UserChat, '*'> {
     return query(
       await supabase
         .from('Chats')
@@ -154,7 +181,7 @@ export const UserChatting: UserChatting = {
           user_id_1: a.supabase_id,
           user_id_2: b.supabase_id,
         })
-        .select()
+        .select('*')
         .single(),
     );
   },
