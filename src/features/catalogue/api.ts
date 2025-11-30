@@ -325,7 +325,7 @@ export const ProductCatalogue: ProductCatalogue = {
         const [smin, smax] = range;
 
         if (smin.ok && smax.ok) {
-          if (smin.data > smin.data) {
+          if (smin.data > smax.data) {
             return [
               err('Minimum stock exceeds maximum stock', range),
               err('Maximum stock is less than minimum stock', range),
