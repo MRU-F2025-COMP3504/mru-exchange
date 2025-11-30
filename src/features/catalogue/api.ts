@@ -1,15 +1,16 @@
+import type { ProductFilter, ProductFilterBuilder } from '@features/catalogue';
 import { supabase } from '@shared/api';
 import type {
-  DatabaseQuery,
-  Category,
-  RequireProperty,
   CategorizedProduct,
+  Category,
+  DatabaseQuery,
+  ExtractArrayType,
   Product,
-  UserProfile,
+  RequireProperty,
   Result,
+  UserProfile,
 } from '@shared/types';
-import { err, ok, query } from '@shared/utils';
-import type { ProductFilter } from '@features/catalogue';
+import { err, FormUtils, ok, query, REGEX_LETTERS_ONLY } from '@shared/utils';
 
 /**
  * See the implementation below for more information.
@@ -19,11 +20,7 @@ interface CategoryCatalogue {
    * Retrieves all category tags.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a promise that resolves to a collection of category tags
+   * @returns the {@link Promise} that resolves to a collection of category tags
    */
   getTags: () => DatabaseQuery<Category[], '*'>;
 
@@ -31,12 +28,8 @@ interface CategoryCatalogue {
    * Retrieves the given category tag.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param tag the given category tag identifier
-   * @returns a promise that resolves to the corresponding category tag that corresponds to the identifier
+   * @returns the {@link Promise} that resolves to the corresponding category tag that corresponds to the identifier
    */
   getTag: (
     tag: RequireProperty<Category, 'id'>,
@@ -46,12 +39,8 @@ interface CategoryCatalogue {
    * Retrieves products by the given category tag that is assigned.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param tag the given category tag identifier
-   * @returns a promise that resolves to the corresponding products with the given category
+   * @returns the {@link Promise} that resolves to the corresponding products with the given category
    */
   getProductsByAssignedTag: (
     tag: RequireProperty<Category, 'id'>,
@@ -61,12 +50,8 @@ interface CategoryCatalogue {
    * Retrieves category tags that are assigned to the given product.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param product the given product identifier
-   * @returns a promise that corresponds category tags with the given product
+   * @returns the {@link Promise} that corresponds category tags with the given product
    */
   getAssignedTagsByProduct: (
     product: RequireProperty<Product, 'id'>,
@@ -84,7 +69,7 @@ interface CategoryCatalogue {
  * @see {@link CategoryListing} for registering and modifying existing category tags
  */
 export const CategoryCatalogue: CategoryCatalogue = {
-  getTags: async (): DatabaseQuery<Category[], '*'> => {
+  async getTags(): DatabaseQuery<Category[], '*'> {
     return query(
       await supabase
         .from('Category_Tags')
@@ -92,9 +77,9 @@ export const CategoryCatalogue: CategoryCatalogue = {
         .order('name', { ascending: true }),
     );
   },
-  getTag: async (
+  async getTag(
     tag: RequireProperty<Category, 'id'>,
-  ): DatabaseQuery<Category, '*'> => {
+  ): DatabaseQuery<Category, '*'> {
     return query(
       await supabase
         .from('Category_Tags')
@@ -103,9 +88,9 @@ export const CategoryCatalogue: CategoryCatalogue = {
         .single(),
     );
   },
-  getProductsByAssignedTag: async (
+  async getProductsByAssignedTag(
     tag: RequireProperty<Category, 'id'>,
-  ): DatabaseQuery<CategorizedProduct[], '*'> => {
+  ): DatabaseQuery<CategorizedProduct[], '*'> {
     return query(
       await supabase
         .from('Category_Assigned_Products')
@@ -113,9 +98,9 @@ export const CategoryCatalogue: CategoryCatalogue = {
         .eq('category_id', tag.id),
     );
   },
-  getAssignedTagsByProduct: async (
+  async getAssignedTagsByProduct(
     product: RequireProperty<Product, 'id'>,
-  ): DatabaseQuery<CategorizedProduct[], '*'> => {
+  ): DatabaseQuery<CategorizedProduct[], '*'> {
     return query(
       await supabase
         .from('Category_Assigned_Products')
@@ -133,12 +118,8 @@ interface ProductCatalogue {
    * Retrieves products by the given product identifier(s).
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param products the given product identifier(s)
-   * @returns a promise that resolves to the corresponding product(s)
+   * @returns the {@link Promise} that resolves to the corresponding product(s)
    */
   get: (
     products: RequireProperty<Product, 'id'>[],
@@ -148,12 +129,8 @@ interface ProductCatalogue {
    * Retrieves products listed by the given seller.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param seller the given user identifier
-   * @returns a promise that resolves to the corresponding products
+   * @returns the {@link Promise} that resolves to the corresponding products
    */
   getBySeller: (
     seller: RequireProperty<UserProfile, 'supabase_id'>,
@@ -163,12 +140,8 @@ interface ProductCatalogue {
    * Retrieves products by the given search query.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param text the given search query
-   * @returns a promise that resolves the corresponding products
+   * @returns the {@link Promise} that resolves the corresponding products
    */
   getBySearch: (text: string) => DatabaseQuery<Product[], '*'>;
 
@@ -176,10 +149,10 @@ interface ProductCatalogue {
    * Retrieves products by filters.
    * Uses a filter builder to adjust the query.
    *
-   * @see {@link ProductFilter} for more information on its builder features
-   * @returns a promise that resolves products passed from the selected filters
+   * @see {@link ProductFilterBuilder} for more information on its builder features
+   * @returns the {@link Promise} that resolves products passed from the selected filters
    */
-  getByFilter: () => ProductFilter;
+  getByFilter: () => ProductFilterBuilder;
 }
 
 /**
@@ -194,9 +167,9 @@ interface ProductCatalogue {
  * @see {@link ProductListing} for product registration and modification
  */
 export const ProductCatalogue: ProductCatalogue = {
-  get: async (
+  async get(
     products: RequireProperty<Product, 'id'>[],
-  ): DatabaseQuery<Product[], '*'> => {
+  ): DatabaseQuery<Product[], '*'> {
     return query(
       await supabase
         .from('Product_Information')
@@ -207,9 +180,9 @@ export const ProductCatalogue: ProductCatalogue = {
         ),
     );
   },
-  getBySeller: async (
+  async getBySeller(
     seller: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<Product[], '*'> => {
+  ): DatabaseQuery<Product[], '*'> {
     return query(
       await supabase
         .from('Product_Information')
@@ -217,7 +190,7 @@ export const ProductCatalogue: ProductCatalogue = {
         .eq('user_id', seller.supabase_id),
     );
   },
-  getBySearch: async (text: string): DatabaseQuery<Product[], '*'> => {
+  async getBySearch(text: string): DatabaseQuery<Product[], '*'> {
     const search = text.replace(/[%_\\]/g, '\\$&'); // prevents sql injection
     return query(
       await supabase
@@ -226,87 +199,192 @@ export const ProductCatalogue: ProductCatalogue = {
         .or(`title.ilike.%${search}%,content.ilike.%${search}%`),
     );
   },
-  getByFilter: (): ProductFilter => {
-    let sql = supabase.from('Product_Information').select('id');
-    let categories: RequireProperty<Category, 'id'>[] = [];
+  getByFilter(): ProductFilterBuilder {
+    const filter: Partial<ProductFilter> = {};
 
     return {
       seller(
         seller: RequireProperty<UserProfile, 'supabase_id'>,
-      ): Result<ProductFilter> {
-        if (!seller.supabase_id) {
-          return err(new Error('Seller ID is not specified'));
-        } else {
-          sql = sql.eq('user_id', seller.supabase_id);
-        }
+      ): Result<string> {
+        const id = seller.supabase_id;
 
-        return ok(this);
-      },
-      price(a: number, b: number): Result<ProductFilter> {
-        if (a < 0 || b < 0) {
-          return err(
-            new Error('Product price range cannot be negative', {
-              cause: { a, b },
-            }),
-          );
+        if (!id) {
+          return err('Missing product seller', seller);
         } else {
-          sql = sql.gte('price', Math.min(a, b));
-          sql = sql.lte('price', Math.max(a, b));
+          return ok((filter.seller = id));
         }
-
-        return ok(this);
       },
-      stock(a: number, b: number): Result<ProductFilter> {
-        if (a < 0 || b < 0) {
-          return err(
-            new Error('Product stock range cannot be negative', {
-              cause: { a, b },
-            }),
-          );
-        } else {
-          sql = sql.gte('stock_count', Math.min(a, b));
-          sql = sql.lte('stock_count', Math.max(a, b));
-        }
+      price(
+        form: FormData,
+        key = ['min-price', 'max-price'],
+      ): [Result<number>, Result<number>] {
+        const min: () => Result<number> = () => {
+          const { data, error } = FormUtils.getString(form, key[0]);
 
-        return ok(this);
-      },
-      categories(
-        values: RequireProperty<Category, 'id'>[],
-      ): Result<ProductFilter> {
-        for (const category of values) {
-          if (!Object.hasOwn(category, 'id')) {
-            return err(
-              new Error('The category tag identifier is not specified', {
-                cause: category,
-              }),
-            );
+          if (error) {
+            return err('Invalid minimum product price', error);
+          } else if (!data) {
+            return err('Minimum price is empty');
+          } else if (REGEX_LETTERS_ONLY.test(data)) {
+            return err('Minimum price cannot have letters', data);
+          } else {
+            const value = +data;
+
+            if (value < 0) {
+              return err('Minimum price cannot be negative', value);
+            } else {
+              return ok(value);
+            }
           }
+        };
+
+        const max: () => Result<number> = () => {
+          const { data, error } = FormUtils.getString(form, key[1]);
+
+          if (error) {
+            return err('Invalid maximum product price', error);
+          } else if (!data) {
+            return err('Maximum price is empty');
+          } else if (REGEX_LETTERS_ONLY.test(data)) {
+            return err('Maximum price cannot have letters', data);
+          } else {
+            const value = +data;
+
+            if (value < 0) {
+              return err('Maximum price cannot be negative', value);
+            } else {
+              return ok(value);
+            }
+          }
+        };
+
+        const range: [Result<number>, Result<number>] = [min(), max()];
+        const [pmin, pmax] = range;
+
+        if (pmin.ok && pmax.ok) {
+          if (pmin.data > pmax.data) {
+            return [
+              err('Minimum price exceeds maximum price', range),
+              err('Maximum price is less than minimum price', range),
+            ];
+          }
+
+          filter.price = {
+            min: pmin.data,
+            max: pmax.data,
+          };
         }
 
-        categories = values;
-
-        return ok(this);
+        return range;
       },
-      async find(): DatabaseQuery<Product[], 'id'> {
-        const products = query(await sql);
+      stock(
+        form: FormData,
+        key = ['min-stock', 'max-stock'],
+      ): [Result<number>, Result<number>] {
+        const min: () => Result<number> = () => {
+          const { data, error } = FormUtils.getString(form, key[0]);
 
-        if (categories.length === 0 || !products.ok) {
-          return products;
+          if (error) {
+            return err('Invalid minimum product stock', error);
+          } else if (!data) {
+            return err('Minimum stock is empty');
+          } else if (REGEX_LETTERS_ONLY.test(data)) {
+            return err('Minimum stock cannot have letters', data);
+          } else {
+            const value = +data;
+
+            if (value < 0) {
+              return err('Minimum stock cannot be negative', value);
+            } else {
+              return ok(value);
+            }
+          }
+        };
+
+        const max: () => Result<number> = () => {
+          const { data, error } = FormUtils.getString(form, key[1]);
+
+          if (error) {
+            return err('Invalid maximum product stock', error);
+          } else if (!data) {
+            return err('Maximum stock is empty');
+          } else if (REGEX_LETTERS_ONLY.test(data)) {
+            return err('Maximum stock cannot have letters', data);
+          } else {
+            const value = +data;
+
+            if (value < 0) {
+              return err('Maximum stock cannot be negative', value);
+            } else {
+              return ok(value);
+            }
+          }
+        };
+
+        const range: [Result<number>, Result<number>] = [min(), max()];
+        const [smin, smax] = range;
+
+        if (smin.ok && smax.ok) {
+          if (smin.data > smax.data) {
+            return [
+              err('Minimum stock exceeds maximum stock', range),
+              err('Maximum stock is less than minimum stock', range),
+            ];
+          }
+
+          filter.stock = {
+            min: smin.data,
+            max: smax.data,
+          };
         }
 
-        return query(
-          await supabase
-            .from('Category_Assigned_Products')
-            .select('id:product_id')
-            .in(
-              'product_id',
-              products.data.map((product) => product.id),
-            )
-            .in(
-              'category_id',
-              categories.map((category) => category.id),
-            ),
-        );
+        return range;
+      },
+      categories(form: FormData, key = 'categories'): Result<number[]> {
+        const { data, error } = FormUtils.getStrings(form, key);
+
+        if (error) {
+          return err('Invalid product category tag(s)', error);
+        } else {
+          const ids: number[] = [];
+
+          for (const value of data) {
+            const id = +value;
+
+            if (!value || isNaN(id) || id < 0) {
+              return err('Invalid product category tag', value);
+            } else {
+              ids.push(id);
+            }
+          }
+
+          return ok(ids);
+        }
+      },
+      async submit(): DatabaseQuery<Product[], '*'> {
+        const prepare = supabase
+          .from('Product_Information')
+          .select('*, categorized:category_assigned_products(*)');
+
+        if (filter.seller) {
+          prepare.eq('user_id', filter.seller);
+        }
+
+        if (filter.categories) {
+          prepare.in('categorized.category_id', filter.categories);
+        }
+
+        if (filter.price) {
+          prepare.gte('price', filter.price.min);
+          prepare.lte('price', filter.price.max);
+        }
+
+        if (filter.stock) {
+          prepare.gte('price', filter.stock.min);
+          prepare.lte('price', filter.stock.max);
+        }
+
+        return query(await prepare);
       },
     };
   },

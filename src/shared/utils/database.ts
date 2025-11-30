@@ -1,28 +1,24 @@
 import type {
-  ExtractArrayType,
   DatabaseQueryResult,
+  ExtractArrayType,
   Result,
-  ProductImage,
 } from '@shared/types';
+import { err, ok } from '@shared/utils';
 import type { PostgrestSingleResponse } from '@supabase/supabase-js';
-import { ok, err, REGEX_IMAGE_PATH } from '@shared/utils';
-import { supabase } from '@shared/api';
-import path from 'path';
 
 /**
  * A utility function for validating database query responses.
  *
  * The {@link query()} evaluates the response of the database query with either of the two output types:
  * - The `data` payload property contains the successful query response.
- *   - If the response is truthy and an object type, the payload property evaluates to the sucessful query response.
+ *   - If the response that is an object type exists, the query evaluates to success.
  * - The `error` payload property contains the failure query response.
- *   - If the response is empty, the payload property evaluates to an error.
- *   - If the response is unknown (i.e., `null` or `undefined`), the payload property evaluates to an error.
- *
- * @see {@link DatabaseQueryResult} for more information on error handling
+ *   - If the response is empty, the query evaluates to an error.
+ *   - If the response is unknown (i.e., `null` or `undefined`), the query evaluates to an error.
  *
  * @param response the given database query response
- * @returns a wrapped query result that may contain the database response
+ * @returns the {@link DatabaseQueryResult} that may contain the database response
+ * @see {@link DatabaseQueryResult} for more information on error handling
  */
 export function query<
   Table extends object | null,
@@ -36,27 +32,10 @@ export function query<
   if (data && typeof data === 'object') {
     result = ok(data);
   } else if (error) {
-    result = err(error);
+    result = err('Failed to query the database', error);
   } else {
-    result = err(new Error('Unknown query result', { cause: response }));
+    result = err('Unknown query result', response);
   }
 
   return result as DatabaseQueryResult<Table, Columns>;
-}
-
-// TODO: rework
-export function images(paths: string[]): Result<string[]> {
-  const changes: string[] = [];
-  for (const path of paths) {
-    if (!REGEX_IMAGE_PATH.test(path)) {
-      return err(new Error('Product image path is invalid', { cause: path }));
-    }
-
-    const change = path.replace('database/images/', '').split('/').pop();
-    if (change) {
-      changes.push(change);
-    }
-  }
-
-  return ok(changes);
 }

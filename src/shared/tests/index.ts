@@ -1,1 +1,1 @@
-export * from '@shared/tests/database.ts';
+export * from '@shared/tests/database';

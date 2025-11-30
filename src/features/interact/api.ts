@@ -1,10 +1,10 @@
+import { supabase } from '@shared/api';
 import type {
   DatabaseQuery,
-  RequireProperty,
   InteractingUsers,
+  RequireProperty,
   UserProfile,
 } from '@shared/types';
-import { supabase } from '@shared/api';
 import { query } from '@shared/utils';
 
 /**
@@ -15,13 +15,9 @@ interface UserInteraction {
    * Retrieves two interacting users by their identifier.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param a the given user identifier
    * @param b the given user identifier
-   * @returns a promise that resolves to the corresponding user interaction
+   * @returns the {@link Promise} that resolves to the corresponding user interaction
    */
   get: (
     a: RequireProperty<UserProfile, 'supabase_id'>,
@@ -32,12 +28,8 @@ interface UserInteraction {
    * Retrieves two interacting users by the given user that is currently blocked from the interaction.
    * If the query fails, the function returns an error result.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param user the given user identifier
-   * @returns a promise that resolves to the corresponding user interaction
+   * @returns the {@link Promise} that resolves to the corresponding user interaction
    */
   getBlockedOnUser: (
     user: RequireProperty<UserProfile, 'supabase_id'>,
@@ -47,12 +39,8 @@ interface UserInteraction {
    * Retrieves two interacting users by the given user that is currently muted from the interaction.
    * If the query fails, the function returns an error result.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param user the given user identifier
-   * @returns a promise that resolves to the corresponding user interaction
+   * @returns the {@link Promise} that resolves to the corresponding user interaction
    */
   getMutedOnUser: (
     user: RequireProperty<UserProfile, 'supabase_id'>,
@@ -62,13 +50,9 @@ interface UserInteraction {
    * Establishes an interaction between two users.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param a the given user identifier
    * @param b the given user identifier
-   * @returns a promise that resolves to the corresponding user interaction.
+   * @returns the {@link Promise} that resolves to the corresponding user interaction.
    */
   create: (
     a: RequireProperty<UserProfile, 'supabase_id'>,
@@ -79,13 +63,9 @@ interface UserInteraction {
    * Blocks the user target by the blocker from the interaction.
    * If the query fails, the function returns an error result.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param blocker the given user identifier
    * @param target the given user identifier
-   * @returns a promise that resolves to the corresponding user interaction
+   * @returns the {@link Promise} that resolves to the corresponding user interaction
    */
   block: (
     blocker: RequireProperty<UserProfile, 'supabase_id'>,
@@ -97,13 +77,9 @@ interface UserInteraction {
    * Mutes the user target by the muter from the interaction.
    * If the query fails, the function returns an error result.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param blocker the given user identifier
    * @param target the given user identifier
-   * @returns a promise that resolves to the corresponding user interaction
+   * @returns the {@link Promise} that resolves to the corresponding user interaction
    */
   mute(
     muter: RequireProperty<UserProfile, 'supabase_id'>,
@@ -124,10 +100,10 @@ interface UserInteraction {
  * @see {@link UserMessaging} for user messaging
  */
 export const UserInteraction: UserInteraction = {
-  get: async (
+  async get(
     a: RequireProperty<UserProfile, 'supabase_id'>,
     b: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<InteractingUsers, '*'> => {
+  ): DatabaseQuery<InteractingUsers, '*'> {
     return query(
       await supabase
         .from('User_Interactions')
@@ -138,9 +114,9 @@ export const UserInteraction: UserInteraction = {
         .single(),
     );
   },
-  getBlockedOnUser: async (
+  async getBlockedOnUser(
     user: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<InteractingUsers[], 'id'> => {
+  ): DatabaseQuery<InteractingUsers[], 'id'> {
     return query(
       await supabase
         .from('User_Interactions')
@@ -149,9 +125,9 @@ export const UserInteraction: UserInteraction = {
         .or('user_1_is_blocked.eq.true,user_2_is_blocked.eq.true'),
     );
   },
-  getMutedOnUser: async (
+  async getMutedOnUser(
     user: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<InteractingUsers[], 'id'> => {
+  ): DatabaseQuery<InteractingUsers[], 'id'> {
     return query(
       await supabase
         .from('User_Interactions')
@@ -160,10 +136,10 @@ export const UserInteraction: UserInteraction = {
         .or('user_1_is_muted.eq.true,user_2_is_muted.eq.true'),
     );
   },
-  create: async (
+  async create(
     a: RequireProperty<UserProfile, 'supabase_id'>,
     b: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<InteractingUsers, '*'> => {
+  ): DatabaseQuery<InteractingUsers, '*'> {
     return query(
       await supabase
         .from('User_Interactions')
@@ -175,11 +151,11 @@ export const UserInteraction: UserInteraction = {
         .single(),
     );
   },
-  block: async (
+  async block(
     blocker: RequireProperty<UserProfile, 'supabase_id'>,
     target: RequireProperty<UserProfile, 'supabase_id'>,
     flag = true,
-  ): DatabaseQuery<InteractingUsers, 'id'> => {
+  ): DatabaseQuery<InteractingUsers, 'id'> {
     const interaction = await UserInteraction.get(blocker, target);
     if (!interaction.ok) {
       return interaction;
@@ -193,11 +169,11 @@ export const UserInteraction: UserInteraction = {
 
     return set(data, update, flag);
   },
-  mute: async (
+  async mute(
     muter: RequireProperty<UserProfile, 'supabase_id'>,
     target: RequireProperty<UserProfile, 'supabase_id'>,
     flag = true,
-  ): DatabaseQuery<InteractingUsers, 'id'> => {
+  ): DatabaseQuery<InteractingUsers, 'id'> {
     const interaction = await UserInteraction.get(muter, target);
     if (!interaction.ok) {
       return interaction;
@@ -220,7 +196,7 @@ export const UserInteraction: UserInteraction = {
  * @param interaction the given interaction identifier
  * @param field the given interaction property
  * @param flag the given modifier
- * @returns a promise that resolves to the corresponding user interaction
+ * @returns the {@link Promise} that resolves to the corresponding user interaction
  */
 async function set(
   interaction: RequireProperty<InteractingUsers, 'id'>,

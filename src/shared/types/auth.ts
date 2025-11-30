@@ -56,11 +56,11 @@ export interface Username {
 export interface UserCredentialsSigner {
   /**
    * Scans the signer for any `undefined` required credentials.
-   * The {@link isValid()} does not evaluate any form inputs.
+   * The {@link isSatisfied()} does not evaluate any form inputs.
    *
    * @returns if the signer has all the required credentials evaluated
    */
-  isValid: () => boolean;
+  isSatisfied: () => boolean;
 
   /**
    * Submits the provided credentials to Supabase's authentication system.
@@ -165,10 +165,11 @@ export interface UserPasswordModifier {
    * An email would be sent to the user's email to configure a new password.
    * Used on user sign-in, such as when a user forgets their password.
    *
-   * @param email the given user profile (i.e., `email`)
+   * @param form the given {@link FormData}
+   * @param key the given key to {@link FormDataEntryValue}
    * @returns the {@link Promise} that successfully resolves
    */
-  reset: (email: RequireProperty<UserProfile, 'email'>) => PromiseResult<null>;
+  reset: (form: FormData, key?: string) => PromiseResult<null>;
 
   /**
    * Updates the user's password.

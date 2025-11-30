@@ -1,4 +1,5 @@
 export * from '@shared/types/auth';
+export * from '@shared/types/math';
 export * from '@shared/types/product';
 export * from '@shared/types/property';
 export * from '@shared/types/result';

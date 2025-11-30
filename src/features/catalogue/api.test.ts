@@ -116,86 +116,79 @@ describe('Product Catalogue', () => {
     expect(result.ok, 'getBySearch() failed').toBe(true);
   });
 
-  it('returns products by filter', async () => {
-    const success = { data: new Array<object>(), error: null };
+  it('returns products by filter', () => {
+    const filter = ProductCatalogue.getByFilter();
+    const form = new FormData();
 
-    mockQuery({
-      select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          gte: vi.fn().mockReturnValue({
-            lte: vi.fn().mockReturnValue({
-              gte: vi.fn().mockReturnValue({
-                lte: vi.fn().mockResolvedValue(success),
-              }),
-            }),
-          }),
-        }),
-      }),
-    });
+    expect(
+      filter.seller({ supabase_id: 'abc123' }).ok,
+      'getByFilter.seller() invalid()',
+    ).toBe(true);
 
-    const seller = { supabase_id: 'abc123' };
-    const sellerFilter = ProductCatalogue.getByFilter().seller(seller);
+    expect(
+      filter.seller({ supabase_id: '' }).ok,
+      'getByFilter.seller() valid()',
+    ).toBe(false);
 
-    if (sellerFilter.ok) {
-      const invalidSeller = { supabase_id: '' };
-      const failedSellerFilter = sellerFilter.data.seller(invalidSeller);
+    form.append('categories', '0');
+    form.append('categories', '1');
+    form.append('categories', '2');
 
-      expect(failedSellerFilter.ok, 'getByFilter.seller() valid').toBe(false);
+    expect(
+      filter.categories(form).ok,
+      'getByFilter.categories() invalid()',
+    ).toBe(true);
 
-      const priceFilter = sellerFilter.data.price(123, 500);
+    form.set('categories', '');
 
-      if (priceFilter.ok) {
-        const failedPriceFilter = priceFilter.data.price(-1, -2);
+    expect(filter.categories(form).ok, 'getByFilter.categories() valid').toBe(
+      false,
+    );
 
-        expect(failedPriceFilter.ok, 'getByFilter.price() valid').toBe(false);
+    form.set('categories', '-1');
 
-        const stockFilter = priceFilter.data.stock(1, 20);
+    expect(filter.categories(form).ok, 'getByFilter.categories() valid').toBe(
+      false,
+    );
 
-        if (stockFilter.ok) {
-          const failedStockFilter = stockFilter.data.price(-1, -2);
+    form.set('min-price', '0');
+    form.set('max-price', '5');
 
-          expect(failedStockFilter.ok, 'getByFilter.stock() valid').toBe(false);
+    const validPrice = filter.price(form);
 
-          const uncategorizedProductsQuery = stockFilter.data.find();
-          const uncategorizedProductsResult = await uncategorizedProductsQuery;
+    expect(
+      validPrice[0].ok && validPrice[1].ok,
+      'getByFilter.price() invalid()',
+    ).toBe(true);
 
-          expect(
-            uncategorizedProductsResult.ok,
-            'getByFilter.find() invalid',
-          ).toBe(true);
+    form.set('min-stock', '0');
+    form.set('max-stock', '9');
 
-          const categories = [{ id: 0 }, { id: 1 }, { id: 2 }];
-          const categoryFilter = stockFilter.data.categories(categories);
+    const validStock = filter.stock(form);
 
-          if (categoryFilter.ok) {
-            mockQuery({
-              select: vi.fn().mockReturnValue({
-                in: vi.fn().mockReturnValue({
-                  in: vi.fn().mockResolvedValue(success),
-                }),
-              }),
-            });
+    expect(
+      validStock[0].ok && validStock[1].ok,
+      'getByFilter.stock() invalid()',
+    ).toBe(true);
 
-            const categorizedProductsQuery = categoryFilter.data.find();
-            const categorizedProductsResult = await categorizedProductsQuery;
+    form.set('min-price', '-5');
+    form.set('max-price', '5');
 
-            expect(
-              categorizedProductsResult.ok,
-              'getByFilter.find() invalid',
-            ).toBe(true);
-          }
+    const invalidPrice = filter.price(form);
 
-          expect(categoryFilter.ok, 'getByFilter.category() invalid').toBe(
-            true,
-          );
-        }
+    expect(
+      invalidPrice[0].ok && invalidPrice[1].ok,
+      'getByFilter.price() valid()',
+    ).toBe(false);
 
-        expect(stockFilter.ok, 'getByFilter.stock() invalid').toBe(true);
-      }
+    form.set('min-stock', '3');
+    form.set('max-stock', '-9');
 
-      expect(priceFilter.ok, 'getByFilter.price() invalid').toBe(true);
-    }
+    const invalidStock = filter.stock(form);
 
-    expect(sellerFilter.ok, 'getByFilter.seller() invalid').toBe(true);
+    expect(
+      invalidStock[0].ok && invalidStock[1].ok,
+      'getByFilter.stock() valid()',
+    ).toBe(false);
   });
 });

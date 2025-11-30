@@ -1,3 +1,5 @@
+import type { UserReporter } from '@features/reporting';
+import { supabase } from '@shared/api';
 import type {
   DatabaseQuery,
   RequireProperty,
@@ -5,9 +7,8 @@ import type {
   UserProfile,
   UserReport,
 } from '@shared/types';
-import { supabase } from '@shared/api';
-import type { UserReporter } from '@features/reporting';
-import { err, ok, query, REGEX_TEXT_PATH } from '@shared/utils';
+import { err, FormUtils, ok, query, REGEX_TEXT_PATH } from '@shared/utils';
+import { link } from 'fs';
 
 /**
  * See the implementation below for more information.
@@ -17,12 +18,8 @@ interface UserReporting {
    * Retrieves user reports made by the given user.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param reporter the given user identifier
-   * @returns a promise that resolves to the corresponding user reports from the given user
+   * @returns the {@link Promise} that resolves to the corresponding user reports from the given user
    */
   getByReporter: (
     reporter: RequireProperty<UserProfile, 'supabase_id'>,
@@ -32,12 +29,8 @@ interface UserReporting {
    * Retrieves user reports against the given user.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param reported the given user identifier
-   * @returns a promise that resolves to the corresponding user reports against the given user
+   * @returns the {@link Promise} that resolves to the corresponding user reports against the given user
    */
   getByReported: (
     reported: RequireProperty<UserProfile, 'supabase_id'>,
@@ -54,13 +47,9 @@ interface UserReporting {
   /**
    * Removes the given user report(s) made by the given user.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param reporter the given user identifier
    * @param reports the given report identifier(s)
-   * @returns a promise that resolves to the corresponding deleted user reports from the given user
+   * @returns the {@link Promise} that resolves to the corresponding deleted user reports from the given user
    */
   remove: (
     reporter: RequireProperty<UserProfile, 'supabase_id'>,
@@ -70,13 +59,9 @@ interface UserReporting {
   /**
    * Closes the given user report(s) made by the given user.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param reporter the given user identifier
    * @param reports the given report identifier(s)
-   * @returns a promise that resolves to the corresponding closed user reports from the given user
+   * @returns the {@link Promise} that resolves to the corresponding closed user reports from the given user
    */
   close: (
     reporter: RequireProperty<UserProfile, 'supabase_id'>,
@@ -86,13 +71,9 @@ interface UserReporting {
   /**
    * Reopens the given user report(s) made by the given user.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param reporter the given user identifier
    * @param reprots the given report identifier(s)
-   * @returns a promise that resolves to the corresponding reopened user reports from the given user
+   * @returns the {@link Promise} that resolves to the corresponding reopened user reports from the given user
    */
   open: (
     reporter: RequireProperty<UserProfile, 'supabase_id'>,
@@ -102,11 +83,7 @@ interface UserReporting {
   /**
    * Modifies the given user report (description).
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a promise that resolves to the corresponding modified user report
+   * @returns the {@link Promise} that resolves to the corresponding modified user report
    */
   modify: (
     report: RequireProperty<UserReport, 'id' | 'description'>,
@@ -123,9 +100,9 @@ interface UserReporting {
  * @author Andrew Krawiec (AndrewTries)
  */
 export const UserReporting: UserReporting = {
-  getByReporter: async (
+  async getByReporter(
     reporter: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<UserReport[], '*'> => {
+  ): DatabaseQuery<UserReport[], '*'> {
     return query(
       await supabase
         .from('Reports')
@@ -134,9 +111,9 @@ export const UserReporting: UserReporting = {
         .order('created_at', { ascending: false }),
     );
   },
-  getByReported: async (
+  async getByReported(
     reported: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<UserReport[], '*'> => {
+  ): DatabaseQuery<UserReport[], '*'> {
     return query(
       await supabase
         .from('Reports')
@@ -145,25 +122,42 @@ export const UserReporting: UserReporting = {
         .order('created_at', { ascending: false }),
     );
   },
-  create: (): UserReporter => {
+  create(): UserReporter {
     const report: Partial<UserReport> = {};
 
     return {
-      description(description: string): Result<UserReporter> {
-        if (!description) {
-          return err('Report description is empty', report);
+      description(form: FormData, key = 'description'): Result<string> {
+        const { data, error } = FormUtils.getString(form, key);
+
+        if (error) {
+          return err('Invalid report description', error);
+        } else if (!data) {
+          return err('Description cannot be empty', report);
+        } else {
+          return ok((report.description = data));
+        }
+      },
+      link(form: FormData, key = 'link'): Result<string> {
+        const { data, error } = FormUtils.getString(form, key);
+
+        if (error) {
+          return err('Invalid report link', error);
+        } else if (!data) {
+          return err('Link cannot be empty', report);
+        } else if (!REGEX_TEXT_PATH.test(data)) {
+          return err('Link cannot be a non-text file', data);
+        } else {
+          return ok((report.linked_information = data));
+        }
+      },
+      isSatisfied(): boolean {
+        if (!report.description) {
+          return false;
         }
 
-        return ok(this);
+        return true;
       },
-      link(link: string): Result<UserReporter> {
-        if (!REGEX_TEXT_PATH.test(link)) {
-          return err('Report link is empty', report);
-        }
-
-        return ok(this);
-      },
-      async report(
+      async submit(
         target: RequireProperty<UserProfile, 'supabase_id'>,
       ): DatabaseQuery<UserReport, 'id'> {
         return query(
@@ -179,10 +173,10 @@ export const UserReporting: UserReporting = {
       },
     };
   },
-  remove: async (
+  async remove(
     reporter: RequireProperty<UserProfile, 'supabase_id'>,
     reports: RequireProperty<UserReport, 'id'>[],
-  ): DatabaseQuery<UserReport[], 'id'> => {
+  ): DatabaseQuery<UserReport[], 'id'> {
     return query(
       await supabase
         .from('Reports')
@@ -195,10 +189,10 @@ export const UserReporting: UserReporting = {
         .select('id'),
     );
   },
-  close: async (
+  async close(
     reporter: RequireProperty<UserProfile, 'supabase_id'>,
     reports: RequireProperty<UserReport, 'id'>[],
-  ): DatabaseQuery<UserReport[], 'id'> => {
+  ): DatabaseQuery<UserReport[], 'id'> {
     return query(
       await supabase
         .from('Reports')
@@ -214,10 +208,10 @@ export const UserReporting: UserReporting = {
         .select(),
     );
   },
-  open: async (
+  async open(
     reporter: RequireProperty<UserProfile, 'supabase_id'>,
     reports: RequireProperty<UserReport, 'id'>[],
-  ): DatabaseQuery<UserReport[], 'id'> => {
+  ): DatabaseQuery<UserReport[], 'id'> {
     return query(
       await supabase
         .from('Reports')
@@ -233,9 +227,9 @@ export const UserReporting: UserReporting = {
         .select('id'),
     );
   },
-  modify: async (
+  async modify(
     report: RequireProperty<UserReport, 'id' | 'description'>,
-  ): DatabaseQuery<UserReport, 'id'> => {
+  ): DatabaseQuery<UserReport, 'id'> {
     return query(
       await supabase
         .from('Reports')
