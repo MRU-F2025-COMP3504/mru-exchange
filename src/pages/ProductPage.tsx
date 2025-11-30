@@ -60,6 +60,7 @@ export default function ProductPage() {
   const reviewBtn = useRef<HTMLButtonElement>(null);
   const reviewPopup = useRef<HTMLDivElement>(null);
   const reviewContent = useRef<HTMLDivElement>(null);
+  const reviewStars: React.RefObject<HTMLSpanElement> = useRef<HTMLSpanElement>(null);
 
   const currentUserId = user.ok ? user.data.id : null;
 
@@ -469,6 +470,10 @@ export default function ProductPage() {
     reviewPopup.current?.classList.remove("flex");
   }
 
+  function resetReviewInput(): void {
+
+  }
+
   // Also hide review input if Esc is pressed.
   document.addEventListener("keyup", e => {
     if (e.key === "Escape") {
@@ -482,25 +487,20 @@ export default function ProductPage() {
    * Displays the rating on the review input form.
    * @param e The event form
    */
-  function displayRating(e: React.MouseEvent<HTMLSpanElement>): void {
+  function displayRating(container: React.RefObject<HTMLSpanElement>, rating: number): void {
 
     // Fetch data
-    const rating: number = Number(e.target?.dataset.value);
-    // console.log(e.target);
-    // console.log(e.target.dataset.value);
     const stars: string = displayStars(rating);
-    const container: HTMLSpanElement = e.target.parentNode;
-    // console.log(container);
 
     // Update the value.
     setRating(rating);
     // console.log(rating);
 
     // For every star,
-    for (let i = 0; i < container.children.length; i++) {
+    for (let i = 0; i < container.current.children.length; i++) {
 
       // Update the stars.
-      container.children[i].textContent = stars[i];
+      container.current.children[i].textContent = stars[i];
 
     }
 
@@ -552,7 +552,9 @@ export default function ProductPage() {
 
         // If success,
         if(publish.ok){
-          console.log("Published!")
+          console.log("Published!");
+          hideReviewInput();
+          resetReviewInput();
         }
         else{
           console.error("Error: Failed to publish.");
@@ -816,12 +818,15 @@ export default function ProductPage() {
                 </label>
                 <label>
                   <p className="text-xl my-2">Rate: &nbsp;
-                    <span id="reviewRating" className="text-2xl my-2 text-yellow-400">
-                      <span data-value="1" onClick={displayRating}>☆</span>
-                      <span data-value="2" onClick={displayRating}>☆</span>
-                      <span data-value="3" onClick={displayRating}>☆</span>
-                      <span data-value="4" onClick={displayRating}>☆</span>
-                      <span data-value="5" onClick={displayRating}>☆</span>
+                    <span 
+                      ref={reviewStars}
+                      id="reviewRating" 
+                      className="text-2xl my-2 text-yellow-400">
+                      <span onClick={() => {displayRating(reviewStars, 1)}}>☆</span>
+                      <span onClick={() => {displayRating(reviewStars, 2)}}>☆</span>
+                      <span onClick={() => {displayRating(reviewStars, 3)}}>☆</span>
+                      <span onClick={() => {displayRating(reviewStars, 4)}}>☆</span>
+                      <span onClick={() => {displayRating(reviewStars, 5)}}>☆</span>
                     </span>
                   </p>
                 </label>
