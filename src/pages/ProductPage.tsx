@@ -4,8 +4,11 @@ import Header from './Header';
 import Footer from './Footer';
 import type { LinkData } from '../shared/components/LinkDelimitedList';
 import LinkDelimitedList from '../shared/components/LinkDelimitedList';
-import { supabase } from '@shared/api';
+import { supabase, UserAuthentication } from '@shared/api';
 import { useAuth } from '@shared/contexts';
+import { type UserProfile, type Result, type DatabaseQueryResult } from '@shared/types';
+import { UserReviewing } from '@features/review';
+import { type ReviewPublisher } from '@features/review';
 
 interface Product {
   id: number;
@@ -350,39 +353,39 @@ export default function ProductPage() {
    */
   function getImageUrls(imageData: { images: string[] }): string[] | null {
 
-      try {
+    try {
 
-          // Create an array.
-          const imagesArray = [];
+      // Create an array.
+      const imagesArray = [];
 
-          // For every image,
-          for (const imagePath of imageData.images) {
+      // For every image,
+      for (const imagePath of imageData.images) {
 
-              if (!imagePath) return null;
+        if (!imagePath) return null;
 
-              if (imagePath.startsWith('http')) {
-                  imagesArray.push(imagePath);
-              }
+        if (imagePath.startsWith('http')) {
+          imagesArray.push(imagePath);
+        }
 
-              const filename = imagePath.replace('database/images/', '').split('/').pop();
+        const filename = imagePath.replace('database/images/', '').split('/').pop();
 
-              if (!filename) return null;
+        if (!filename) return null;
 
-              const { data } = supabase.storage
-                  .from('product-images')
-                  .getPublicUrl(filename);
+        const { data } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(filename);
 
-              imagesArray.push(data.publicUrl);
+        imagesArray.push(data.publicUrl);
 
-          }
-
-          // Return
-          return imagesArray;
-
-      } catch (error) {
-          console.error('Error getting image URL:', error);
-          return null;
       }
+
+      // Return
+      return imagesArray;
+
+    } catch (error) {
+      console.error('Error getting image URL:', error);
+      return null;
+    }
   };
 
   const calculateAverageRating = (): number => {
@@ -488,13 +491,13 @@ export default function ProductPage() {
     const stars: string = displayStars(rating);
     const container: HTMLSpanElement = e.target.parentNode;
     // console.log(container);
-    
+
     // Update the value.
     setRating(rating);
     // console.log(rating);
 
     // For every star,
-    for(let i = 0; i < container.children.length; i++){
+    for (let i = 0; i < container.children.length; i++) {
 
       // Update the stars.
       container.children[i].textContent = stars[i];
@@ -507,21 +510,63 @@ export default function ProductPage() {
    * Submits the review to the database.
    * @param event The submit event.
    */
-  function submitReview(event: FormEvent<HTMLFormElement>): void {
+  async function submitReview(event: FormEvent<HTMLFormElement>): void {
 
     // Stop the submission.
     event.preventDefault();
 
     // Get values.
     const form: FormData = new FormData(event.currentTarget);
-    const title: FormDataEntryValue = form.get("title");
-    const desc: FormDataEntryValue = form.get("desc");
+    const title: string = form.get("title") as string;
+    const desc: string = form.get("description") as string;
     const rate: number = rating;
-    
+
+    // console.log(user);
     // console.log(title);
     // console.log(desc);
     // console.log(rate);
 
+    // If success,
+    if (user.ok) {
+
+      // Get the profile.
+      const profile: Result<UserProfile> = await UserAuthentication.getUserProfile(user.data);
+
+      // console.log(typeof profile);
+      // console.log(profile);
+
+      // If success,
+      if (profile.ok) {
+
+        // console.log(profile.data);
+
+        // Create review publisher
+        const rpublisher: ReviewPublisher = UserReviewing.create(profile.data);
+        rpublisher.description(form);
+        rpublisher.rating(form);
+
+        // console.log(rpublisher);
+
+        // Publish
+        const publish: DatabaseQueryResult<Review, "id"> = await rpublisher.submit();
+
+        // If success,
+        if(publish.ok){
+          console.log("Published!")
+        }
+        else{
+          console.error("Error: Failed to publish.");
+        }
+
+      }
+      else {
+        console.error("Error: Could not get profile.");
+      }
+
+    }
+    else {
+      console.error("Error: Could not get user.");
+    }
 
 
   }
@@ -763,7 +808,7 @@ export default function ProductPage() {
                 </button>
               </div>
               <form
-              onSubmit={submitReview}
+                onSubmit={submitReview}
               >
                 <label>
                   <p className="text-xl my-2">Title:</p>
@@ -771,23 +816,23 @@ export default function ProductPage() {
                 </label>
                 <label>
                   <p className="text-xl my-2">Rate: &nbsp;
-                  <span id="reviewRating" className="text-2xl my-2 text-yellow-400">
-                    <span data-value="1" onClick={displayRating}>☆</span>
-                    <span data-value="2" onClick={displayRating}>☆</span>
-                    <span data-value="3" onClick={displayRating}>☆</span>
-                    <span data-value="4" onClick={displayRating}>☆</span>
-                    <span data-value="5" onClick={displayRating}>☆</span>
-                  </span>
+                    <span id="reviewRating" className="text-2xl my-2 text-yellow-400">
+                      <span data-value="1" onClick={displayRating}>☆</span>
+                      <span data-value="2" onClick={displayRating}>☆</span>
+                      <span data-value="3" onClick={displayRating}>☆</span>
+                      <span data-value="4" onClick={displayRating}>☆</span>
+                      <span data-value="5" onClick={displayRating}>☆</span>
+                    </span>
                   </p>
                 </label>
                 <label>
                   <p className="text-xl my-2">Description:</p>
-                  <textarea name="desc" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-full h-40 resize-none"></textarea>
+                  <textarea name="description" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-full h-40 resize-none"></textarea>
                 </label>
                 <div className="py-5">
-                  <button 
-                  type="submit" 
-                  className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Submit</button>
+                  <button
+                    type="submit"
+                    className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Submit</button>
                   <button type="reset" className="bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25">Clear</button>
                 </div>
               </form>
