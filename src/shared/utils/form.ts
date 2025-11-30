@@ -44,6 +44,11 @@ export const FormUtils: FormUtils = {
         return err(
           `Invalid file detected in the form data (key: ${key}, input: ${JSON.stringify(input)})`,
         );
+      } else if (Object.keys(value).length === 0) {
+        return err(
+          `No file found in the form data (key: ${key}, input: ${JSON.stringify(value)})`,
+          value,
+        );
       }
     }
 
@@ -52,10 +57,12 @@ export const FormUtils: FormUtils = {
   getFile(form: FormData, key: string): Result<File> {
     const input = form.get(key);
 
-    if (input && typeof input !== 'string') {
+    if (input && typeof input !== 'string' && Object.keys(input).length > 0) {
       return ok(input);
     }
 
-    return err(`No file found in the form data (key: ${key}, input: ${input})`);
+    return err(
+      `No file found in the form data (key: ${key}, input: ${JSON.stringify(input)})`,
+    );
   },
 };
