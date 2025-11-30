@@ -574,7 +574,13 @@ export default function ProductPage() {
               <h1 className='text-3xl py-2 font-bold'>{product.title}</h1>
               {seller && (
                 <p className='text-xl'>
-                  Seller: {seller.first_name} {seller.last_name}
+                  Seller:{' '}
+                  <span
+                    onClick={() => navigate(`/seller/${seller.supabase_id}`)}
+                    className='text-[#007FB5] hover:underline cursor-pointer'
+                  >
+                    {seller.first_name} {seller.last_name}
+                  </span>
                 </p>
               )}
             </div>
@@ -675,7 +681,13 @@ export default function ProductPage() {
                 <h1 className='text-3xl py-2 font-bold'>{product.title}</h1>
                 {seller && (
                   <p className='text-xl pb-4'>
-                    Seller: {seller.first_name} {seller.last_name}
+                    Seller:{' '}
+                    <span
+                      onClick={() => navigate(`/seller/${seller.supabase_id}`)}
+                      className='text-[#007FB5] hover:underline cursor-pointer'
+                    >
+                      {seller.first_name} {seller.last_name}
+                    </span>
                   </p>
                 )}
               </div>

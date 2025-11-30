@@ -9,6 +9,7 @@ export { default as PreviewPostPage } from '@pages/PreviewPostPage';
 export { default as ProductPage } from '@pages/ProductPage';
 export { default as ProductSearchPage } from '@pages/ProductSearchPage';
 export { default as ProfilePage } from '@pages/ProfilePage';
+export { default as SellerPage } from '@pages/SellerPage';
 export { default as ResetPasswordPage } from '@pages/ResetPasswordPage';
 export { default as SignInPage } from '@pages/SignInPage';
 export { default as SignUpPage } from '@pages/SignUpPage';

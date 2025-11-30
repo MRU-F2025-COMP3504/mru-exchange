@@ -8,6 +8,7 @@ import {
   ProductPage,
   ProductSearchPage,
   ProfilePage,
+  SellerPage,
   ResetPasswordPage,
   SignInPage,
   SignUpPage,
@@ -64,6 +65,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/seller/:sellerId'
+            element={
+              <ProtectedRoute>
+                <SellerPage />
               </ProtectedRoute>
             }
           />
