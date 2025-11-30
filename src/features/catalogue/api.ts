@@ -228,7 +228,13 @@ export const ProductCatalogue: ProductCatalogue = {
           } else if (REGEX_LETTERS_ONLY.test(data)) {
             return err('Minimum price cannot have letters', data);
           } else {
-            return ok(+data);
+            const value = +data;
+
+            if (value < 0) {
+              return err('Minimum price cannot be negative', value);
+            } else {
+              return ok(value);
+            }
           }
         };
 
@@ -242,7 +248,13 @@ export const ProductCatalogue: ProductCatalogue = {
           } else if (REGEX_LETTERS_ONLY.test(data)) {
             return err('Maximum price cannot have letters', data);
           } else {
-            return ok(+data);
+            const value = +data;
+
+            if (value < 0) {
+              return err('Maximum price cannot be negative', value);
+            } else {
+              return ok(value);
+            }
           }
         };
 
@@ -250,6 +262,13 @@ export const ProductCatalogue: ProductCatalogue = {
         const [pmin, pmax] = range;
 
         if (pmin.ok && pmax.ok) {
+          if (pmin.data > pmax.data) {
+            return [
+              err('Minimum price exceeds maximum price', range),
+              err('Maximum price is less than minimum price', range),
+            ];
+          }
+
           filter.price = {
             min: pmin.data,
             max: pmax.data,
@@ -272,7 +291,13 @@ export const ProductCatalogue: ProductCatalogue = {
           } else if (REGEX_LETTERS_ONLY.test(data)) {
             return err('Minimum stock cannot have letters', data);
           } else {
-            return ok(+data);
+            const value = +data;
+
+            if (value < 0) {
+              return err('Minimum stock cannot be negative', value);
+            } else {
+              return ok(value);
+            }
           }
         };
 
@@ -286,7 +311,13 @@ export const ProductCatalogue: ProductCatalogue = {
           } else if (REGEX_LETTERS_ONLY.test(data)) {
             return err('Maximum stock cannot have letters', data);
           } else {
-            return ok(+data);
+            const value = +data;
+
+            if (value < 0) {
+              return err('Maximum stock cannot be negative', value);
+            } else {
+              return ok(value);
+            }
           }
         };
 
@@ -294,6 +325,13 @@ export const ProductCatalogue: ProductCatalogue = {
         const [smin, smax] = range;
 
         if (smin.ok && smax.ok) {
+          if (smin.data > smin.data) {
+            return [
+              err('Minimum stock exceeds maximum stock', range),
+              err('Maximum stock is less than minimum stock', range),
+            ];
+          }
+
           filter.stock = {
             min: smin.data,
             max: smax.data,
