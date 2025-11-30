@@ -50,7 +50,10 @@ interface UserAuthentication {
    * @returns the subscription for the {@link AuthChangeEvent}
    */
   subscribe: (
-    callback: (event: AuthChangeEvent, session: Result<Session>) => void,
+    callback: (
+      event: AuthChangeEvent,
+      session: Result<Session>,
+    ) => Promise<void>,
   ) => Subscription;
 
   /**
@@ -117,15 +120,23 @@ export const UserAuthentication: UserAuthentication = {
     );
   },
   subscribe(
-    callback: (event: AuthChangeEvent, session: Result<Session>) => void,
+    callback: (
+      event: AuthChangeEvent,
+      session: Result<Session>,
+    ) => Promise<void>,
   ): Subscription {
-    const subscriber = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        callback(event, ok(session));
-      } else {
-        callback(event, err('No user session found', { event, session }));
-      }
-    });
+    const subscriber = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session) {
+          await callback(event, ok(session));
+        } else {
+          await callback(
+            event,
+            err('No user session found', { event, session }),
+          );
+        }
+      },
+    );
 
     return subscriber.data.subscription;
   },

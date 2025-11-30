@@ -1,6 +1,6 @@
 import { UserAuthentication } from '@shared/api';
 import { AuthContext } from '@shared/contexts';
-import type { NullableResult } from '@shared/types';
+import type { NullableResult, UserProfile } from '@shared/types';
 import { empty, ok } from '@shared/utils';
 import type { User } from '@supabase/supabase-js';
 import { type JSX, type ReactNode, useEffect, useState } from 'react';
@@ -26,6 +26,9 @@ interface AuthProvider {
 export function AuthProvider({ children }: AuthProvider): JSX.Element {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<NullableResult<User>>(() => empty());
+  const [profile, setProfile] = useState<NullableResult<UserProfile>>(() =>
+    empty(),
+  );
 
   /**
    * Hooks the `signup()` functionality.
@@ -64,12 +67,17 @@ export function AuthProvider({ children }: AuthProvider): JSX.Element {
    * Subscribes the authentication provider to user authentication events.
    */
   useEffect(() => {
-    const subscription = UserAuthentication.subscribe((_, result) => {
+    const subscription = UserAuthentication.subscribe(async (_, result) => {
       if (result.ok) {
-        setUser(ok(result.data.user));
+        const user = result.data.user;
+        const profile = await UserAuthentication.getUserProfile(user);
+
+        setUser(ok(user));
+        setProfile(profile);
         setLoading(false);
       } else {
         setUser(result);
+        setProfile(result);
       }
     });
 
@@ -83,6 +91,7 @@ export function AuthProvider({ children }: AuthProvider): JSX.Element {
       value={{
         loading,
         user,
+        profile,
         signup,
         signin,
         signout,

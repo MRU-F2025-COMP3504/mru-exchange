@@ -2,6 +2,7 @@ import type {
   NullableResult,
   PromiseResult,
   UserPasswordModifier,
+  UserProfile,
   UserSignin,
   UserSignup,
   UserVerificationResender,
@@ -26,6 +27,11 @@ export interface AuthContext {
    * The current user result state.
    */
   user: NullableResult<User>;
+
+  /**
+   * The current user profile result state.
+   */
+  profile: NullableResult<UserProfile>;
 
   /**
    * @see {@link UserAuthentication.signup()}
