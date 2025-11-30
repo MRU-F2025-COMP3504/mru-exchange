@@ -60,7 +60,9 @@ export default function ProductPage() {
   const reviewBtn = useRef<HTMLButtonElement>(null);
   const reviewPopup = useRef<HTMLDivElement>(null);
   const reviewContent = useRef<HTMLDivElement>(null);
+  const reviewTitle: React.RefObject<HTMLInputElement> = useRef<HTMLInputElement>(null);
   const reviewStars: React.RefObject<HTMLSpanElement> = useRef<HTMLSpanElement>(null);
+  const reviewDescription: React.RefObject<HTMLTextAreaElement> = useRef<HTMLTextAreaElement>(null);
 
   const currentUserId = user.ok ? user.data.id : null;
 
@@ -472,6 +474,11 @@ export default function ProductPage() {
 
   function resetReviewInput(): void {
 
+    // Reset the inputs.
+    displayRating(reviewStars, 0);
+    reviewTitle.current.value = "";
+    reviewDescription.current.value = "";
+
   }
 
   // Also hide review input if Esc is pressed.
@@ -551,12 +558,12 @@ export default function ProductPage() {
         const publish: DatabaseQueryResult<Review, "id"> = await rpublisher.submit();
 
         // If success,
-        if(publish.ok){
+        if (publish.ok) {
           console.log("Published!");
           hideReviewInput();
           resetReviewInput();
         }
-        else{
+        else {
           console.error("Error: Failed to publish.");
         }
 
@@ -814,25 +821,32 @@ export default function ProductPage() {
               >
                 <label>
                   <p className="text-xl my-2">Title:</p>
-                  <input name="title" type="text" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-[50%] min-w-60"></input>
+                  <input
+                    ref={reviewTitle}
+                    name="title"
+                    type="text"
+                    className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-[50%] min-w-60"></input>
                 </label>
                 <label>
                   <p className="text-xl my-2">Rate: &nbsp;
-                    <span 
+                    <span
                       ref={reviewStars}
-                      id="reviewRating" 
+                      id="reviewRating"
                       className="text-2xl my-2 text-yellow-400">
-                      <span onClick={() => {displayRating(reviewStars, 1)}}>☆</span>
-                      <span onClick={() => {displayRating(reviewStars, 2)}}>☆</span>
-                      <span onClick={() => {displayRating(reviewStars, 3)}}>☆</span>
-                      <span onClick={() => {displayRating(reviewStars, 4)}}>☆</span>
-                      <span onClick={() => {displayRating(reviewStars, 5)}}>☆</span>
+                      <span onClick={() => { displayRating(reviewStars, 1) }}>☆</span>
+                      <span onClick={() => { displayRating(reviewStars, 2) }}>☆</span>
+                      <span onClick={() => { displayRating(reviewStars, 3) }}>☆</span>
+                      <span onClick={() => { displayRating(reviewStars, 4) }}>☆</span>
+                      <span onClick={() => { displayRating(reviewStars, 5) }}>☆</span>
                     </span>
                   </p>
                 </label>
                 <label>
                   <p className="text-xl my-2">Description:</p>
-                  <textarea name="description" className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-full h-40 resize-none"></textarea>
+                  <textarea
+                    ref={reviewDescription}
+                    name="description"
+                    className="bg-gray-100 border-2 rounded border-gray-300 p-2 w-full h-40 resize-none"></textarea>
                 </label>
                 <div className="py-5">
                   <button
