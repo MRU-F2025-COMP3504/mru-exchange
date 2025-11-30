@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import Footer from '../Footer.tsx';
+import { Footer } from '@pages/index';
 import { MemoryRouter } from 'react-router-dom';
 
 describe('Footer', () => {
@@ -13,6 +13,7 @@ describe('Footer', () => {
     );
 
     const link = screen.getByRole('link', { name: /contact us/i });
+
     expect(link).not.toBeNull();
     expect(link.getAttribute('href')).toBe('/contact-us');
     expect(link.textContent).toContain('Contact Us');

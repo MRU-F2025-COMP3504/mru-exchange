@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mockQuery } from '@shared/tests';
+import { mockQuery } from '@shared/utils';
 import { UserReporting } from '@features/reporting';
 
 describe('User Reporting', () => {
@@ -39,58 +39,33 @@ describe('User Reporting', () => {
     expect(result.ok, 'getByReported() failed').toBe(true);
   });
 
-  it('create a user report', async () => {
-    mockQuery({
-      insert: vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          single: vi.fn().mockReturnValue({ data: { id: 0 }, error: null }),
-        }),
-      }),
-    });
-
+  it('create a user report', () => {
     const create = UserReporting.create();
+    const form = new FormData();
 
-    const validDescription = 'this is a description';
-    const validDescriptionResult = create.description(validDescription);
+    form.set('description', '123abc');
 
-    expect(validDescriptionResult.ok, 'create.description() invalid').toBe(
+    expect(create.description(form).ok, 'create.description() invalid').toBe(
       true,
     );
 
-    const invalidDescription = '';
-    const invalidDescriptionResult = create.description(invalidDescription);
+    form.set('description', '');
 
-    expect(invalidDescriptionResult.ok, 'create.description() valid').toBe(
+    expect(create.description(form).ok, 'create.description() valid').toBe(
       false,
     );
 
-    const validLinks = [
-      'reports/user1.txt',
-      '/reports/user2.txt',
-      './reports/user3.txt',
-      '../reports/user4.txt',
-      '../../reports/user5.txt',
-    ];
+    form.append('link', 'reports/user.txt');
+    form.append('link', '/reports/user.txt');
+    form.append('link', './reports/user.txt');
+    form.append('link', '../reports/user.txt');
+    form.append('link', '../../reports/user.txt');
 
-    for (const link of validLinks) {
-      const validLinkResult = create.link(link);
+    expect(create.link(form).ok, 'create.description() invalid').toBe(true);
 
-      expect(validLinkResult.ok, 'link() invalid').toBe(true);
-    }
+    form.set('link', 'reports/user.jpg');
 
-    const invalidLinks = ['', '. reports/user1.txt', '$!@#,', 'c:/', '.txt'];
-
-    for (const link of invalidLinks) {
-      const invalidLinkResult = create.link(link);
-
-      expect(invalidLinkResult.ok, 'link() valid').toBe(false);
-    }
-
-    const target = { supabase_id: 'abc123' };
-    const report = create.report(target);
-    const result = await report;
-
-    expect(result.ok, 'report() failed').toBe(true);
+    expect(create.link(form).ok, 'create.description() valid').toBe(false);
   });
 
   it('remove user reports', async () => {

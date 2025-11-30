@@ -1,53 +1,43 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mockQuery } from '@shared/tests';
+import { mockQuery } from '@shared/utils';
 import { UserReviewing } from '@features/review';
 
 describe('Review Creation/Modification', () => {
-  it('creates a review', async () => {
-    mockQuery({
-      insert: vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          single: vi.fn().mockReturnValue({ data: { id: 0 }, error: null }),
-        }),
-      }),
-    });
+  it('creates a review', () => {
+    const create = UserReviewing.create({ supabase_id: 'abc123' });
+    const form = new FormData();
 
-    const reviewer = { supabase_id: 'abc123' };
-    const create = UserReviewing.create(reviewer);
+    form.set('description', '123abc');
 
-    const validDescription = 'this is a description';
-    const validDescriptionResult = create.description(validDescription);
-
-    expect(validDescriptionResult.ok, 'create.description() invalid').toBe(
+    expect(create.description(form).ok, 'create.description() invalid').toBe(
       true,
     );
 
-    const invalidDescription = '';
-    const invalidDescriptionResult = create.description(invalidDescription);
+    form.set('description', '');
 
-    expect(invalidDescriptionResult.ok, 'create.description() valid').toBe(
+    expect(create.description(form).ok, 'create.description() valid').toBe(
       false,
     );
 
-    const validRating = 3.5;
-    const validRatingResult = create.rating(validRating);
+    form.set('rating', '3.5');
 
-    expect(validRatingResult.ok, 'create.rating() invalid').toBe(true);
+    expect(create.rating(form).ok, 'create.rating() invalid').toBe(true);
 
-    const invalidNegativeRating = -1;
-    const invalidNegativeRatingResult = create.rating(invalidNegativeRating);
+    form.set('rating', '5');
 
-    expect(invalidNegativeRatingResult.ok, 'create.rating() valid').toBe(false);
+    expect(create.rating(form).ok, 'create.rating() invalid').toBe(true);
 
-    const invalidOverMaxRating = 6;
-    const invalidOverMaxRatingResult = create.rating(invalidOverMaxRating);
+    form.set('rating', '');
 
-    expect(invalidOverMaxRatingResult.ok, 'create.rating() valid').toBe(false);
+    expect(create.rating(form).ok, 'create.rating() valid').toBe(false);
 
-    const publish = create.publish();
-    const result = await publish;
+    form.set('rating', '-1');
 
-    expect(result.ok, 'create.publish() failed').toBe(true);
+    expect(create.rating(form).ok, 'create.rating() valid').toBe(false);
+
+    form.set('rating', '5.5');
+
+    expect(create.rating(form).ok, 'create.rating() valid').toBe(false);
   });
 
   it('removes reviews', async () => {

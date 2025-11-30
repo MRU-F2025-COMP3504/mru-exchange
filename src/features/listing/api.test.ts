@@ -1,5 +1,5 @@
 import { describe, it, vi, expect } from 'vitest';
-import { mockQuery } from '@shared/tests';
+import { err, mockQuery } from '@shared/utils';
 import { CategoryListing, ProductListing } from '@features/listing';
 
 describe('Category Creation/Modification', () => {
@@ -17,7 +17,7 @@ describe('Category Creation/Modification', () => {
       description: 'School textbooks',
     };
 
-    const query = CategoryListing.register(category);
+    const query = CategoryListing.create(category);
     const result = await query;
 
     expect(result.ok, 'register()').toBe(true);
@@ -85,111 +85,75 @@ describe('Category Tagging', () => {
 });
 
 describe('Product Listing', () => {
-  it('registers a product', async () => {
-    mockQuery({
-      insert: vi.fn().mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({ data: { id: 0 }, error: null }),
-        }),
-      }),
-    });
+  it('registers a product', () => {
+    const create = ProductListing.create();
+    const form = new FormData();
 
-    const register = ProductListing.register();
+    form.set('title', '123abc');
 
-    const validSeller = { supabase_id: 'abc123' };
-    const validSellerResult = register.seller(validSeller);
+    expect(create.title(form).ok, 'create.title() invalid').toBe(true);
 
-    expect(validSellerResult.ok, 'register.seller() invalid').toBe(true);
+    form.set('title', '');
 
-    const invalidSeller = { supabase_id: '' };
-    const invalidSellerResult = register.seller(invalidSeller);
+    expect(create.title(form).ok, 'create.title() valid').toBe(false);
 
-    expect(invalidSellerResult.ok, 'register.seller() valid').toBe(false);
+    form.set('description', '123abc');
 
-    const validTitle = 'title here';
-    const validTitleResult = register.title(validTitle);
-
-    expect(validTitleResult.ok, 'register.title() invalid').toBe(true);
-
-    const invalidTitle = '';
-    const invalidTitleResult = register.title(invalidTitle);
-
-    expect(invalidTitleResult.ok, 'register.title() valid').toBe(false);
-
-    const validDescription = 'description here';
-    const validDescriptionResult = register.description(validDescription);
-
-    expect(validDescriptionResult.ok, 'register.description() invalid').toBe(
+    expect(create.description(form).ok, 'create.description() invalid').toBe(
       true,
     );
 
-    const invalidDescription = '';
-    const invalidDescriptionResult = register.description(invalidDescription);
+    form.set('description', '');
 
-    expect(invalidDescriptionResult.ok, 'register.description() valid').toBe(
+    expect(create.description(form).ok, 'create.description() valid').toBe(
       false,
     );
 
-    const validImages = [
-      'database/images/test.jpg',
-      'test.jpg',
-      'test.png',
-      'database/images/test.jpg',
-      '/test/image.png',
-      '/test/image.jpg',
-    ];
-
-    const validImageResult = register.image(
-      validImages.map((image) => ({
-        path: image,
-        body: new File([], ''),
-      })),
+    form.append(
+      'images',
+      new File([], 'img1.jpg', {
+        type: 'image/jpeg',
+      }),
+    );
+    form.append(
+      'images',
+      new File([], 'img2.jpg', {
+        type: 'image/jpeg',
+      }),
+    );
+    form.append(
+      'images',
+      new File([], 'img3.jpg', {
+        type: 'image/jpeg',
+      }),
     );
 
-    expect(validImageResult.ok, 'register.image() invalid').toBe(true);
+    expect(create.images(form).ok, 'create.images() invalid').toBe(true);
 
-    const invalidImages = [
-      '',
-      '. database/images/test.jpg',
-      '$!@#,',
-      'c:/',
-      '.png',
-      '.jpg',
-    ];
-
-    const invalidImageResult = register.image(
-      invalidImages.map((image) => ({
-        path: image,
-        body: new File([], ''),
-      })),
+    form.set(
+      'images',
+      new File(['12345'], 'imgx.txt', {
+        type: 'image/jpeg',
+      }),
     );
 
-    expect(invalidImageResult.ok, 'register.image() valid').toBe(false);
+    expect(create.images(form).ok, 'create.images() valid').toBe(false);
 
-    const validPrice = 15;
-    const validPriceResult = register.price(validPrice);
+    form.set('price', '690');
 
-    expect(validPriceResult.ok, 'register.price() invalid').toBe(true);
+    expect(create.price(form).ok, 'create.price() invalid').toBe(true);
 
-    const invalidPrice = -1;
-    const invalidPriceResult = register.price(invalidPrice);
+    form.set('price', '-69');
 
-    expect(invalidPriceResult.ok, 'register.price() valid').toBe(false);
+    expect(create.price(form).ok, 'create.price() valid').toBe(false);
 
-    const validStock = 5;
-    const validStockResult = register.stock(validStock);
+    form.set('stock', '420');
 
-    expect(validStockResult.ok, 'register.stock() invalid').toBe(true);
+    expect(create.stock(form).ok, 'create.stock() invalid').toBe(true);
 
-    const invalidStock = -1;
-    const invalidStockResult = register.stock(invalidStock);
+    form.set('stock', '-69');
 
-    expect(invalidStockResult.ok, 'register.stock() valid').toBe(false);
-
-    const query = register.build();
-    const result = await query;
-
-    expect(result.ok, 'register.build() failed').toBe(true);
+    expect(create.stock(form).ok, 'create.stock() valid').toBe(false);
   });
 
   it('puts products to listing', async () => {
@@ -229,7 +193,63 @@ describe('Product Listing', () => {
     expect(result.ok, 'remove() failed').toBe(true);
   });
 
-  it('modify a product attribute', async () => {
+  it('modify a product attribute', () => {
+    const modifier = ProductListing.attribute({ id: 0 });
+    const form = new FormData();
+
+    form.set('title', '123abc');
+
+    expect(modifier.title(form).ok, 'attribute.title() invalid').toBe(true);
+
+    form.set('title', '');
+
+    expect(modifier.title(form).ok, 'attribute.title() valid').toBe(false);
+
+    form.set('description', '123abc');
+
+    expect(
+      modifier.description(form).ok,
+      'attribute.description() invalid',
+    ).toBe(true);
+
+    form.set('description', '');
+
+    expect(modifier.description(form).ok, 'attribute.description() valid').toBe(
+      false,
+    );
+
+    form.append(
+      'images',
+      new File(['12345'], 'img1.jpg', {
+        type: 'image/jpeg',
+      }),
+    );
+    form.append(
+      'images',
+      new File(['12345'], 'img2.jpg', {
+        type: 'image/jpeg',
+      }),
+    );
+    form.append(
+      'images',
+      new File(['12345'], 'img3.jpg', {
+        type: 'image/jpeg',
+      }),
+    );
+
+    expect(modifier.images(form).ok, 'create.images() invalid').toBe(true);
+
+    form.set(
+      'images',
+      new File(['12345'], 'imgx.txt', {
+        type: 'image/jpeg',
+      }),
+    );
+
+    expect(modifier.images(form).ok, 'create.images() valid').toBe(false);
+  });
+
+  it('change product price', async () => {
     mockQuery({
       update: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -240,73 +260,21 @@ describe('Product Listing', () => {
       }),
     });
 
-    const product = { id: 0 };
-    const attribute = ProductListing.attribute(product);
+    const form = new FormData();
 
-    const validTitle = 'title here';
-    const validTitleResult = attribute.title(validTitle);
+    form.set('price', '123');
 
-    expect(validTitleResult.ok, 'attribute.title() invalid').toBe(true);
+    expect(
+      (await ProductListing.price({ id: 0 }, form)).ok,
+      'price() invalid',
+    ).toBe(true);
 
-    const invalidTitle = '';
-    const invalidTitleResult = attribute.title(invalidTitle);
+    form.set('price', '');
 
-    expect(invalidTitleResult.ok, 'attribute.title() valid').toBe(false);
-
-    const validDescription = 'description here';
-    const validDescriptionResult = attribute.description(validDescription);
-
-    expect(validDescriptionResult.ok, 'attribute.description() invalid').toBe(
-      true,
-    );
-
-    const invalidDescription = '';
-    const invalidDescriptionResult = attribute.description(invalidDescription);
-
-    expect(invalidDescriptionResult.ok, 'attribute.description() valid').toBe(
-      false,
-    );
-
-    const validImages = [
-      'database/images/test.jpg',
-      'test.jpg',
-      'test.png',
-      'database/images/test.jpg',
-      '/test/image.png',
-      '/test/image.jpg',
-    ];
-
-    const validImageResult = attribute.image(
-      validImages.map((image) => ({
-        path: image,
-        body: new File([], ''),
-      })),
-    );
-
-    expect(validImageResult.ok, 'attribute.image() invalid').toBe(true);
-
-    const invalidImages = [
-      '',
-      '. database/images/test.jpg',
-      '$!@#,',
-      'c:/',
-      '.png',
-      '.jpg',
-    ];
-
-    const invalidImageResult = attribute.image(
-      invalidImages.map((image) => ({
-        path: image,
-        body: new File([], ''),
-      })),
-    );
-
-    expect(invalidImageResult.ok, 'attribute.image() valid').toBe(false);
-
-    const query = attribute.modify();
-    const result = await query;
-
-    expect(result.ok, 'attribute() failed').toBe(true);
+    expect(
+      (await ProductListing.price({ id: 0 }, form)).ok,
+      'price() valid',
+    ).toBe(false);
   });
 
   it('change product stock', async () => {
@@ -320,12 +288,20 @@ describe('Product Listing', () => {
       }),
     });
 
-    const product = { id: 0 };
+    const form = new FormData();
 
-    const stock = 5;
-    const query = ProductListing.stock(product, stock);
-    const result = await query;
+    form.set('stock', '123');
 
-    expect(result.ok, 'stock() invalid').toBe(true);
+    expect(
+      (await ProductListing.stock({ id: 0 }, form)).ok,
+      'stock() invalid',
+    ).toBe(true);
+
+    form.set('stock', '');
+
+    expect(
+      (await ProductListing.stock({ id: 0 }, form)).ok,
+      'stock() valid',
+    ).toBe(false);
   });
 });

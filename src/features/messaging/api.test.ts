@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mockChannel, mockQuery } from '@shared/tests';
+import { mockChannel, mockQuery } from '@shared/utils';
 import { UserChatting, UserMessaging } from '@features/messaging';
 
 describe('User Chat', () => {
