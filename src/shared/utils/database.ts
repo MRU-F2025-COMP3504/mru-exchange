@@ -1,3 +1,4 @@
+import { supabase } from '@shared/api';
 import type {
   DatabaseQueryResult,
   ExtractArrayType,
@@ -38,4 +39,8 @@ export function query<
   }
 
   return result as DatabaseQueryResult<Table, Columns>;
+}
+
+export function getAssetByBucket(bucket: string, path: string): string {
+  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }
