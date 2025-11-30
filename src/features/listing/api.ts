@@ -16,6 +16,7 @@ import {
   FormUtils,
   ok,
   query,
+  REGEX_IMAGE_PATH,
   REGEX_LETTER_NUMBERS_ONLY,
 } from '@shared/utils';
 
@@ -464,10 +465,22 @@ function setImages(
   if (error) {
     return err('Invalid product image(s)', error);
   } else {
+    const paths: string[] = [];
+
+    for (const image of data) {
+      const name = image.name;
+
+      if (!REGEX_IMAGE_PATH.test(name)) {
+        return err('Invalid image');
+      } else {
+        paths.push(name);
+      }
+    }
+
     images.splice(0, images.length, ...data);
 
     product.image = {
-      images: data.map((file) => file.name),
+      images: paths,
     };
 
     return ok(images);
