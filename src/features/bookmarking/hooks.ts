@@ -1,4 +1,5 @@
 import { ProductBookmarking } from '@features/bookmarking';
+import { useAuth } from '@shared/contexts';
 import type {
   BookmarkedProduct,
   DatabaseQuery,
@@ -6,10 +7,11 @@ import type {
   Product,
   ProductBookmarker,
   RequireProperty,
-  UserProfile,
+  Result,
 } from '@shared/types';
-import { err, HookUtils } from '@shared/utils';
+import { err, HookUtils, ok } from '@shared/utils';
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * The return type for the {@link useBookmarker()} hook.
@@ -44,35 +46,40 @@ interface UseBookmarker {
   refresh: () => DatabaseQuery<ProductBookmarker, '*'>;
 
   /**
-   * Bookmarks the given product(s) from the user.
+   * Retrieves a single product by the given product identifier.
    *
-   * @param the given product identifier(s)
-   * @returns the {@link DatabaseQuery} of stored bookmarked product(s)
+   * @param product the given product identifier
+   * @returns the {@link Result} that may contain the bookmarked product.
+   */
+  getBookmarkedProduct: (
+    product: RequireProperty<Product, 'id'>,
+  ) => Result<BookmarkedProduct>;
+
+  /**
+   * Bookmarks the given product from the user.
+   *
+   * @param product given product identifier
+   * @returns the {@link DatabaseQuery} of stored bookmarked product
    * @see {@link ProductBookmarking.store()}
    */
   store: (
-    products: RequireProperty<Product, 'id'>[],
-  ) => DatabaseQuery<BookmarkedProduct[], '*'>;
+    product: RequireProperty<Product, 'id'>,
+  ) => DatabaseQuery<BookmarkedProduct, '*'>;
 
   /**
-   * Removes bookmarks on the given product(s) from the user.
+   * Removes bookmarks on the given product from the user.
    *
-   * @param the given product identifier(s)
-   * @returns the {@link DatabaseQuery} of deleted bookmarked product(s)
+   * @param product given product identifier(s)
+   * @returns the {@link DatabaseQuery} of deleted bookmarked product
    * @see {@link ProductBookmarking.remove()}
    */
   remove: (
-    products: RequireProperty<Product, 'id'>[],
-  ) => DatabaseQuery<BookmarkedProduct[], '*'>;
+    product: RequireProperty<Product, 'id'>,
+  ) => DatabaseQuery<BookmarkedProduct, '*'>;
 
   /**
-   * Removes all bookmarked products from the user.
+   * Removes all bookmarked product(s) from the user.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param the given product identifier(s)
    * @returns the {@link DatabaseQuery} of deleted bookmarked product(s)
    * @see {@link ProductBookmarking.clear()}
    */
@@ -92,14 +99,14 @@ type BookmarkerResult = DatabaseQueryResult<ProductBookmarker, '*'>;
  * @author Ramos Jacosalem (cjaco906)
  * @see {@link ProductBookmarking} for more information
  */
-export function useBookmarker(
-  buyer: RequireProperty<UserProfile, 'supabase_id'>,
-): UseBookmarker {
+export function useBookmarker(): UseBookmarker {
   const [loading, setLoading] = useState<boolean>(true);
   const [bookmarker, setBookmarker] = useState<BookmarkerResult>(() =>
     err('No bookmarker found'),
   );
   const [products, setProducts] = useState<BookmarkedProduct[]>([]);
+  const { profile: buyer } = useAuth();
+  const navigate = useNavigate();
 
   /**
    * Updates the callback state when its dependencies (i.e., buyer) changes state.
@@ -107,32 +114,73 @@ export function useBookmarker(
    * @see {@link UseBookmarker.refresh()}
    */
   const refresh = useCallback(async () => {
-    return HookUtils.load(setLoading, ProductBookmarking.get(buyer)).then(
-      (result) => {
-        if (result.ok) {
-          setBookmarker(result);
-        }
+    if (buyer.ok) {
+      return await ProductBookmarking.get(buyer.data).then(async (result) => {
+        setBookmarker(result);
 
-        return result;
-      },
-    );
+        if (result.ok) {
+          void HookUtils.load(
+            setLoading,
+            ProductBookmarking.getProducts(result.data),
+          ).then((products) => {
+            if (products.ok) {
+              setProducts(products.data);
+            }
+          });
+
+          return result;
+        } else {
+          return HookUtils.load(
+            setLoading,
+            ProductBookmarking.register(buyer.data),
+          ).then((bookmarker) => {
+            setBookmarker(bookmarker);
+
+            return result;
+          });
+        }
+      });
+    }
+
+    return err('No user profile found', buyer) as DatabaseQueryResult<
+      ProductBookmarker,
+      '*'
+    >;
   }, [buyer]);
 
   /**
-   * Hooks the store() functionality.
-   * Updates the callback state when its dependencies (i.e., bookmarker and product) changes state.
+   * Updates the callback state when its dependencies (i.e., bookmarker) changes state.
+   *
+   * @see {@link UseBookmarker.getProduct()}
+   */
+  const getBookmarkedProduct = useCallback(
+    (product: RequireProperty<Product, 'id'>): Result<BookmarkedProduct> => {
+      for (const value of products) {
+        if (value.product_id === product.id) {
+          return ok(value);
+        }
+      }
+
+      return err('No product found', product);
+    },
+    [products],
+  );
+
+  /**
+   * Hooks the `store()` functionality.
+   * Updates the callback state when its dependencies (i.e., bookmarker and products) changes state.
    *
    * @see {@link ProductBookmarking.store()}
    */
   const store = useCallback(
-    async (array: RequireProperty<Product, 'id'>[]) => {
+    async (product: RequireProperty<Product, 'id'>) => {
       if (bookmarker.ok) {
         return HookUtils.load(
           setLoading,
-          ProductBookmarking.store(bookmarker.data, array),
+          ProductBookmarking.store(bookmarker.data, product),
         ).then((result) => {
           if (result.ok) {
-            setProducts([...products, ...result.data]);
+            setProducts([...products, result.data]);
           }
 
           return result;
@@ -145,28 +193,23 @@ export function useBookmarker(
   );
 
   /**
-   * Hooks the remove() functionality.
+   * Hooks the `remove()` functionality.
    * Updates the callback state when its dependencies (i.e., bookmarker and products) changes state.
    *
    * @see {@link ProductBookmarking.remove()}
    */
   const remove = useCallback(
-    async (array: RequireProperty<Product, 'id'>[]) => {
+    async (product: RequireProperty<Product, 'id'>) => {
       if (bookmarker.ok) {
         return HookUtils.load(
           setLoading,
-          ProductBookmarking.remove(bookmarker.data, array),
+          ProductBookmarking.remove(bookmarker.data, product),
         ).then((result) => {
-          if (!result.ok) {
-            return result;
+          if (result.ok) {
+            setProducts(
+              products.filter((value) => value.product_id !== product.id),
+            );
           }
-
-          setProducts(
-            products.filter(
-              (product) =>
-                !array.find((change) => product.product_id === change.id),
-            ),
-          );
 
           return result;
         });
@@ -178,7 +221,7 @@ export function useBookmarker(
   );
 
   /**
-   * Hooks the clear() functionality.
+   * Hooks the `clear()` functionality.
    * Updates the callback state when its dependencies (i.e., bookmarker) changes state.
    *
    * @see {@link ProductBookmarking.clear()}
@@ -189,11 +232,9 @@ export function useBookmarker(
         setLoading,
         ProductBookmarking.clear(bookmarker.data),
       ).then((result) => {
-        if (!result.ok) {
-          return result;
+        if (result.ok) {
+          setProducts([]);
         }
-
-        setProducts([]);
 
         return result;
       });
@@ -208,17 +249,14 @@ export function useBookmarker(
    * The {@link refresh()} callback dependency prevents infinite recursion re-calls.
    */
   useEffect(() => {
-    void refresh().then((result) => {
-      if (!result.ok) {
-        console.error(result.error);
-      }
-    });
-  }, [buyer, refresh]);
+    void refresh();
+  }, [buyer, refresh, navigate]);
 
   return {
     loading,
     bookmarker,
     products,
+    getBookmarkedProduct,
     refresh,
     store,
     remove,

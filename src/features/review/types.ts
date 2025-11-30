@@ -16,7 +16,7 @@ export interface ReviewPublisher {
    *
    * @param form the given {@link FormData}
    * @param key the given key (`description`) to {@link FormDataEntryValue}
-   * @returns a result that validates the given input
+   * @returns the {@link Result} that validates the given input
    */
   description: (form: FormData, key?: string) => Result<string>;
 
@@ -29,7 +29,7 @@ export interface ReviewPublisher {
    *
    * @param form the given {@link FormData}
    * @param key the given key (`rating`) to {@link FormDataEntryValue}
-   * @returns a result that validates the given input
+   * @returns the {@link Result} that validates the given input
    */
   rating: (form: FormData, key?: string) => Result<number>;
 
@@ -44,7 +44,7 @@ export interface ReviewPublisher {
   /**
    * Finalizes the builder and inserts the new user review to the database.
    *
-   * @returns a promise that resolves to the corresponding new user review
+   * @returns the {@link Promise} that resolves to the corresponding new user review
    */
-  submit: () => DatabaseQuery<Review, 'id'>;
+  submit: () => DatabaseQuery<Review, '*'>;
 }

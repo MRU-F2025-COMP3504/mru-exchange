@@ -25,11 +25,11 @@ interface ProductBookmarking {
   ) => DatabaseQuery<ProductBookmarker, '*'>;
 
   /**
-   * Retrieves products bookmarked by the given user.
+   * Retrieves product(s) bookmarked by the given user.
    * Selects all columns.
    *
    * @param bookmarker the given bookmarker identifier
-   * @returns the {@link Promise} that resolves to the corresponding products bookmarked by the given user
+   * @returns the {@link Promise} that resolves to the corresponding product(s) bookmarked by the given user
    */
   getProducts: (
     bookmarker: RequireProperty<ProductBookmarker, 'id'>,
@@ -46,30 +46,30 @@ interface ProductBookmarking {
   ) => DatabaseQuery<ProductBookmarker, '*'>;
 
   /**
-   * Bookmarks the given product(s) for the given user (bookmarker).
+   * Bookmarks the given product for the given user (bookmarker).
    * Selects all columns.
    *
    * @param bookmarker the given bookmarker identifier
-   * @param products the given product identifier(s)
-   * @returns the {@link Promise} that resolves to the corresponding product(s) bookmarked by the given user
+   * @param products the given product identifier
+   * @returns the {@link Promise} that resolves to the corresponding product bookmarked by the given user
    */
   store: (
     bookmarker: RequireProperty<ProductBookmarker, 'id'>,
-    products: RequireProperty<Product, 'id'>[],
-  ) => DatabaseQuery<BookmarkedProduct[], '*'>;
+    products: RequireProperty<Product, 'id'>,
+  ) => DatabaseQuery<BookmarkedProduct, '*'>;
 
   /**
    * Removes the given bookmarked products from the given user (bookmarker).
    * Selects all columns.
    *
    * @param bookmarker the given bookmarker identifier
-   * @param products the given product identifier(s)
-   * @returns the {@link Promise} that resolves to the corresponding product(s) bookmarked by the given user
+   * @param products the given product identifier
+   * @returns the {@link Promise} that resolves to the corresponding product bookmarked by the given user
    */
   remove: (
     bookmarker: RequireProperty<ProductBookmarker, 'id'>,
-    products: RequireProperty<Product, 'id'>[],
-  ) => DatabaseQuery<BookmarkedProduct[], '*'>;
+    products: RequireProperty<Product, 'id'>,
+  ) => DatabaseQuery<BookmarkedProduct, '*'>;
 
   /**
    * Removes the entire bookmarked products from the user (bookmarker).
@@ -104,14 +104,13 @@ export const ProductBookmarking: ProductBookmarking = {
     );
   },
   async getProducts(
-    cart: RequireProperty<ProductBookmarker, 'id'>,
+    bookmarker: RequireProperty<ProductBookmarker, 'id'>,
   ): DatabaseQuery<BookmarkedProduct[], '*'> {
     return query(
       await supabase
         .from('Shopping_Cart_Products')
         .select('*')
-        .eq('shopping_cart_id', cart.id)
-        .select(),
+        .eq('shopping_cart_id', bookmarker.id),
     );
   },
   async register(
@@ -128,46 +127,43 @@ export const ProductBookmarking: ProductBookmarking = {
     );
   },
   async store(
-    cart: RequireProperty<ProductBookmarker, 'id'>,
-    products: RequireProperty<Product, 'id'>[],
-  ): DatabaseQuery<BookmarkedProduct[], '*'> {
-    const id = cart.id;
+    bookmarker: RequireProperty<ProductBookmarker, 'id'>,
+    product: RequireProperty<Product, 'id'>,
+  ): DatabaseQuery<BookmarkedProduct, '*'> {
+    const id = bookmarker.id;
     return query(
       await supabase
         .from('Shopping_Cart_Products')
-        .insert(
-          products.map((product) => ({
-            shopping_cart_id: id,
-            product_id: product.id,
-          })),
-        )
-        .select('*'),
+        .insert({
+          shopping_cart_id: id,
+          product_id: product.id,
+        })
+        .select('*')
+        .single(),
     );
   },
   async remove(
-    cart: RequireProperty<ProductBookmarker, 'id'>,
-    products: RequireProperty<Product, 'id'>[],
-  ): DatabaseQuery<BookmarkedProduct[], '*'> {
+    bookmarker: RequireProperty<ProductBookmarker, 'id'>,
+    product: RequireProperty<Product, 'id'>,
+  ): DatabaseQuery<BookmarkedProduct, '*'> {
     return query(
       await supabase
         .from('Shopping_Cart_Products')
         .delete()
-        .eq('shopping_cart_id', cart.id)
-        .in(
-          'id',
-          products.map((product) => product.id),
-        )
-        .select('*'),
+        .eq('shopping_cart_id', bookmarker.id)
+        .eq('id', product.id)
+        .select('*')
+        .single(),
     );
   },
   async clear(
-    cart: RequireProperty<ProductBookmarker, 'id'>,
+    bookmarker: RequireProperty<ProductBookmarker, 'id'>,
   ): DatabaseQuery<BookmarkedProduct[], '*'> {
     return query(
       await supabase
         .from('Shopping_Cart_Products')
         .delete()
-        .eq('shopping_cart_id', cart.id)
+        .eq('shopping_cart_id', bookmarker.id)
         .select('*'),
     );
   },
