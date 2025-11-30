@@ -215,7 +215,7 @@ export const UserReviewing: UserReviewing = {
           return ok((review.description = data));
         }
       },
-      rating(form: FormData, key = 'description'): Result<number> {
+      rating(form: FormData, key = 'rating'): Result<number> {
         const { data, error } = FormUtils.getString(form, key);
 
         if (error) {
