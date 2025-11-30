@@ -248,30 +248,32 @@ export const UserAuthentication: UserAuthentication = {
   },
   password(): UserPasswordModifier {
     return {
-      async reset(
-        user: RequireProperty<UserProfile, 'email'>,
-      ): PromiseResult<null> {
-        const { error } = await supabase.auth.resetPasswordForEmail(
-          user.email,
-          {
-            redirectTo: `${window.location.origin}/reset-password`,
-          },
-        );
+      async reset(form: FormData, key = 'email'): PromiseResult<null> {
+        const email = setEmail({}, form, key);
 
-        if (error) {
-          return err('Failed to send reset password email', error);
-        } else {
-          return ok(null);
+        if (email.ok) {
+          const { error } = await supabase.auth.resetPasswordForEmail(
+            email.data,
+            {
+              redirectTo: `${window.location.origin}/reset-password`,
+            },
+          );
+
+          if (error) {
+            return err('Failed to send reset password email', error);
+          } else {
+            return ok(null);
+          }
         }
+
+        return email;
       },
       async update(form: FormData, key: string): PromiseResult<null> {
-        const validate = setPassword({}, form, key);
+        const password = setPassword({}, form, key);
 
-        if (validate.ok) {
-          const password = validate.data;
-
+        if (password.ok) {
           const { error } = await supabase.auth.updateUser({
-            password,
+            password: password.data,
           });
 
           if (error) {
@@ -281,7 +283,7 @@ export const UserAuthentication: UserAuthentication = {
           }
         }
 
-        return validate;
+        return password;
       },
     };
   },
