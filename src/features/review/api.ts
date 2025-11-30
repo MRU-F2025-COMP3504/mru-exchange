@@ -227,7 +227,7 @@ export const UserReviewing: UserReviewing = {
 
           if (rating < 0) {
             return err('Rating cannot be negative', rating);
-          } else if (rating > 0) {
+          } else if (rating > 5) {
             return err('Rating cannot exceed score limit', rating);
           }
 
