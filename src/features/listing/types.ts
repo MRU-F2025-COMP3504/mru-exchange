@@ -1,7 +1,6 @@
 import type {
   DatabaseQuery,
   Product,
-  ProductImage,
   RequireProperty,
   Result,
   UserProfile,
@@ -15,100 +14,87 @@ import type {
  */
 export interface ProductBuilder {
   /**
-   * Initializes the seller property.
-   * If the given seller does not have a `supabase_id` property, the function returns an error.
-   *
-   * **The seller propery must be initialized to publish the product.**
-   *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param seller the given user identifier
-   * @returns a result that validates the given input
-   */
-  seller: (id: RequireProperty<UserProfile, 'supabase_id'>) => Result<this>;
-
-  /**
    * Initializes the title property.
    * If the given title is empty, the function returns an error.
+   * By default, the form `key` parameter is `title`.
    *
    * **The title property must be initialized to publish the product.**
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param title the given product title
-   * @returns a result that validates the given input
+   * @param form the given {@link FormData}
+   * @param key the given key (`title`) to {@link FormDataEntryValue}
+   * @returns the {@link Result} that validates the given input
    */
-  title: (title: string) => Result<this>;
+  title: (form: FormData, key?: string) => Result<string>;
 
   /**
    * Initializes the description property.
    * If the given description is empty, the function returns an error.
+   * By default, the form `key` parameter is `description`.
    *
-   * Initializing the description property is optional.
-   *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
+   * **The description property must be initialized to publish the product.**
    *
    * @param description the given product description
-   * @returns a result that validates the given input
+   * @param form the given {@link FormData}
+   * @param key the given key (`description`) to {@link FormDataEntryValue}
+   * @returns the {@link Result} that validates the given input
    */
-  description: (description: string) => Result<this>;
+  description: (form: FormData, key?: string) => Result<string>;
 
   /**
    * Initializes the image property.
    * If the given images are invalid, the function returns an error.
+   * By default, the form `key` parameter is `images`.
    *
    * Initializing the image property is optional.
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param paths the given product images
-   * @returns a result that validates the given input
+   * @param form the given {@link FormData}
+   * @param key the given key (`images`) to {@link FormDataEntryValue}
+   * @returns the {@link Result} that validates the given input
    * @see {@link REGEX_IMAGE_PATH}
    */
-  image: (image: ProductImage[]) => Result<this>;
+  images: (form: FormData, key?: string) => Result<File[]>;
 
   /**
    * Initializes the price property.
    * If the given price value exceeds the minimum (0) bound, the function returns an error.
+   * By default, the form `key` parameter is `price`.
    *
    * **The price property must be initialized to publish the product.**
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param price the given product price value
-   * @returns a result that validates the given input
+   * @param form the given {@link FormData}
+   * @param key the given key (`price`) to {@link FormDataEntryValue}
+   * @returns the {@link Result} that validates the given input
    */
-  price: (price: number) => Result<this>;
+  price: (form: FormData, key?: string) => Result<number>;
 
   /**
    * Initializes the stock property.
    * If the given stock value exceeds the minimum (0) bound, the function returns an error.
+   * By default, the form `key` parameter is `stock`.
    *
    * Initializing the stock property is optional.
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param price the given product stock value
-   * @returns a result that validates the given input
+   * @param form the given {@link FormData}
+   * @param key the given key (`stock`) to {@link FormDataEntryValue}
+   * @returns the {@link Result} that validates the given input
    */
-  stock: (stock: number) => Result<this>;
+  stock: (form: FormData, key?: string) => Result<number>;
+
+  /**
+   * Scans the builder for any `undefined` required product properties.
+   * The {@link isSatisfied()} does not evaluate any form inputs.
+   *
+   * @returns if the product builder has all the required properties evaluated
+   */
+  isSatisfied: () => boolean;
 
   /**
    * Finalizes the builder and inserts the new product to the database.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a promise that resolves to the corresponding new product
+   * @returns the {@link Promise} that resolves to the corresponding new product
    */
-  build: () => DatabaseQuery<Product, 'id'>;
+  submit: () => DatabaseQuery<Product, '*'>;
 }
 
 /**
@@ -121,48 +107,41 @@ export interface ProductAttributeModifier {
   /**
    * Modifies the title property.
    * If the given title is empty, the function returns an error.
+   * By default, the form `key` parameter is `title`.
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param title the given product title
-   * @returns a result that validates the given input
+   * @param form the given {@link FormData}
+   * @param key the given key (`title`) to {@link FormDataEntryValue}
+   * @returns the {@link Result} that validates the given input
    */
-  title: (title: string) => Result<this>;
+  title: (form: FormData, key?: string) => Result<string>;
 
   /**
    * Modifies the description property.
    * If the given description is empty, the function returns an error.
+   * By default, the form `key` parameter is `description`.
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param title the given product description
-   * @returns a result that validates the given input
+   * @param form the given {@link FormData}
+   * @param key the given key (`description`) to {@link FormDataEntryValue}
+   * @returns the {@link Result} that validates the given input
    */
-  description: (description: string) => Result<this>;
+  description: (form: FormData, key?: string) => Result<string>;
 
   /**
    * Modifies the image property.
    * If the given images are invalid, the function returns an error.
+   * By default, the form `key` parameter is `images`.
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param paths the given product images
-   * @returns a result that validates the given input
+   * @param form the given {@link FormData}
+   * @param key the given key (`images`) to {@link FormDataEntryValue}
+   * @returns the {@link Result} that validates the given input
    * @see {@link REGEX_IMAGE_PATH}
    */
-  image: (paths: ProductImage[]) => Result<this>;
+  images: (form: FormData, key?: string) => Result<File[]>;
 
   /**
    * Finalizes modification and updates the given product.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a promise that resolves to the corresponding modified product
+   * @returns the {@link Promise} that resolves to the corresponding modified product
    */
-  modify: () => DatabaseQuery<Product, 'id'>;
+  submit: () => DatabaseQuery<Product, '*'>;
 }

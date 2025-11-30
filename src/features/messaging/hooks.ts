@@ -1,13 +1,13 @@
+import { UserChatting, UserMessaging } from '@features/messaging';
 import type {
-  UserMessage,
   DatabaseQuery,
   RequireProperty,
-  UserProfile,
   UserChat,
+  UserMessage,
+  UserProfile,
 } from '@shared/types';
 import { HookUtils } from '@shared/utils';
-import { useState, useCallback, useEffect } from 'react';
-import { UserMessaging, UserChatting } from '@features/messaging';
+import { useCallback, useEffect, useState } from 'react';
 
 /**
  * The return type for the {@link useChat()} hook.
@@ -23,31 +23,23 @@ interface UseChat {
   /**
    * The current collection of user messages from the user chat.
    *
-   * @returns an unwrapped query result of user messages
+   * @returns the {@link DatabaseQueryResult} of user messages
    */
   messages: UserMessage[];
 
   /**
    * Force refreshes the state to the latest update.
    *
-   ** To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query that may contain a collection of user messages
+   * @returns the {@link DatabaseQuery} that may contain a collection of user messages
    */
   refresh: () => DatabaseQuery<UserMessage[], '*'>;
 
   /**
    * Modifies the visibility of the given user message(s) from the user's chat.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param visible the visibility flag
    * @param messages the given user message identifier(s) from the user's chat
-   * @returns a promise that resolves to the corresponding modified user message(s)
+   * @returns the {@link Promise} that resolves to the corresponding modified user message(s)
    */
   show: (
     flag: boolean,
@@ -57,12 +49,8 @@ interface UseChat {
   /**
    * Sends the given user message from the user's chat.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param message the given user message data
-   * @returns a promise that resolves to the corresponding sent user message
+   * @returns the {@link Promise} that resolves to the corresponding sent user message
    */
   send: (message: string) => DatabaseQuery<UserMessage, 'id'>;
 }
@@ -85,7 +73,7 @@ export function useChat(
   /**
    * Updates the callback state when its dependencies (i.e., chat) changes state.
    *
-   * @see {@link UseChat.refresh()} for more information
+   * @see {@link UseChat.refresh()}
    */
   const refresh = useCallback(async () => {
     return HookUtils.load(setLoading, UserMessaging.getByChat(chat)).then(
@@ -194,31 +182,23 @@ interface UseChats {
   /**
    * The current collection of user chats from the user.
    *
-   * @returns an unwrapped query result of user chats
+   * @returns the {@link DatabaseQueryResult} of user chats
    */
   chats: UserChat[];
 
   /**
    * Force refreshes the state to the latest update.
    *
-   ** To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query that may contain a collection of user chats
+   * @returns the {@link DatabaseQuery} that may contain a collection of user chats
    */
   refresh: () => DatabaseQuery<UserChat[], '*'>;
 
   /**
    * Modifies the visibility the given user chat from the user.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param visible the visibility flag
    * @param chats the given chat identifier(s)
-   * @returns a promise that resolves to the corresponding chat(s)
+   * @returns the {@link Promise} that resolves to the corresponding chat(s)
    */
   show: (
     flag: boolean,
@@ -243,7 +223,7 @@ export function useChats(
   /**
    * Updates the callback state when its dependencies (i.e., sender) changes state.
    *
-   * @see {@link UseChats.refresh()} for more information
+   * @see {@link UseChats.refresh()}
    */
   const refresh = useCallback(async () => {
     return HookUtils.load(setLoading, UserChatting.getByUser(sender)).then(

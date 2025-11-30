@@ -1,15 +1,15 @@
+import { ProductBookmarking } from '@features/bookmarking';
 import type {
   BookmarkedProduct,
   DatabaseQuery,
+  DatabaseQueryResult,
+  Product,
   ProductBookmarker,
   RequireProperty,
-  Product,
-  DatabaseQueryResult,
   UserProfile,
 } from '@shared/types';
-import { empty, err, HookUtils } from '@shared/utils';
-import { useState, useCallback, useEffect } from 'react';
-import { ProductBookmarking } from '@features/bookmarking';
+import { err, HookUtils } from '@shared/utils';
+import { useCallback, useEffect, useState } from 'react';
 
 /**
  * The return type for the {@link useBookmarker()} hook.
@@ -25,40 +25,29 @@ interface UseBookmarker {
   /**
    * The current bookmarker state from the user.
    *
-   * To handle the query result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query result that may contain the product bookmarker
+   * @returns the {@link DatabaseQueryResult} that may contain the product bookmarker
    */
   bookmarker: BookmarkerResult;
 
   /**
    * The current collection of bookmarked products from the user.
    *
-   * @returns an unwrapped query result of bookmarked products
+   * @returns the unwrapped {@link DatabaseQueryResult} of bookmarked products
    */
   products: BookmarkedProduct[];
 
   /**
    * Force refreshes the state to the latest update.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query that may contain the product bookmarker
+   * @returns the {@link DatabaseQuery} that may contain the product bookmarker
    */
   refresh: () => DatabaseQuery<ProductBookmarker, '*'>;
 
   /**
    * Bookmarks the given product(s) from the user.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param the given product identifier(s)
-   * @returns a wrapped query of stored bookmarked product(s)
+   * @returns the {@link DatabaseQuery} of stored bookmarked product(s)
    * @see {@link ProductBookmarking.store()}
    */
   store: (
@@ -68,12 +57,8 @@ interface UseBookmarker {
   /**
    * Removes bookmarks on the given product(s) from the user.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param the given product identifier(s)
-   * @returns a wrapped query of deleted bookmarked product(s)
+   * @returns the {@link DatabaseQuery} of deleted bookmarked product(s)
    * @see {@link ProductBookmarking.remove()}
    */
   remove: (
@@ -88,7 +73,7 @@ interface UseBookmarker {
    * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param the given product identifier(s)
-   * @returns a wrapped query of deleted bookmarked product(s)
+   * @returns the {@link DatabaseQuery} of deleted bookmarked product(s)
    * @see {@link ProductBookmarking.clear()}
    */
   clear: () => DatabaseQuery<BookmarkedProduct[], 'product_id'>;
@@ -119,7 +104,7 @@ export function useBookmarker(
   /**
    * Updates the callback state when its dependencies (i.e., buyer) changes state.
    *
-   * @see {@link UseBookmarker.refresh()} for more information
+   * @see {@link UseBookmarker.refresh()}
    */
   const refresh = useCallback(async () => {
     return HookUtils.load(setLoading, ProductBookmarking.get(buyer)).then(

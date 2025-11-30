@@ -1,3 +1,4 @@
+import { UserReviewing } from '@features/review';
 import type {
   DatabaseQuery,
   Product,
@@ -7,7 +8,6 @@ import type {
   UserProfile,
 } from '@shared/types';
 import { HookUtils, ok } from '@shared/utils';
-import { UserReviewing } from '@features/review';
 import { useCallback, useEffect, useState } from 'react';
 
 /**
@@ -24,21 +24,14 @@ interface UseProductReviewers {
   /**
    * The current collection of reviews from the user.
    *
-   * To handle the query result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns an unwrapped query result of user reviews
+   * @returns the unwrapped {@link DatabaseQueryResult} of user reviews
    */
   reviews: Review[];
 
   /**
    * Force refreshes the state to the latest update.
    *
-   ** To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query that may contain user reviews
+   * @returns the {@link Result} that may contain user reviews
    */
   refresh: () => DatabaseQuery<Review[], '*'>;
 }
@@ -47,10 +40,9 @@ interface UseProductReviewers {
  * Hooks product reviewer functionality.
  * The hook state updaets when its dependency states changes.
  *
- * @see {@link UserReviewing.getProductReviewByReviewer()} for more information
- *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link UserReviewing.getProductReviewByReviewer()} for more information
  */
 export function useProductReviewers(
   reviewer: RequireProperty<UserProfile, 'supabase_id'>,
@@ -108,7 +100,7 @@ interface UseProductReviews {
   /**
    * The current collection of user reviews from the product.
    *
-   * @return an unwrapped query result of user reviews
+   * @return the unwrapped {@link DatabaseQueryResult} of user reviews
    */
   reviews: Review[];
 
@@ -122,11 +114,7 @@ interface UseProductReviews {
   /**
    * Force refreshes the state to the latest update.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query that may contain a successful (OK) result
+   * @returns the {@link Result} that may contain a successful (OK) result
    */
   refresh: () => PromiseResult<string>;
 }
@@ -237,18 +225,14 @@ interface UseSellerReviewers {
   /**
    * The current collection of user reviews that the seller has accumulated from past product listings.
    *
-   * @return an unwrapped query result of user reviews
+   * @return the unwrapped {@link DatabaseQueryResult} of user reviews
    */
   reviews: Review[];
 
   /**
    * Force refreshes the state to the latest update.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query that may contain user reviews
+   * @returns the {@link DatabaseQuery} that may contain user reviews
    */
   refresh: () => DatabaseQuery<Review[], '*'>;
 }
@@ -259,7 +243,7 @@ interface UseSellerReviewers {
  *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
- * @see {@link UseSellerReviewers} for more information
+ * @see {@link UserReviewing.getSellerReviewByReviewer()} for more information
  */
 export function useSellerReviewers(
   reviewer: RequireProperty<UserProfile, 'supabase_id'>,
@@ -319,7 +303,7 @@ interface UseSellerReviews {
   /**
    * The current collection of user reviews that the seller has accumulated from past product listings.
    *
-   * @return an unwrapped query result of user reviews
+   * @return the unwrapped {@link DatabaseQueryResult} of user reviews
    */
   reviews: Review[];
 
@@ -333,13 +317,9 @@ interface UseSellerReviews {
   /**
    * Force refreshes the state to the latest update.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @returns a wrapped query that may contain a successful (OK) result
+   * @returns the {@link PromiseResult} that may contain a successful (OK) result
    */
-  refresh: () => PromiseResult<string>;
+  refresh: () => PromiseResult<null>;
 }
 
 /**
@@ -348,6 +328,7 @@ interface UseSellerReviews {
  *
  * @author Sahil Grewal (SahilGrewalx)
  * @author Ramos Jacosalem (cjaco906)
+ * @see {@link UserReviewing.getSellerReviews()} for more information
  */
 export function useSellerReviews(
   reviewer: RequireProperty<UserProfile, 'supabase_id'>,
@@ -411,7 +392,7 @@ export function useSellerReviews(
       return reviews;
     }
 
-    return ok('OK');
+    return ok(null);
   }, [fetchAverageRating, fetchReviews]);
 
   /**

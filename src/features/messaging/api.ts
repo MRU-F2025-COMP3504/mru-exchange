@@ -1,17 +1,17 @@
+import { supabase } from '@shared/api';
 import type {
-  UserChat,
   DatabaseQuery,
   RequireProperty,
+  UserChat,
   UserMessage,
   UserProfile,
 } from '@shared/types';
-import { supabase } from '@shared/api';
+import { query } from '@shared/utils';
 import {
   REALTIME_LISTEN_TYPES,
   type RealtimeChannel,
   type RealtimePostgresInsertPayload,
 } from '@supabase/supabase-js';
-import { query } from '@shared/utils';
 
 /**
  * See the implementation below for more information.
@@ -33,12 +33,8 @@ interface UserChatting {
    * Retrieves the given chat by its identifier.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param chat the given chat identifier
-   * @returns a promise that resolves to the corresponding chat
+   * @returns the {@link Promise} that resolves to the corresponding chat
    */
   get: (chat: RequireProperty<UserChat, 'id'>) => DatabaseQuery<UserChat, '*'>;
 
@@ -46,12 +42,8 @@ interface UserChatting {
    * Retrieves chat that involves the given user.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param user the given user identifier
-   * @returns a promise that resolves to the corresponding chat
+   * @returns the {@link Promise} that resolves to the corresponding chat
    */
   getByUser: (
     user: RequireProperty<UserProfile, 'supabase_id'>,
@@ -60,13 +52,9 @@ interface UserChatting {
   /**
    * Modifies the visibility of the given chat.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param visible the visibility flag
    * @param chats the given chat identifier(s)
-   * @returns a promise that resolves to the corresponding chat(s)
+   * @returns the {@link Promise} that resolves to the corresponding chat(s)
    */
   show: (
     visible: boolean,
@@ -77,13 +65,9 @@ interface UserChatting {
    * Establishes chat connection between two users.
    * Only one connection per two given users are allowed.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param a a user's identifier
    * @param b a user's identifier
-   * @returns a promise that resolves to chat registration
+   * @returns the {@link Promise} that resolves to chat registration
    */
   register: (
     a: RequireProperty<UserProfile, 'supabase_id'>,
@@ -106,10 +90,10 @@ interface UserChatting {
  * @see {@link UserMessaging} for user messaging
  */
 export const UserChatting: UserChatting = {
-  subscribe: (
+  subscribe(
     user: RequireProperty<UserProfile, 'supabase_id'>,
     callback: (payload: RealtimePostgresInsertPayload<UserChat>) => void,
-  ): RealtimeChannel => {
+  ): RealtimeChannel {
     const id = user.supabase_id;
     return supabase
       .channel(`user-chat-${id}`)
@@ -125,16 +109,16 @@ export const UserChatting: UserChatting = {
       )
       .subscribe();
   },
-  get: async (
+  async get(
     chat: RequireProperty<UserChat, 'id'>,
-  ): DatabaseQuery<UserChat, '*'> => {
+  ): DatabaseQuery<UserChat, '*'> {
     return query(
       await supabase.from('Chats').select('*').eq('id', chat.id).single(),
     );
   },
-  getByUser: async (
+  async getByUser(
     user: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<UserChat[], '*'> => {
+  ): DatabaseQuery<UserChat[], '*'> {
     const id = user.supabase_id;
     return query(
       await supabase
@@ -144,10 +128,10 @@ export const UserChatting: UserChatting = {
         .order('created_at', { ascending: false }),
     );
   },
-  show: async (
+  async show(
     visible: boolean,
     chats: RequireProperty<UserChat, 'id'>[],
-  ): DatabaseQuery<UserChat[], 'id'> => {
+  ): DatabaseQuery<UserChat[], 'id'> {
     return query(
       await supabase
         .from('Chats')
@@ -159,10 +143,10 @@ export const UserChatting: UserChatting = {
         .select('id'),
     );
   },
-  register: async (
+  async register(
     a: RequireProperty<UserProfile, 'supabase_id'>,
     b: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<UserChat, 'id'> => {
+  ): DatabaseQuery<UserChat, 'id'> {
     return query(
       await supabase
         .from('Chats')
@@ -194,12 +178,8 @@ interface UserMessaging {
   /**
    * Retrieves user messages from the given chat.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param chat the given chat identifier
-   * @returns a promise that resolves to the corresponding user messages
+   * @returns the {@link Promise} that resolves to the corresponding user messages
    */
   getByChat: (
     chat: RequireProperty<UserChat, 'id'>,
@@ -208,14 +188,10 @@ interface UserMessaging {
   /**
    * Sends the given user message from the given chat.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param chat the given chat identifier
    * @param user the given user linked to the given chat
    * @param message the given user message data
-   * @returns a promise that resolves to the corresponding sent user message
+   * @returns the {@link Promise} that resolves to the corresponding sent user message
    */
   send: (
     chat: RequireProperty<UserChat, 'id'>,
@@ -226,15 +202,11 @@ interface UserMessaging {
   /**
    * Modifies the visibility of the given user message(s) from the given chat.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param chat the given chat identifier
    * @param user the given user identifier linked to the given chat
    * @param visible the visibility flag
    * @param messages the given user message identifier(s) from the given chat
-   * @returns a promise that resolves to the corresponding modified user message(s)
+   * @returns the {@link Promise} that resolves to the corresponding modified user message(s)
    */
   show: (
     chat: RequireProperty<UserChat, 'id'>,
@@ -246,14 +218,10 @@ interface UserMessaging {
   /**
    * Removes the given user message(s) from the given chat.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param chat the given chat identifier
    * @param user the given user identifier
    * @param messages the given user message identifier(s) from the given chat
-   * @returns a promise that resolves to the corresponding deleted user message(s)
+   * @returns the {@link Promise} that resolves to the corresponding deleted user message(s)
    */
   remove: (
     chat: RequireProperty<UserChat, 'id'>,
@@ -276,10 +244,10 @@ interface UserMessaging {
  * @see {@link UserChatting} for user user chatting registration and fetching
  */
 export const UserMessaging: UserMessaging = {
-  subscribe: (
+  subscribe(
     chat: RequireProperty<UserChat, 'id'>,
     callback: (payload: RealtimePostgresInsertPayload<UserMessage>) => void,
-  ): RealtimeChannel => {
+  ): RealtimeChannel {
     const id = chat.id.toString();
     return supabase
       .channel(`chat-${id}`)
@@ -295,9 +263,9 @@ export const UserMessaging: UserMessaging = {
       )
       .subscribe();
   },
-  getByChat: async (
+  async getByChat(
     chat: RequireProperty<UserChat, 'id'>,
-  ): DatabaseQuery<UserMessage[], '*'> => {
+  ): DatabaseQuery<UserMessage[], '*'> {
     return query(
       await supabase
         .from('Messages')
@@ -307,11 +275,11 @@ export const UserMessaging: UserMessaging = {
         .order('created_at', { ascending: true }),
     );
   },
-  send: async (
+  async send(
     chat: RequireProperty<UserChat, 'id'>,
     user: RequireProperty<UserProfile, 'supabase_id'>,
     message: string,
-  ): DatabaseQuery<UserMessage, 'id'> => {
+  ): DatabaseQuery<UserMessage, 'id'> {
     return query(
       await supabase
         .from('Messages')
@@ -324,12 +292,12 @@ export const UserMessaging: UserMessaging = {
         .single(),
     );
   },
-  show: async (
+  async show(
     chat: RequireProperty<UserChat, 'id'>,
     user: RequireProperty<UserProfile, 'supabase_id'>,
     visible: boolean,
     messages: RequireProperty<UserMessage, 'id'>[],
-  ): DatabaseQuery<UserMessage[], 'id'> => {
+  ): DatabaseQuery<UserMessage[], 'id'> {
     return query(
       await supabase
         .from('Messages')
@@ -343,11 +311,11 @@ export const UserMessaging: UserMessaging = {
         .select('id'),
     );
   },
-  remove: async (
+  async remove(
     chat: RequireProperty<UserChat, 'id'>,
     user: RequireProperty<UserProfile, 'supabase_id'>,
     messages: RequireProperty<UserMessage, 'id'>[],
-  ): DatabaseQuery<UserMessage[], 'id'> => {
+  ): DatabaseQuery<UserMessage[], 'id'> {
     return query(
       await supabase
         .from('Messages')

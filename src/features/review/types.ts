@@ -10,39 +10,41 @@ export interface ReviewPublisher {
   /**
    * Initializes the description property.
    * The given description always successfully validates.
+   * By default, the form `key` parameter is `description`.
    *
    * Initializing the description property is optional.
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param description the given user review description
+   * @param form the given {@link FormData}
+   * @param key the given key (`description`) to {@link FormDataEntryValue}
    * @returns a result that validates the given input
    */
-  description: (description: string) => Result<this>;
+  description: (form: FormData, key?: string) => Result<string>;
 
   /**
    * Initializes the description property.
    * If the given rating exceeds the minimum (0) bound, the function returns an error.
+   * By default, the form `key` parameter is `rating`.
    *
    * **The rating property must be initialized to publish the review.**
    *
-   * To handle the validation result:
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
-   * @param description the given user review rating
+   * @param form the given {@link FormData}
+   * @param key the given key (`rating`) to {@link FormDataEntryValue}
    * @returns a result that validates the given input
    */
-  rating: (rating: number) => Result<this>;
+  rating: (form: FormData, key?: string) => Result<number>;
+
+  /**
+   * Scans the publisher for any `undefined` required review properties.
+   * The {@link isSatisfied()} does not evaluate any form inputs.
+   *
+   * @returns if the review publisher has all the required properties evaluated
+   */
+  isSatisfied: () => boolean;
 
   /**
    * Finalizes the builder and inserts the new user review to the database.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @returns a promise that resolves to the corresponding new user review
    */
-  publish: () => DatabaseQuery<Review, 'id'>;
+  submit: () => DatabaseQuery<Review, 'id'>;
 }

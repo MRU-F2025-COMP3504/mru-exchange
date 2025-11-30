@@ -1,4 +1,13 @@
 /**
+ * Validates the given unique (UUID) image file path.
+ * Use {@link RegExp.test()} to match the given image file path.
+ *
+ * @see {@link https://regex101.com/r/ZaU81J/1} (adjusted for uuids) (Submitter: Anonymous)
+ * @returns the {@link RegExp} object
+ */
+export const REGEX_UNIQUE_IMAGE_PATH = /^[a-zA-Z0-9._-]+\.(png|jpg)$/i;
+
+/**
  * Validates the given image file path.
  * Use {@link RegExp.test()} to match the given image file path.
  *
@@ -32,7 +41,7 @@ export const REGEX_EMAIL = /^([\w-]+(?:\.[\w-]+)*)@(mtroyal\.ca)$/i;
  * @see {@link https://regex101.com/r/pG2xV4/1} (Submitter: Anonymous)
  * @returns the {@link RegExp} object
  */
-export const REGEX_USERNAME = /^(?=.*?[A-Za-z])[A-Za-z+]+$/;
+export const REGEX_LETTER_NUMBERS_ONLY = /^[a-zA-Z0-9]+$/;
 
 /**
  * Validates the given letters.

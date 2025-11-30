@@ -1,12 +1,12 @@
+import { supabase } from '@shared/api';
 import type {
+  BookmarkedProduct,
   DatabaseQuery,
   Product,
-  RequireProperty,
   ProductBookmarker,
-  BookmarkedProduct,
+  RequireProperty,
   UserProfile,
 } from '@shared/types';
-import { supabase } from '@shared/api';
 import { query } from '@shared/utils';
 
 /**
@@ -17,93 +17,69 @@ interface ProductBookmarking {
    * Retrieves the product bookmarker of the given user.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param user the given user's identifier
-   * @returns a promise that resolves to the corresponding user's bookmarker
+   * @returns the {@link Promise} that resolves to the corresponding user's bookmarker
    */
-  get(
+  get: (
     user: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<ProductBookmarker, '*'>;
+  ) => DatabaseQuery<ProductBookmarker, '*'>;
 
   /**
    * Retrieves products bookmarked by the given user.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param bookmarker the given bookmarker identifier
-   * @returns a promise that resolves to the corresponding products bookmarked by the given user
+   * @returns the {@link Promise} that resolves to the corresponding products bookmarked by the given user
    */
-  getProducts(
+  getProducts: (
     bookmarker: RequireProperty<ProductBookmarker, 'id'>,
-  ): DatabaseQuery<BookmarkedProduct[], '*'>;
+  ) => DatabaseQuery<BookmarkedProduct[], '*'>;
 
   /**
    * Registers the user with a bookmarker.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param user the given user's identifier
-   * @returns a promise that resolves to the corresponding user's bookmarker
+   * @returns the {@link Promise} that resolves to the corresponding user's bookmarker
    */
-  register(
+  register: (
     user: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<ProductBookmarker, 'id'>;
+  ) => DatabaseQuery<ProductBookmarker, '*'>;
 
   /**
    * Bookmarks the given product(s) for the given user (bookmarker).
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param bookmarker the given bookmarker identifier
    * @param products the given product identifier(s)
-   * @returns a promise that resolves to the corresponding product(s) bookmarked by the given user
+   * @returns the {@link Promise} that resolves to the corresponding product(s) bookmarked by the given user
    */
-  store(
+  store: (
     bookmarker: RequireProperty<ProductBookmarker, 'id'>,
     products: RequireProperty<Product, 'id'>[],
-  ): DatabaseQuery<BookmarkedProduct[], '*'>;
+  ) => DatabaseQuery<BookmarkedProduct[], '*'>;
 
   /**
    * Removes the given bookmarked products from the given user (bookmarker).
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param bookmarker the given bookmarker identifier
    * @param products the given product identifier(s)
-   * @returns a promise that resolves to the corresponding product(s) bookmarked by the given user
+   * @returns the {@link Promise} that resolves to the corresponding product(s) bookmarked by the given user
    */
-  remove(
+  remove: (
     bookmarker: RequireProperty<ProductBookmarker, 'id'>,
     products: RequireProperty<Product, 'id'>[],
-  ): DatabaseQuery<BookmarkedProduct[], '*'>;
+  ) => DatabaseQuery<BookmarkedProduct[], '*'>;
 
   /**
    * Removes the entire bookmarked products from the user (bookmarker).
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param bookmarker the bookmarker identifier
-   * @returns a promise that resolves to the corresponding product(s) bookmarked by the given user
+   * @returns the {@link Promise} that resolves to the corresponding product(s) bookmarked by the given user
    */
-  clear(
+  clear: (
     bookmarker: RequireProperty<ProductBookmarker, 'id'>,
-  ): DatabaseQuery<BookmarkedProduct[], 'product_id'>;
+  ) => DatabaseQuery<BookmarkedProduct[], '*'>;
 }
 
 /**
@@ -116,9 +92,9 @@ interface ProductBookmarking {
  * @author Andrew Krawiec (AndrewTries)
  */
 export const ProductBookmarking: ProductBookmarking = {
-  get: async (
+  async get(
     user: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<ProductBookmarker, '*'> => {
+  ): DatabaseQuery<ProductBookmarker, '*'> {
     return query(
       await supabase
         .from('Shopping_Cart')
@@ -127,9 +103,9 @@ export const ProductBookmarking: ProductBookmarking = {
         .single(),
     );
   },
-  getProducts: async (
+  async getProducts(
     cart: RequireProperty<ProductBookmarker, 'id'>,
-  ): DatabaseQuery<BookmarkedProduct[], '*'> => {
+  ): DatabaseQuery<BookmarkedProduct[], '*'> {
     return query(
       await supabase
         .from('Shopping_Cart_Products')
@@ -138,23 +114,23 @@ export const ProductBookmarking: ProductBookmarking = {
         .select(),
     );
   },
-  register: async (
+  async register(
     user: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<ProductBookmarker, 'id'> => {
+  ): DatabaseQuery<ProductBookmarker, '*'> {
     return query(
       await supabase
         .from('Shopping_Cart')
         .insert({
           user_id: user.supabase_id,
         })
-        .select('id')
+        .select('*')
         .single(),
     );
   },
-  store: async (
+  async store(
     cart: RequireProperty<ProductBookmarker, 'id'>,
     products: RequireProperty<Product, 'id'>[],
-  ): DatabaseQuery<BookmarkedProduct[], '*'> => {
+  ): DatabaseQuery<BookmarkedProduct[], '*'> {
     const id = cart.id;
     return query(
       await supabase
@@ -168,10 +144,10 @@ export const ProductBookmarking: ProductBookmarking = {
         .select('*'),
     );
   },
-  remove: async (
+  async remove(
     cart: RequireProperty<ProductBookmarker, 'id'>,
     products: RequireProperty<Product, 'id'>[],
-  ): DatabaseQuery<BookmarkedProduct[], '*'> => {
+  ): DatabaseQuery<BookmarkedProduct[], '*'> {
     return query(
       await supabase
         .from('Shopping_Cart_Products')
@@ -184,15 +160,15 @@ export const ProductBookmarking: ProductBookmarking = {
         .select('*'),
     );
   },
-  clear: async (
+  async clear(
     cart: RequireProperty<ProductBookmarker, 'id'>,
-  ): DatabaseQuery<BookmarkedProduct[], 'product_id'> => {
+  ): DatabaseQuery<BookmarkedProduct[], '*'> {
     return query(
       await supabase
         .from('Shopping_Cart_Products')
         .delete()
         .eq('shopping_cart_id', cart.id)
-        .select('product_id'),
+        .select('*'),
     );
   },
 };

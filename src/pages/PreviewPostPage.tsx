@@ -54,12 +54,17 @@ export default function PreviewPostPage() {
   }
 
   function convertToProductImages(files: File[]): ProductImage[] {
-  return files.map((file) => ({
-    path: `${file.name}`, // unique + original file name
-    body: file                                         // File is already a Blob
-  }));
-}
+    
+    return files.map((file) => {
+      const uuid = crypto.randomUUID();
+      const ext = file.name.slice(file.name.lastIndexOf("."));
 
+    return {
+      path: `${uuid}${ext}`,
+      body: file
+    };                                       
+  });
+}
 
   async function handleProductPosting() {
     if (!product) {
@@ -74,9 +79,9 @@ export default function PreviewPostPage() {
 
       result = result.data.description(product.description);
       if (!result.ok) throw result.error;
-
+      console.log(convertToProductImages(images || []));
       result = result.data.image(convertToProductImages(images || []))
-      console.log(result);
+      
       if (result.ok === false) throw result.error;
 
       result = result.data.price(product.price);
@@ -105,7 +110,9 @@ export default function PreviewPostPage() {
       }
 
       alert('Product successfully inserted');
-      console.log('inserted:', insert);
+      
+      navigate(`/product/${insertedProduct.id}`)
+
     } catch (e) {
       alert('Error: failed to register product');
       throw e;

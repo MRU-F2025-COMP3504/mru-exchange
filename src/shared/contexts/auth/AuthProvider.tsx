@@ -1,15 +1,9 @@
 import { UserAuthentication } from '@shared/api';
 import { AuthContext } from '@shared/contexts';
-import type { NullableResult, Result } from '@shared/types';
+import type { NullableResult } from '@shared/types';
 import { empty, ok } from '@shared/utils';
 import type { User } from '@supabase/supabase-js';
-import {
-  type JSX,
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { type JSX, type ReactNode, useEffect, useState } from 'react';
 
 /**
  * The return type for the {@link AuthProvider} component.

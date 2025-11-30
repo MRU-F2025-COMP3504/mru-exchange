@@ -4,7 +4,6 @@ import type {
   RequireProperty,
   Result,
   UserCredentials,
-  Username,
   UserPasswordModifier,
   UserProfile,
   UserSignin,
@@ -17,8 +16,8 @@ import {
   ok,
   query,
   REGEX_EMAIL,
+  REGEX_LETTER_NUMBERS_ONLY,
   REGEX_LETTERS_ONLY,
-  REGEX_USERNAME,
 } from '@shared/utils';
 import {
   type AuthChangeEvent,
@@ -146,7 +145,7 @@ export const UserAuthentication: UserAuthentication = {
       ): [Result<string>, Result<string>, Result<string>] {
         return setName(credentials, form, key);
       },
-      isValid(): boolean {
+      isSatisfied(): boolean {
         if (!credentials.email) {
           return false;
         } else if (!credentials.password) {
@@ -190,7 +189,7 @@ export const UserAuthentication: UserAuthentication = {
       password(form: FormData, key = 'password'): Result<string> {
         return setPassword(credentials, form, key);
       },
-      isValid(): boolean {
+      isSatisfied(): boolean {
         if (!credentials.email) {
           return false;
         } else if (!credentials.password) {
@@ -249,30 +248,32 @@ export const UserAuthentication: UserAuthentication = {
   },
   password(): UserPasswordModifier {
     return {
-      async reset(
-        user: RequireProperty<UserProfile, 'email'>,
-      ): PromiseResult<null> {
-        const { error } = await supabase.auth.resetPasswordForEmail(
-          user.email,
-          {
-            redirectTo: `${window.location.origin}/reset-password`,
-          },
-        );
+      async reset(form: FormData, key = 'email'): PromiseResult<null> {
+        const email = setEmail({}, form, key);
 
-        if (error) {
-          return err('Failed to send reset password email', error);
-        } else {
-          return ok(null);
+        if (email.ok) {
+          const { error } = await supabase.auth.resetPasswordForEmail(
+            email.data,
+            {
+              redirectTo: `${window.location.origin}/reset-password`,
+            },
+          );
+
+          if (error) {
+            return err('Failed to send reset password email', error);
+          } else {
+            return ok(null);
+          }
         }
+
+        return email;
       },
       async update(form: FormData, key: string): PromiseResult<null> {
-        const validate = setPassword({}, form, key);
+        const password = setPassword({}, form, key);
 
-        if (validate.ok) {
-          const password = validate.data;
-
+        if (password.ok) {
           const { error } = await supabase.auth.updateUser({
-            password,
+            password: password.data,
           });
 
           if (error) {
@@ -282,7 +283,7 @@ export const UserAuthentication: UserAuthentication = {
           }
         }
 
-        return validate;
+        return password;
       },
     };
   },
@@ -412,7 +413,7 @@ function setName(
       return err('Invalid alias', error);
     } else if (!data) {
       return err('Alias cannot be empty');
-    } else if (!REGEX_USERNAME.test(data)) {
+    } else if (!REGEX_LETTER_NUMBERS_ONLY.test(data)) {
       return err('Alias cannot have in-between spaces', data);
     } else {
       return ok(data);

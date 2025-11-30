@@ -1,3 +1,5 @@
+import type { ReviewPublisher } from '@features/review';
+import { supabase } from '@shared/api';
 import type {
   DatabaseQuery,
   Product,
@@ -6,9 +8,7 @@ import type {
   Review,
   UserProfile,
 } from '@shared/types';
-import { supabase } from '@shared/api';
-import type { ReviewPublisher } from '@features/review';
-import { err, ok, query } from '@shared/utils';
+import { err, FormUtils, ok, query } from '@shared/utils';
 
 /**
  * See the implementation below for more information.
@@ -17,10 +17,6 @@ interface UserReviewing {
   /**
    * Retrieves product reviews by the given product.
    * Selects all columns.
-   *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param product the given product identifier
    * @returns a promise that resolves to the corresponding product reviews
@@ -32,10 +28,6 @@ interface UserReviewing {
   /**
    * Retrieves product reviews made for the given product by the given reviewer.
    * Selects all columns.
-   *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param reviewer the given user identifier
    * @param product the given product identifier
@@ -50,10 +42,6 @@ interface UserReviewing {
    * Retrieves seller reviews by the given seller.
    * Selects all columns.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param seller the given user identifier
    * @returns a promise that resolves to the corresponding seller reviews
    */
@@ -64,10 +52,6 @@ interface UserReviewing {
   /**
    * Retrieves seller reviews made for the given seller by the given reviewer.
    * Selects all columns.
-   *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param reviewer the given user identifier
    * @param seller the given user identifier
@@ -81,10 +65,6 @@ interface UserReviewing {
   /**
    * Retrieves the average rating of the given product.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param product the given product identifier
    * @returns a promise that resolves to the corresponding product rating
    */
@@ -94,10 +74,6 @@ interface UserReviewing {
 
   /**
    * Retrieves the average rating of the given seller.
-   *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param seller the given user identifier
    * @returns a promise that resolves to the corresponding seller rating
@@ -120,10 +96,6 @@ interface UserReviewing {
   /**
    * Removes the given review from the reviewer.
    *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
-   *
    * @param reviewer the user identifier
    * @param reviews the review identifier
    * @returns a promise that resolves to the corresponding deleted reviews
@@ -135,10 +107,6 @@ interface UserReviewing {
 
   /**
    * Modifies the given review from the reviewer with a new rating and/or description.
-   *
-   * To handle the query result:
-   * - The {@link PromiseResult} must be awaited.
-   * - The {@link Result} that contains either the corresponding data or error must be unwrapped using a conditional statement.
    *
    * @param reviewer the user identifier
    * @param review the review identifier
@@ -160,9 +128,9 @@ interface UserReviewing {
  * @author Andrew Krawiec (AndrewTries)
  */
 export const UserReviewing: UserReviewing = {
-  getProductReviews: async (
+  async getProductReviews(
     product: RequireProperty<Product, 'id'>,
-  ): DatabaseQuery<Review[], '*'> => {
+  ): DatabaseQuery<Review[], '*'> {
     return query(
       await supabase
         .from('Reviews')
@@ -171,10 +139,10 @@ export const UserReviewing: UserReviewing = {
         .order('created_at', { ascending: false }),
     );
   },
-  getProductReviewByReviewer: async (
+  async getProductReviewByReviewer(
     reviewer: RequireProperty<UserProfile, 'supabase_id'>,
     product: RequireProperty<Product, 'id'>,
-  ): DatabaseQuery<Review[], '*'> => {
+  ): DatabaseQuery<Review[], '*'> {
     return query(
       await supabase
         .from('Reviews')
@@ -184,9 +152,9 @@ export const UserReviewing: UserReviewing = {
         .order('created_at', { ascending: false }),
     );
   },
-  getSellerReviews: async (
+  async getSellerReviews(
     seller: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<Review[], '*'> => {
+  ): DatabaseQuery<Review[], '*'> {
     return query(
       await supabase
         .from('Reviews')
@@ -195,10 +163,10 @@ export const UserReviewing: UserReviewing = {
         .order('created_at', { ascending: false }),
     );
   },
-  getSellerReviewByReviewer: async (
+  async getSellerReviewByReviewer(
     reviewer: RequireProperty<UserProfile, 'supabase_id'>,
     seller: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<Review[], '*'> => {
+  ): DatabaseQuery<Review[], '*'> {
     return query(
       await supabase
         .from('Reviews')
@@ -208,9 +176,9 @@ export const UserReviewing: UserReviewing = {
         .order('created_at', { ascending: false }),
     );
   },
-  getAverageProductRating: async (
+  async getAverageProductRating(
     product: RequireProperty<Product, 'id'>,
-  ): DatabaseQuery<Review, 'id' | 'rating'> => {
+  ): DatabaseQuery<Review, 'id' | 'rating'> {
     return query(
       await supabase
         .from('Reviews')
@@ -219,9 +187,9 @@ export const UserReviewing: UserReviewing = {
         .single(),
     );
   },
-  getAverageSellerRating: async (
+  async getAverageSellerRating(
     seller: RequireProperty<UserProfile, 'supabase_id'>,
-  ): DatabaseQuery<Review, 'id' | 'rating'> => {
+  ): DatabaseQuery<Review, 'id' | 'rating'> {
     return query(
       await supabase
         .from('User_Information')
@@ -230,32 +198,52 @@ export const UserReviewing: UserReviewing = {
         .single(),
     );
   },
-  create: (
+  create(
     reviewer: RequireProperty<UserProfile, 'supabase_id'>,
-  ): ReviewPublisher => {
+  ): ReviewPublisher {
     const review: Partial<Review> = {};
+
     return {
-      description(description: string): Result<ReviewPublisher> {
-        if (!description) {
-          return err('Review description cannot be empty', review);
+      description(form: FormData, key = 'description'): Result<string> {
+        const { data, error } = FormUtils.getString(form, key);
+
+        if (error) {
+          return err('Invalid review description', error);
+        } else if (!data) {
+          return err('Description cannot be empty');
         } else {
-          review.description = description;
+          return ok((review.description = data));
+        }
+      },
+      rating(form: FormData, key = 'rating'): Result<number> {
+        const { data, error } = FormUtils.getString(form, key);
+
+        if (error) {
+          return err('Invalid review rating', error);
+        } else if (!data) {
+          return err('Rating cannot be empty');
+        } else {
+          const rating = +data;
+
+          if (rating < 0) {
+            return err('Rating cannot be negative', rating);
+          } else if (rating > 5) {
+            return err('Rating cannot exceed score limit', rating);
+          }
+
+          return ok((review.rating = rating));
+        }
+      },
+      isSatisfied(): boolean {
+        if (!review.description) {
+          return false;
+        } else if (!review.rating) {
+          return false;
         }
 
-        return ok(this);
+        return true;
       },
-      rating(rating: number): Result<ReviewPublisher> {
-        if (rating < 0) {
-          return err('Review rating cannot be negative', review);
-        } else if (rating > 5) {
-          return err('Review rating exceeds max rating', review);
-        } else {
-          review.rating = rating;
-        }
-
-        return ok(this);
-      },
-      async publish(): DatabaseQuery<Review, 'id'> {
+      async submit(): DatabaseQuery<Review, 'id'> {
         return query(
           await supabase
             .from('Reviews')
@@ -269,10 +257,10 @@ export const UserReviewing: UserReviewing = {
       },
     };
   },
-  remove: async (
+  async remove(
     reviewer: RequireProperty<UserProfile, 'supabase_id'>,
     reviews: RequireProperty<Review, 'id'>[],
-  ): DatabaseQuery<Review[], 'id'> => {
+  ): DatabaseQuery<Review[], 'id'> {
     return query(
       await supabase
         .from('Reviews')
@@ -285,10 +273,10 @@ export const UserReviewing: UserReviewing = {
         .select(),
     );
   },
-  modify: async (
+  async modify(
     reviewer: RequireProperty<UserProfile, 'supabase_id'>,
     review: RequireProperty<Review, 'id' | 'rating' | 'description'>,
-  ): DatabaseQuery<Review, 'id'> => {
+  ): DatabaseQuery<Review, 'id'> {
     return query(
       await supabase
         .from('Reviews')
