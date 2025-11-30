@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mockQuery } from '@shared/utils';
+import { mockQuery } from '@shared/tests';
 import { UserReporting } from '@features/reporting';
 
 describe('User Reporting', () => {

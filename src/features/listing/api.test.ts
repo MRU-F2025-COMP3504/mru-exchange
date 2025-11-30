@@ -1,5 +1,5 @@
 import { describe, it, vi, expect } from 'vitest';
-import { err, mockQuery } from '@shared/utils';
+import { mockQuery } from '@shared/tests';
 import { CategoryListing, ProductListing } from '@features/listing';
 
 describe('Category Creation/Modification', () => {

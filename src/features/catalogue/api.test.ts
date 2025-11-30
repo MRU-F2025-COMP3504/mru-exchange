@@ -1,5 +1,5 @@
 import { describe, it, vi, expect } from 'vitest';
-import { mockQuery } from '@shared/utils';
+import { mockQuery } from '@shared/tests';
 import { CategoryCatalogue, ProductCatalogue } from '@features/catalogue';
 
 describe('Category Tag Catalogue', () => {
