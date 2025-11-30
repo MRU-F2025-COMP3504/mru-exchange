@@ -126,6 +126,17 @@ interface ProductCatalogue {
   ) => DatabaseQuery<Product[], '*'>;
 
   /**
+   * Retrieves a single product by the given product identifier.
+   * Selects all columns.
+   *
+   * @param products the given product identifier
+   * @returns the {@link Promise} that resolves to the corresponding product
+   */
+  getSingle: (
+    product: RequireProperty<Product, 'id'>,
+  ) => DatabaseQuery<Product, '*'>;
+
+  /**
    * Retrieves products listed by the given seller.
    * Selects all columns.
    *
@@ -178,6 +189,17 @@ export const ProductCatalogue: ProductCatalogue = {
           'id',
           products.map((product) => product.id),
         ),
+    );
+  },
+  async getSingle(
+    product: RequireProperty<Product, 'id'>,
+  ): DatabaseQuery<Product, '*'> {
+    return query(
+      await supabase
+        .from('Product_Information')
+        .select('*')
+        .eq('id', product.id)
+        .single(),
     );
   },
   async getBySeller(
