@@ -313,7 +313,7 @@ export const ProductCatalogue: ProductCatalogue = {
           for (const value of data) {
             const id = +value;
 
-            if (isNaN(id)) {
+            if (!id || isNaN(id) || id < 0) {
               return err('Invalid product category tag', value);
             } else {
               ids.push(id);
