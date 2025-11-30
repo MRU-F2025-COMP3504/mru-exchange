@@ -1,11 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { UserAuthentication } from '@shared/api';
 import { supabase } from '@shared/api';
-import type {
-  UserCredentialsSigner,
-  UserSignin,
-  UserSignup,
-} from '@shared/types';
+import type { UserSignin, UserSignup } from '@shared/types';
 
 describe('User Authentication', () => {
   vi.spyOn(supabase, 'auth', 'get').mockReturnValue({
