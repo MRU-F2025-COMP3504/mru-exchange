@@ -4,11 +4,8 @@ import Header from './Header';
 import Footer from './Footer';
 import type { LinkData } from '../shared/components/LinkDelimitedList';
 import LinkDelimitedList from '../shared/components/LinkDelimitedList';
-import { supabase, UserAuthentication } from '@shared/api';
+import { supabase } from '@shared/api';
 import { useAuth } from '@shared/contexts';
-import { type UserProfile, type Result, type DatabaseQueryResult } from '@shared/types';
-import { UserReviewing } from '@features/review';
-import { type ReviewPublisher } from '@features/review';
 
 interface Product {
   id: number;
@@ -513,71 +510,53 @@ export default function ProductPage() {
 
   }
 
-  /**
-   * Submits the review to the database.
-   * @param event The submit event.
-   */
-  async function submitReview(event: FormEvent<HTMLFormElement>): void {
-
-    // Stop the submission.
+  // Submit review to database
+  async function submitReview(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
 
-    // Get values.
     const form: FormData = new FormData(event.currentTarget);
-    const title: string = form.get("title") as string;
     const desc: string = form.get("description") as string;
-    const rate: number = rating;
 
-    // console.log(user);
-    // console.log(title);
-    // console.log(desc);
-    // console.log(rate);
-
-    // If success,
-    if (user.ok) {
-
-      // Get the profile.
-      const profile: Result<UserProfile> = await UserAuthentication.getUserProfile(user.data);
-
-      // console.log(typeof profile);
-      // console.log(profile);
-
-      // If success,
-      if (profile.ok) {
-
-        // console.log(profile.data);
-
-        // Create review publisher
-        const rpublisher: ReviewPublisher = UserReviewing.create(profile.data);
-        rpublisher.description(form);
-        rpublisher.rating(form);
-
-        // console.log(rpublisher);
-
-        // Publish
-        const publish: DatabaseQueryResult<Review, "id"> = await rpublisher.submit();
-
-        // If success,
-        if (publish.ok) {
-          console.log("Published!");
-          hideReviewInput();
-          resetReviewInput();
-        }
-        else {
-          console.error("Error: Failed to publish.");
-        }
-
-      }
-      else {
-        console.error("Error: Could not get profile.");
-      }
-
+    // Validation
+    if (!rating || rating < 1 || rating > 5) {
+      setError("Please select a rating between 1 and 5 stars");
+      return;
     }
-    else {
-      console.error("Error: Could not get user.");
+    if (!currentUserId) {
+      setError("You must be logged in to write a review");
+      return;
+    }
+    if (!product || !seller) {
+      setError("Product or seller information not available");
+      return;
     }
 
+    try {
+      const { data, error: insertError } = await supabase
+        .from('Reviews')
+        .insert({
+          rating: rating,
+          description: desc || null,
+          product_id: product.id,
+          created_by_id: currentUserId,
+          created_on_id: seller.supabase_id,
+        })
+        .select()
+        .single();
 
+      if (insertError) {
+        console.error("Error inserting review:", insertError);
+        setError(insertError.message || "Failed to submit review");
+        return;
+      }
+
+      hideReviewInput();
+      resetReviewInput();
+      await fetchProductReviews();
+    } catch (err: any) {
+      console.error("Error submitting review:", err);
+      setError(err?.message || "Failed to submit review");
+    }
   }
 
   return (
