@@ -8,6 +8,7 @@ import type {
   Category,
   DatabaseQuery,
   Product,
+  ProductImage,
   RequireProperty,
   Result,
 } from '@shared/types';
@@ -227,7 +228,7 @@ interface ProductListing {
 export const ProductListing: ProductListing = {
   create(): ProductBuilder {
     const product: Partial<Product> = {};
-    const images: File[] = [];
+    const images: ProductImage[] = [];
 
     return {
       title(form: FormData, key = 'title'): Result<string> {
@@ -236,7 +237,7 @@ export const ProductListing: ProductListing = {
       description(form: FormData, key = 'description'): Result<string> {
         return setDescription(product, form, key);
       },
-      images(form: FormData, key = 'images'): Result<File[]> {
+      images(form: FormData, key = 'images'): Result<ProductImage[]> {
         return setImages(product, images, form, key);
       },
       price(form: FormData, key = 'price'): Result<number> {
@@ -264,7 +265,8 @@ export const ProductListing: ProductListing = {
         for (const image of images) {
           await supabase.storage
             .from('product-images')
-            .upload(image.name, image, { upsert: true });
+            .upload(image.path, image.body, { upsert: true });
+          console.log('uploading', images);
         }
 
         return query(
@@ -312,7 +314,7 @@ export const ProductListing: ProductListing = {
     product: RequireProperty<Product, 'id'>,
   ): ProductAttributeModifier => {
     const change: Partial<Product> = {};
-    const images: File[] = [];
+    const images: ProductImage[] = [];
 
     return {
       title(form: FormData, key = 'title'): Result<string> {
@@ -321,14 +323,18 @@ export const ProductListing: ProductListing = {
       description(form: FormData, key = 'description'): Result<string> {
         return setDescription(change, form, key);
       },
-      images(form: FormData, key = 'images'): Result<File[]> {
+      images(form: FormData, key = 'images'): Result<ProductImage[]> {
         return setImages(change, images, form, key);
       },
       async submit(): DatabaseQuery<Product, '*'> {
         for (const image of images) {
-          await supabase.storage
+          const { error } = await supabase.storage
             .from('product-images')
-            .upload(image.name, image, { upsert: true });
+            .upload(image.path, image.body, { upsert: true });
+
+          if (error) {
+            return err('Failed to upload product image', error);
+          }
         }
 
         return query(
@@ -448,7 +454,7 @@ function setDescription(
  *
  * @internal
  * @param product the given incomplete product modification
- * @param images the given images in {@link File} format for upload
+ * @param images the given images in {@link ProductImage} format
  * @param form the given {@link FormData}
  * @param key the given key to {@link FormDataEntryValue}
  * @returns the {@link Result} that may contain the product images
@@ -456,31 +462,39 @@ function setDescription(
  */
 function setImages(
   product: Partial<Product>,
-  images: File[],
+  images: ProductImage[],
   form: FormData,
   key: string,
-): Result<File[]> {
+): Result<ProductImage[]> {
   const { data, error } = FormUtils.getFiles(form, key);
 
   if (error) {
     return err('Invalid product image(s)', error);
   } else {
-    const paths: string[] = [];
+    const randomize = (file: File) => {
+      return (
+        crypto.randomUUID().replaceAll('-', '') + '.' + file.name.split('.')[1]
+      );
+    };
 
-    for (const image of data) {
-      const name = image.name.replace('-', '_');
+    const array: ProductImage[] = [];
 
-      if (!REGEX_IMAGE_PATH.test(name)) {
-        return err('Invalid image');
-      } else {
-        paths.push(name);
+    for (const body of data) {
+      const path = body.name;
+      if (!REGEX_IMAGE_PATH.test(path)) {
+        return err('Invalid image path', body);
       }
+
+      array.push({
+        path: randomize(body),
+        body,
+      });
     }
 
-    images.splice(0, images.length, ...data);
+    images.splice(0, images.length, ...array);
 
     product.image = {
-      images: paths,
+      images: images.map((image) => image.path),
     };
 
     return ok(images);

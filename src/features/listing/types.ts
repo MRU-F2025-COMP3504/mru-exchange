@@ -1,6 +1,7 @@
 import type {
   DatabaseQuery,
   Product,
+  ProductImage,
   RequireProperty,
   Result,
   UserProfile,
@@ -53,7 +54,7 @@ export interface ProductBuilder {
    * @returns the {@link Result} that validates the given input
    * @see {@link REGEX_IMAGE_PATH}
    */
-  images: (form: FormData, key?: string) => Result<File[]>;
+  images: (form: FormData, key?: string) => Result<ProductImage[]>;
 
   /**
    * Initializes the price property.
@@ -136,7 +137,7 @@ export interface ProductAttributeModifier {
    * @returns the {@link Result} that validates the given input
    * @see {@link REGEX_IMAGE_PATH}
    */
-  images: (form: FormData, key?: string) => Result<File[]>;
+  images: (form: FormData, key?: string) => Result<ProductImage[]>;
 
   /**
    * Finalizes modification and updates the given product.
