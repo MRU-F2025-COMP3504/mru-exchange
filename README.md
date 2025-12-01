@@ -64,7 +64,9 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 **_Tests are not completely implemented._**
 
 ---
-
+- [User Guide](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/User%20Guide.md)
+- [Developer Guide](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/Developer%20Guide.md)
+---
 ## Deployment
 
 The commands below prepares the production server for deployment.
