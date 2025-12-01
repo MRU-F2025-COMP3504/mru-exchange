@@ -102,4 +102,5 @@ Here is detailed instructions on how to use the website!
 
 ### Current Bugs
 
-- [Product not posting](https://github.com/MRU-F2025-COMP3504/mru-exchange/issues/113)
+- [Build Fails With Multiple TypeScript Compilation Errors](https://github.com/MRU-F2025-COMP3504/mru-exchange/issues/115)
+- [Registration Error](http://github.com/MRU-F2025-COMP3504/mru-exchange/issues/116)
