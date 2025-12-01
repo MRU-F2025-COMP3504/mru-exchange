@@ -224,7 +224,7 @@ interface UserMessaging {
     chat: RequireProperty<UserChat, 'id'>,
     user: RequireProperty<UserProfile, 'supabase_id'>,
     message: string,
-  ) => DatabaseQuery<UserMessage, 'id'>;
+  ) => DatabaseQuery<UserMessage, '*'>;
 
   /**
    * Modifies the visibility of the given user message(s) from the given chat.
@@ -306,7 +306,7 @@ export const UserMessaging: UserMessaging = {
     chat: RequireProperty<UserChat, 'id'>,
     user: RequireProperty<UserProfile, 'supabase_id'>,
     message: string,
-  ): DatabaseQuery<UserMessage, 'id'> {
+  ): DatabaseQuery<UserMessage, '*'> {
     return query(
       await supabase
         .from('Messages')
@@ -315,7 +315,7 @@ export const UserMessaging: UserMessaging = {
           sender_id: user.supabase_id,
           logged_message: message,
         })
-        .select('id')
+        .select('*')
         .single(),
     );
   },
