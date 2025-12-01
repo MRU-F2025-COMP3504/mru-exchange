@@ -14,7 +14,7 @@ export const REGEX_UNIQUE_IMAGE_PATH = /^[a-zA-Z0-9._-]+\.(png|jpg)$/i;
  * @see {@link https://regex101.com/r/ZaU81J/1} (Submitter: Anonymous)
  * @returns the {@link RegExp} object
  */
-export const REGEX_IMAGE_PATH = /^(\w|\.|\/[a-z_\-\s0-9.]+)+\.(png|jpg)$/i;
+export const REGEX_IMAGE_PATH = /^(\w|\.|\/[a-z_\s0-9.]|[-])+\.(png|jpg)$/i;
 
 /**
  * Validates the given text file path.
@@ -41,7 +41,7 @@ export const REGEX_EMAIL = /^([\w-]+(?:\.[\w-]+)*)@(mtroyal\.ca)$/i;
  * @see {@link https://regex101.com/r/pG2xV4/1} (Submitter: Anonymous)
  * @returns the {@link RegExp} object
  */
-export const REGEX_LETTER_NUMBERS_ONLY = /^[a-zA-Z0-9]+$/;
+export const REGEX_LETTER_NUMBERS_ONLY = /^[a-zA-Z0-9\s]+$/;
 
 /**
  * Validates the given letters.

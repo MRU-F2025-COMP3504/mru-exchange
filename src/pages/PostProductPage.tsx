@@ -107,6 +107,7 @@ export default function PostProductPage() {
 
   // Validates the required fields to pass into the Preview Page
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    console.log('form data', new FormData(event.currentTarget));
     navigate('/preview-post', {
       state: {
         product,
@@ -265,8 +266,9 @@ export default function PostProductPage() {
 
             <div className='bg-white rounded-xl p-4 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg'>
               <div
-                className={`w-[340px] h-[140px] rounded-xl flex items-center justify-center p-4 shadow-sm transition-all duration-200 ${images && images.length > 0 ? 'bg-transparent' : 'bg-gray-300'
-                  }`}
+                className={`w-[340px] h-[140px] rounded-xl flex items-center justify-center p-4 shadow-sm transition-all duration-200 ${
+                  images && images.length > 0 ? 'bg-transparent' : 'bg-gray-300'
+                }`}
               >
                 {images && images.length > 0 ? (
                   <img

@@ -468,7 +468,7 @@ function setImages(
     const paths: string[] = [];
 
     for (const image of data) {
-      const name = image.name;
+      const name = image.name.replace('-', '_');
 
       if (!REGEX_IMAGE_PATH.test(name)) {
         return err('Invalid image');
