@@ -68,4 +68,38 @@ Here is detailed instructions on how to use the website!
 3. Enter in a Generic title for your review.
 4. Click on the number of stars you want to give the review.
 5. Write exactly what went well between the user, and how close the product is to the description they provided.
-6. Click the 'Submit' Button and 
+6. Click the 'Submit' Button and
+
+## Testing
+
+### Adding Tests
+
+- How to add a new Test
+
+1. Create a test file in the __tests__ directory next to your component: ComponentName.test.tsx
+
+2. Import testing utilities
+
+3. Write test cases using describe and it blocks
+
+4. Run tests locally
+
+5. Commit your test, CI will automatically run tests on every PR
+
+## Bugs
+
+### Adding Bugs 
+
+- Go into Issues and click the 'New issue' button
+
+- Click on'Bug report'
+
+- Follow the starred (**) guidelines within the input box
+
+- Include a link to the repository version with this syntax:
+  `[example bug](https://github.com/example-bug)`
+
+
+### Current Bugs
+
+- [Product not posting](https://github.com/MRU-F2025-COMP3504/mru-exchange/issues/113)
