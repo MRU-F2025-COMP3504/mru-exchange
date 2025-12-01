@@ -1,5 +1,18 @@
-
 # MRU Exchange Developer Guide
+
+- [1. Deployment](#deployment)
+  - [1.1. Clone Repository](#clone-repository)
+- [2. Directory Structure](#directory-sturcture)
+  - [2.1. Definitions](#definitions)
+- [3. Build Releases](#build-releases)
+- [4. Daily Operation & Development](#daily-operation-development)
+  - [4.1. Clone Repository](#clone-repository)
+  - [4.2. Update](#update)
+  - [4.3. Install Dependencies](#install-dependencies)
+  - [4.4. Running](#running)
+    - [4.4.1. Production](#production)
+    - [4.4.2. Development](#development)
+- [5. Testing](#testing)
 
 ## Deployment
 
@@ -34,76 +47,169 @@ $ DEPLOY_NAME=production npm run deploy
 
 See the [script usage](#production) below for more information.
 
-### Website Access
+> [!NOTE]
+> The website is accessed using the following URL:
+>
+> ```
+> mruexchange.app
+> ```
+>
+> See the [nginx.conf](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/nginx.conf) to configure the reverse proxy for the production server.
 
-The website is accessed using the following URL:
+## Directory Structure
+
+Our directory tree structure is as follows:
 
 ```
-mruexchange.app
+.
+├── database
+│   └── images
+├── public
+│   └── vite.svg
+└── src
+    ├── assets
+    │   └── react.svg
+    ├── features
+    │   ├── bookmarking
+    │   │   ├── api.test.ts
+    │   │   ├── api.ts
+    │   │   ├── components.ts
+    │   │   ├── hooks.ts
+    │   │   ├── index.ts
+    │   │   └── types.ts
+    │   ├── catalogue
+    │   │   ├── api.test.ts
+    │   │   ├── api.ts
+    │   │   ├── components.ts
+    │   │   ├── hooks.ts
+    │   │   ├── index.ts
+    │   │   └── types.ts
+    │   ├── interact
+    │   │   ├── api.test.ts
+    │   │   ├── api.ts
+    │   │   ├── components.ts
+    │   │   ├── hooks.ts
+    │   │   ├── index.ts
+    │   │   └── types.ts
+    │   ├── listing
+    │   │   ├── api.test.ts
+    │   │   ├── api.ts
+    │   │   ├── components.ts
+    │   │   ├── hooks.ts
+    │   │   ├── index.ts
+    │   │   └── types.ts
+    │   ├── messaging
+    │   │   ├── api.test.ts
+    │   │   ├── api.ts
+    │   │   ├── components.ts
+    │   │   ├── hooks.ts
+    │   │   ├── index.ts
+    │   │   └── types.ts
+    │   ├── reporting
+    │   │   ├── api.test.ts
+    │   │   ├── api.ts
+    │   │   ├── components.ts
+    │   │   ├── hooks.ts
+    │   │   ├── index.ts
+    │   │   └── types.ts
+    │   └── review
+    │       ├── api.test.ts
+    │       ├── api.ts
+    │       ├── components.ts
+    │       ├── hooks.ts
+    │       ├── index.ts
+    │       └── types.ts
+    ├── pages
+    │   └── index.ts
+    ├── shared
+    │   ├── api
+    │   │   ├── auth.test.ts
+    │   │   ├── auth.ts
+    │   │   ├── database.ts
+    │   │   └── index.ts
+    │   ├── components
+    │   │   └── index.ts
+    │   ├── contexts
+    │   │   ├── auth
+    │   │   │   ├── index.ts
+    │   │   │   └── useAuth.ts
+    │   │   └── index.ts
+    │   ├── tests
+    │   │   ├── database.ts
+    │   │   └── index.ts
+    │   ├── types
+    │   │   ├── auth.ts
+    │   │   ├── index.ts
+    │   │   ├── math.ts
+    │   │   ├── product.ts
+    │   │   ├── property.ts
+    │   │   ├── result.ts
+    │   │   ├── schema.ts
+    │   │   └── table.ts
+    │   └── utils
+    │       ├── database.ts
+    │       ├── form.ts
+    │       ├── hooks.ts
+    │       ├── index.ts
+    │       ├── product.ts
+    │       ├── regex.ts
+    │       └── result.ts
+    └── test
+        └── setup.ts
 ```
 
-See the [nginx.conf](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/nginx.conf) to configure the reverse proxy for the production server.
+### Definitions
 
-## Directory Sturcture 
+- `database`
+  - Database schema source code
+  - Row-Level Security (RLS) policies and associated functions
+  - Initial test user–data generation scripts
+  - Additional functions, triggers, views, and indexes
+- `public`
+  - Site-wide assets such as logos
+- `src`
+  - Contains the main application source code.
+  - `assets`
+    - Static assets, including the React logo
+  - `features`
+    - Organizes APIs and related modules by functional area.
+    - Contains backend code for implementing various features across the site. Each feature has test.ts, and .ts files.
+    - Each feature folder typically includes the following file types:
+      - `index.ts`
+      - `components.ts`
+      - `hooks.ts`
+      - `types.ts`
+    - Each file type variants may have a test file version (i.e., `*.test.ts`).
+    - The following feature categories are:
+      - `bookmarking`
+        - Logic for retrieving and modifying bookmarked products
+      - `catalogue`
+        - Logic for retrieving, linking, and modifying product categories
+      - `interact`
+        - Logic for retrieving and modifying user interactions (e.g., muting, blocking)
+      - `listing`
+        - Logic for posting product listings
+      - `messaging`
+        - Logic for retrieving and modifying messages
+      - `reporting`
+        - Reporting-related functionality
+      - `review`
+        - Review-related functionality
+  - `pages`
+    - All front end React pages in .tsx format. Also has a **test** folder for any frontend tests the page needs to run.
+  - `shared`
+    - Shared utilities, components, hooks, and configuration
+  - `test`
+    - Project-wide testing utilities and configuration
+    - Holds integration tests
 
-### 1. database
-- Database schema source code  
-- Row-Level Security (RLS) policies and associated functions  
-- Initial test user–data generation scripts  
-- Additional functions, triggers, views, and indexes  
+## Build Releases
 
-### 2. public
-Site-wide assets such as logos  
+- Use the [main](https://github.com/MRU-F2025-COMP3504/mru-exchange/tree/main) branch for bleeding-edge updates.
+- Otherwise, use the [stable](https://github.com/MRU-F2025-COMP3504/i-exchange/tree/stable) branch.
 
-### 3. src
-Contains the main application source code.
-
-#### 3.1 assets
-Static assets, including the React logo  
-
-#### 3.2 features
-Organizes APIs and related modules by functional area.
-Contains backend code for implementing various features across the site. Each feature has test.ts, and .ts files.
-
-Each feature folder typically includes:
-- api.test.ts
-- components.ts
-- hooks.ts
-- index.ts
-- types.ts
-
-Feature categories:
-- **bookmarking**
-  - Logic for retrieving and modifying bookmarked products  
-- **catalogue**
-  - Logic for retrieving, linking, and modifying product categories  
-- **interact**
-  - Logic for retrieving and modifying user interactions (e.g., muting, blocking)  
-- **listing**
-  - Logic for posting product listings  
-- **messaging**
-  - Logic for retrieving and modifying messages  
-- **reporting**
-  - Reporting-related functionality  
-- **review**
-  - Review-related functionality  
-
-#### 3.3 pages
-All front end React pages in .tsx format. Also has a __test__ folder for any frontend tests the page needs to run.
-
-#### 3.4 shared
-- Shared utilities, components, hooks, and configuration  
-
-#### 3.5 test
-- Project-wide testing utilities and configuration 
-
-### Build Releases
-
-For updating the repository to include new changes to the files, use the [main](https://github.com/MRU-F2025-COMP3504/mru-exchange/tree/main)
-
-Every time a feature is rolled out and confirmed to be working, merge the branch from [Stable](https://github.com/MRU-F2025-COMP3504/mru-exchange/tree/Stable) 
-
-**DO NOT PUSH DIRECTLY INTO STABLE BRANCH**
+> [!IMPORTANT]
+> **DO NOT PUSH DIRECTLY INTO STABLE BRANCH!**
 
 ## Daily Operation & Development
 
@@ -162,10 +268,11 @@ To install all dependencies configured for the application:
 $ npm install
 ```
 
-If the running host is experiencing a dependency issue, deleting the `node_modules` folder and re-running the script above may resolve the issue.
-Alternatively, if you are using docker to run the application, the running host may combine the previous command with `npm run docker:prune` or `npm run docker:build` or both.
-
-See the [package.json](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/package.json) for more information on the list of dependencies that the application uses.
+> [!TIP]
+> If the running host is experiencing a dependency issue, deleting the `node_modules` folder and re-running the script above may resolve the issue.
+> Alternatively, if you are using docker to run the application, the running host may combine the previous command with `npm run docker:prune` or `npm run docker:build` or both.
+>
+> See the [package.json](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/package.json) for more information on the list of dependencies that the application uses.
 
 ### Build
 
@@ -182,17 +289,20 @@ When the build fails, the workflow would be cancelled.
 ### Running
 
 We recommend using [docker](https://www.docker.com/) for application behaviour consistency that runs in a reproducable environment and deploying to production.
-Depending on the host and how docker is configured, running docker may require **root or administrator priviledges**.
 
-- See the documentation for [Windows](https://docs.docker.com/desktop/setup/install/windows-permission-requirements/) about permission requirements for more information.
-- See the documentation for [Linux](https://docs.docker.com/engine/install/linux-postinstall/) about root priviledges for more information.
+> [!IMPORTANT]
+> Depending on the host and how docker is configured, running docker may require **root or administrator priviledges**.
+>
+> - See the documentation for [Windows](https://docs.docker.com/desktop/setup/install/windows-permission-requirements/) about permission requirements for more information.
+> - See the documentation for [Linux](https://docs.docker.com/engine/install/linux-postinstall/) about root priviledges for more information.
 
 #### Production
 
 The application must be dockerized in order to run the Nginx (reverse proxy) docker image to route and encrypt traffic.
 Our Nginx configuration uses [LetsEncrypt](https://letsencrypt.org/) for HTTPS traffic.
 
-- We recommend using [certbot](https://certbot.eff.org/) to install and automate SSL certificate renewal.
+> [!TIP]
+> We recommend using [certbot](https://certbot.eff.org/) to install and automate SSL certificate renewal.
 
 We recommend running the system in a clean slate:
 
@@ -210,7 +320,8 @@ $ DEPLOY_NAME=production \
     docker compose up -d --build
 ```
 
-This script is automatically executed on deployment via the [CI/CD](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/.github/workflows/cicd.yml) workflow.
+> [!NOTE]
+> This script is automatically executed on deployment via the [CI/CD](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/.github/workflows/cicd.yml) workflow.
 
 #### Development
 
@@ -233,7 +344,8 @@ Alternatively, we can rebuild the docker image and run the application:
 $ npm run docker:build
 ```
 
-The script above is equivalent to passing the `--build` flag on the previouosly mentioned `docker compose` command.
+> [!NOTE]
+> The script above is equivalent to passing the `--build` flag on the previouosly mentioned `docker compose` command.
 
 The running host may prune existing data that the dockerized application has cached.
 The following script prunes the cache by force:
@@ -259,12 +371,19 @@ $ npm run dev
 ## Testing
 
 ### Testing Site
+
 If you would like to view the site without creating an account, you can use the following credentials:
 
 ```
 Email: publicUser@mtroyal.ca
 Password: publicPassword
 ```
+
+> [!WARNING]
+> We use Supabase to manage our database.
+> As Supabase is not meant to be an email service provider, fake (testing) email accounts has **higher risks of being bounced**.
+> Using fake email accounts may lead you to becoming heavily rate-limited.
+> Learn more [here](https://en.wikipedia.org/wiki/Bounce_message) and [here](https://supabase.com/docs/guides/troubleshooting/not-receiving-auth-emails-from-the-supabase-project-OFSNzw).
 
 ### Running Tests
 
@@ -295,15 +414,6 @@ $ npm run test:watch
 
 ### Adding Tests
 
-- How to add a new Test
-
-1. Create a test file in the __tests__ directory next to your component: ComponentName.test.tsx
-
-2. Import testing utilities
-
-3. Write test cases using describe and it blocks
-
-4. Run tests locally
-
-5. Commit your test, CI will automatically run tests on every PR
-
+1. Create a test file in the **tests** directory next to your component (e.g., `ComponentName.test.tsx`)
+2. Import testing utilities (e.g., `vi`, `mock`)
+3. Commit your test. Our automated continuous integration workflow will automatically run tests on every pull request.

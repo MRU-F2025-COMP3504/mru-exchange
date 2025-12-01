@@ -1,23 +1,37 @@
-
 # MRU Exchange User Guide
 
+- [1. Abstract](#abstract)
+- [2. How to Access the Website](#how-to-access-the-website)
+- [3. Use-Case Guide](#use-case-guide)
+  - [Use-Case (1): Creating an Account](#use-case-1-creating-an-account)
+  - [Use-Case (2): Log-in](#use-case-2-log-in)
+  - [Use-Case (3): Find Product](#use-case-3-find-a-product)
+  - [Use-Case (4): Posting Product](#use-case-4-posting-a-product)
+  - [Use-Case (5): Buying Product](#use-case-5-buying-a-product)
+  - [Use-Case (6): Inquiry About Seller or Service](#use-case-6-inquiry-about-a-seller-or-services)
+  - [Use-Case (7): Write Review](#use-case-7-write-a-review)
+- [4. Issues](#issues)
+  - [4.1 Reporting Issues](#reporting-issues)
+
 ## Abstract
+
 MRU Exchange is a campus-exclusive marketplace where students can buy, sell, and trade resources directly tied to MRU life---Parking, Textbooks, Notes, and Tutoring to start. This idea is similar to systems like Facebook Marketplace or Kijiji, but unlike these public platforms, MRU Exchange is student-only (verified @mtroyal email) and emphasizes saftey/trust/convenience. The aim is a single, reliable hub for student needs---simpler, safer, cheaper.
 
-## How to access the Webstie
+## How to Access the Website
+
 Simply go to [mruexchange.app](https://mruexchange.app/) to access the website!
 
 ## Use Case Guide
 
 Here is detailed instructions on how to use the website!
-  
+
 ### Use Case 1: Creating an Account
 
 1. Click the blue 'Create Account' Button
 2. Enter in your credentials, make sure every field is entered & you use your mount royal linked student email account. If you cant access your email you wont be able to verify your sign up.
 3. Click the blue 'Create Account' button at the bottom.
 4. Once you see the 'Check your email' page you can go over to your email and open the newly sent email from 'Supabase Auth'.
-5. Scroll down a bit till you see the 'Verify Your Email' button, then click on it. 
+5. Scroll down a bit till you see the 'Verify Your Email' button, then click on it.
 
 ### Use Case 2: Log In
 
@@ -29,9 +43,9 @@ Here is detailed instructions on how to use the website!
 
 1. After logging in, you are now in the home page. You can click on a 'Recently Listed' product at the bottom OR click on the 'Browse Products' button located in the middle of the screen
 2. All of the products are listed here. To find your desired product you have three options to go with:
-  Option 1: Click on a category and press the 'Search' button within the blue strip at the top to filter in the desired product you want to find.
-  Option 2: Type in what your desired product is, make sure to use specific key words if you are looking for a specific product. Then click on the 'Search' button.
-  Option 3: Use both the Category filter and key word search to find a product. Click on the 'Search' button once both are filled out.
+   Option 1: Click on a category and press the 'Search' button within the blue strip at the top to filter in the desired product you want to find.
+   Option 2: Type in what your desired product is, make sure to use specific key words if you are looking for a specific product. Then click on the 'Search' button.
+   Option 3: Use both the Category filter and key word search to find a product. Click on the 'Search' button once both are filled out.
 3. Click on the desried product.
 
 ### Use Case 4: Posting a Product
@@ -70,21 +84,14 @@ Here is detailed instructions on how to use the website!
 5. Write exactly what went well between the user, and how close the product is to the description they provided.
 6. Click the 'Submit' Button and
 
+## Issues
 
-## Bugs
+See the [issue tracker](https://github.com/MRU-F2025-COMP3504/mru-exchange/issues) for the latest issue reports.
 
-### Current Bugs
+### Reporting Issues
 
-- [Build Fails With Multiple TypeScript Compilation Errors](https://github.com/MRU-F2025-COMP3504/mru-exchange/issues/115)
-- [Registration Error](http://github.com/MRU-F2025-COMP3504/mru-exchange/issues/116)
-
-### Adding Bugs 
-
-- Go into Issues and click the 'New issue' button
-
-- Click on'Bug report'
-
-- Follow the starred (**) guidelines within the input box
-
+- Navigate into [issues](https://github.com/MRU-F2025-COMP3504/mru-exchange/issues) and click the 'New issue' button.
+- Click on 'Bug report'.
+- Follow the starred (\*\*) guidelines within the input box.
 - Include a link to the repository version with this syntax:
   `[example bug](https://github.com/example-bug)`

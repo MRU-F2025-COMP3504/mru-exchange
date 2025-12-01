@@ -20,6 +20,8 @@
 
 ---
 
+---
+
 ### Status (Project Tab)
 
 The latest project status (issues, pull requests, etc.) can be found [here](https://github.com/orgs/MRU-F2025-COMP3504/projects/4).
@@ -46,13 +48,12 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - ✅ User profiles
 - ✅ Listings CRUD (Create, Read, Update, Delete)
 - ✅ Real-time messaging (database query only)
-  - **_Chat initiation establishment via express-js not yet implemented._**
 - ✅ Favorites/bookmarks system
 - ✅ Image upload support
 - ✅ Category filtering (Parking, Textbooks, Notes, Tutoring)
 - ✅ Search functionality
 - ✅ Row Level Security (RLS) for data protection
-  - **_Currently disabled indefinitely_**.
+  - **_Disabled indefinitely_**.
 
 ### Product Categories
 
@@ -61,15 +62,15 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - 📝 **Notes** - Study notes and materials
 - 👨‍🏫 **Tutoring** - Tutoring services
 
-**_Tests are not completely implemented._**
+**_Integration tests are not implemented._**
 
 ---
 
-## Guides To Using MRU Exchange 
+## Guides
 
 - [User Guide](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/User%20Guide.md)
 - [Developer Guide](https://github.com/MRU-F2025-COMP3504/mru-exchange/blob/main/Developer%20Guide.md)
-  
+
 ---
 
 ### 📖 Additional Resources
@@ -80,4 +81,5 @@ Our shared folder ([link here](https://drive.google.com/drive/folders/1Yfgw8HaCE
 - [Vite Documentation](https://vitejs.dev/)
 
 ### Beta release with guide
+
 - Tag: v0.1.0-beta.2
