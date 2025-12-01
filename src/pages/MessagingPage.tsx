@@ -5,7 +5,8 @@ import { useAuth } from '@shared/contexts';
 import { supabase } from '@shared/api';
 import Header from './Header';
 import Footer from './Footer';
-import { UserMessaging } from '@features/messaging/index.ts';
+import { useChats } from '@features/messaging/hooks.ts';
+import { UserChatting, UserMessaging } from '@features/messaging/index.ts';
 import type {
   UserChat, UserProfile
 } from '@shared/types';
@@ -16,14 +17,14 @@ interface Chat {
   user_id_1: string;
   user_id_2: string;
   visible: boolean;
-  user1: {
+  user1?: {
     id: number;
     first_name: string;
     last_name: string;
     supabase_id: string;
     profile_image: any | null;
   } | null
-  user2: {
+  user2?: {
     id: number;
     first_name: string;
     last_name: string;
@@ -39,7 +40,7 @@ interface UserMessage {
   logged_message: string;
   sender_id: string;
   visible: boolean;
-  sender: {
+  sender?: {
     id: number;
     first_name: string;
     last_name: string;
@@ -79,14 +80,12 @@ export default function MessagingPage() {
 
   useEffect(() => {
     fetchUserProfile();
-    if (currentUserId && chats.length === 0) fetchChats();
-    if (currentUserId && chats.length > 0 && messages.length === 0) fetchMessages();
-  }, [currentUserId, chats]);
-
+    fetchChats();
+    fetchMessages();
+  }, [currentUserId]);
 
   useEffect(() => {
     localStorage.setItem('chats', JSON.stringify(chats));
-    localStorage.setItem('messages', JSON.stringify(messages));
     if (chats.length > 0) setLoading(false);
   }, [chats]);
 
@@ -110,23 +109,25 @@ export default function MessagingPage() {
   //     localStorage.setItem('messages', JSON.stringify(messages));
   //   }, [messages]);
   
-  //   useEffect(() => {
-  //     if (!userInfo) return;
-  //     const channel = UserChatting.subscribe(userInfo, (payload) => {
-  //       setChats((chats) => [...chats, payload.new]);
-  //     });
+
+    // useEffect(() => {
+    //   if (!userInfo) return;
+    //   const channel = UserChatting.subscribe(userInfo, (payload) => {
+        
+    //     setChats((chats) => [...chats, payload.new]);
+    //   });
   
-  //     return () => channel.unsubscribe();
-  //   }, [userInfo]);
+    //   return () => channel.unsubscribe();
+    // }, [userInfo]);
+
+    // useEffect(() => {
+    //   if (!selectedChat) return;
+    //   const channel = UserMessaging.subscribe(selectedChat, (payload) => {
+    //     setMessages((messages) => [...messages, payload.new]);
+    //   });
   
-  //   useEffect(() => {
-  //     if (!selectedChat) return;
-  //     const channel = UserMessaging.subscribe(selectedChat, (payload) => {
-  //       setMessages((messages) => [...messages, payload.new]);
-  //     });
-  
-  //     return () => channel.unsubscribe();
-  //   }, [selectedChat]);
+    //   return () => channel.unsubscribe();
+    // }, [selectedChat]);
 
 
   const fetchUserProfile = async () => {
@@ -405,7 +406,7 @@ export default function MessagingPage() {
             <div className='flex items-start h-full px-4 pt-2 text-sm'>
 
               <div className='flex-1 overflow-hidden'>
-                <div className='truncate whitespace-nowrap overflow-hidden text-black'> {firstMessage?.logged_message} </div>
+                <div className='truncate w-[15vw] whitespace-nowrap overflow-x-hidden text-black'> {firstMessage?.logged_message} </div>
               </div>
               <div className='flex items-end '>{date}</div>
             </div>
