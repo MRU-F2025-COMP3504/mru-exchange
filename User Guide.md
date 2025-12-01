@@ -48,4 +48,24 @@ Here is detailed instructions on how to use the website!
 10. Here you can see a previewed version of your product, if you want to edit something about it, click on the 'Continue Editing' button at the bottom to go back to the 'Product Details' page.
 11. Click on the blue "Post Product" button below the previewed product. Once you see the "Successfully Posted Product" you will be directed to your products page.
 
-### Use Case : Buying a Product
+### Use Case 5: Buying a Product
+
+1. From the home page click on a recently listed product OR go through use Case 3
+2. Click on the "Message Seller" button underneath the description
+3. You should see a new page with an open messaging tab with the seller, enter in your message and click the 'send' button
+
+### Use Case 6: Inquiry About a Seller or Services
+
+1. From the home page, scroll down to the bottom of the footer, click on the 'contact us' text link.
+2. Enter your inquiry into the text field. Be sure to leave a deatiled explanation.
+3. Click on the 'Submit' button.
+4. Wait 3-5 business days, check your mru student email for a response.
+
+### Use Case 7: Write a Review
+
+1. Click on the Product you purchased.
+2. Press the 'Write a Review' button underneath the product photo
+3. Enter in a Generic title for your review.
+4. Click on the number of stars you want to give the review.
+5. Write exactly what went well between the user, and how close the product is to the description they provided.
+6. Click the 'Submit' Button and 
