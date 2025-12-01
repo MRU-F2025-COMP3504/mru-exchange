@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@shared/contexts';
 import { supabase, UserAuthentication } from '@shared/api';
@@ -77,15 +77,17 @@ export default function MessagingPage() {
   const [text, setText] = useState('');
 
   useEffect(() => {
-    fetchUserProfile();
-    fetchChats();
-    fetchMessages();
-  }, [currentUserId]);
+    void fetchUserProfile().then(async () => {
+      await fetchChats().then(async (chats: Chat[]) => {
+        await fetchMessages(chats).then(() => {
+          setLoading(false);
+        });
+      });
+    });
 
-  useEffect(() => {
     localStorage.setItem('chats', JSON.stringify(chats));
     if (chats.length > 0) setLoading(false);
-  }, [chats]);
+  }, [currentUserId]);
 
   // useEffect(() => {
   //     if(!currentUserId) return;
@@ -142,8 +144,8 @@ export default function MessagingPage() {
     }
   };
 
-  const fetchChats = async () => {
-    if (!currentUserId) return;
+  const fetchChats = async (): Promise<Chat[]> => {
+    if (!currentUserId) throw Error('No user found');
 
     try {
       console.log('Attempting to fetch chats');
@@ -180,9 +182,14 @@ export default function MessagingPage() {
       if (error) throw error;
       console.log('No error thrown');
       // console.log("Data", data)
-      setChats(data as Chat[]);
+
+      const chats = data as Chat[];
+      setChats(chats);
+
+      return chats;
     } catch (err: any) {
       console.error('Error fetching user profile:', err);
+      throw err;
     }
   };
 
@@ -214,7 +221,7 @@ export default function MessagingPage() {
     }
   };
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (chats: Chat[]) => {
     if (!currentUserId) return;
     const chat_ids = chats.map((chat) => chat.id);
 
@@ -553,11 +560,6 @@ export default function MessagingPage() {
                         message.visible && message.chat_id === selectedChat?.id,
                     )
                     .map((message) => {
-                      console.log(
-                        'message',
-                        message.sender?.supabase_id,
-                        currentUserId,
-                      );
                       const alignment =
                         message.sender?.supabase_id === currentUserId
                           ? 'justify-end'
