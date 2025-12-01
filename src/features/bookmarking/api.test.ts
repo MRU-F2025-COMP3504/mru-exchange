@@ -23,9 +23,8 @@ describe('Product Bookmarking', () => {
     mockQuery({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          select: vi
-            .fn()
-            .mockReturnValue({ data: new Array<object>(), error: null }),
+          data: new Array<object>(),
+          error: null,
         }),
       }),
     });
@@ -33,6 +32,8 @@ describe('Product Bookmarking', () => {
     const cart = { id: 0 };
     const query = ProductBookmarking.getProducts(cart);
     const result = await query;
+
+    console.log(result);
 
     expect(result.ok, 'getProducts() failed').toBe(true);
   });
@@ -56,9 +57,12 @@ describe('Product Bookmarking', () => {
   it('bookmark products', async () => {
     mockQuery({
       insert: vi.fn().mockReturnValue({
-        select: vi
-          .fn()
-          .mockReturnValue({ data: new Array<object>(), error: null }),
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockReturnValue({
+            data: new Array<object>(),
+            error: null,
+          }),
+        }),
       }),
     });
 
@@ -74,10 +78,13 @@ describe('Product Bookmarking', () => {
     mockQuery({
       delete: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          in: vi.fn().mockReturnValue({
-            select: vi
-              .fn()
-              .mockReturnValue({ data: new Array<object>(), error: null }),
+          eq: vi.fn().mockReturnValue({
+            select: vi.fn().mockReturnValue({
+              single: vi.fn().mockReturnValue({
+                data: new Array<object>(),
+                error: null,
+              }),
+            }),
           }),
         }),
       }),

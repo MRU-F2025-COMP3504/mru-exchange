@@ -35,7 +35,7 @@ export function query<
   } else if (error) {
     result = err('Failed to query the database', error);
   } else {
-    result = err('Unknown query result', response);
+    result = err('Unknown query result', JSON.stringify(response));
   }
 
   return result as DatabaseQueryResult<Table, Columns>;

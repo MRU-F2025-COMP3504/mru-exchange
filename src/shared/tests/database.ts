@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { supabase } from '@shared/api';
 
-vi.mock('@shared/api/database/connection');
+vi.mock('@shared/api/database');
 
 export function mockQuery(value: unknown) {
   vi.spyOn(supabase, 'from').mockReturnValue(value as never);
