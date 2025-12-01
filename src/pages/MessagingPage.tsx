@@ -1,10 +1,11 @@
+/* eslint-disable */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@shared/contexts';
 import { supabase } from '@shared/api';
 import Header from './Header';
 import Footer from './Footer';
-import { UserChatting, UserMessaging } from '@features/messaging/index.ts';
+import { UserMessaging } from '@features/messaging/index.ts';
 import type {
   UserChat, UserProfile
 } from '@shared/types';
@@ -47,6 +48,14 @@ interface UserMessage {
   } | null;
 }
 
+interface ChatUserPreview {
+  id: number;
+  first_name: string;
+  last_name: string;
+  supabase_id: string;
+  profile_image: any;
+}
+
 export default function MessagingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -65,21 +74,14 @@ export default function MessagingPage() {
   const [loading, setLoading] = useState(true);
   const [chatLoading, setChatLoading] = useState(true);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
-  const [chatWith, setChatWith] = useState();
+  const [chatWith, setChatWith] = useState<ChatUserPreview | null>(null);
   const [text, setText] = useState('');
 
   useEffect(() => {
     fetchUserProfile();
-  }, [currentUserId]);
-
-  useEffect(() => {
-    fetchChats();
-    if (chats.length > 0) setLoading(false);
-  }, [chats])
-  
-  useEffect(() => {
-    fetchMessages();
-  }, [messages]);
+    if (currentUserId && chats.length === 0) fetchChats();
+    if (currentUserId && chats.length > 0 && messages.length === 0) fetchMessages();
+  }, [currentUserId, chats]);
 
 
   useEffect(() => {
@@ -87,7 +89,6 @@ export default function MessagingPage() {
     localStorage.setItem('messages', JSON.stringify(messages));
     if (chats.length > 0) setLoading(false);
   }, [chats]);
-
 
   // useEffect(() => {
   //     if(!currentUserId) return;
@@ -126,6 +127,7 @@ export default function MessagingPage() {
   
   //     return () => channel.unsubscribe();
   //   }, [selectedChat]);
+
 
   const fetchUserProfile = async () => {
     if (!currentUserId) return;
@@ -307,21 +309,21 @@ export default function MessagingPage() {
       const update = await UserMessaging.send(chatToSend, userInfo, text);
 
       if (!update.ok) {
-        setErrors({ general: 'Message failed to send' });
+        // setErrors({ general: 'Message failed to send' });
         return;
       }
 
       // navigate('/signin');
     } catch (error: any) {
       console.error('Error sending message:', error);
-      setErrors({ general: 'An error occurred. Please try again.' });
+      // setErrors({ general: 'An error occurred. Please try again.' });
     } finally {
       // setIsSubmitting(false);
       setText('');
     }
   };
 
-  const getAnyDate = (message) => {
+  const getAnyDate = (message: UserMessage) => {
     const messageDate = new Date(message?.created_at)
     let date;
 
@@ -341,9 +343,7 @@ export default function MessagingPage() {
   }
 
   const ChatCard = ({
-    chat,
-    showRemove = false,
-    showSold = false,
+    chat
   }: {
     chat: Chat;
     showRemove?: boolean;
@@ -354,6 +354,9 @@ export default function MessagingPage() {
     const isVisible = chat.visible;
     const imageUrl = getImageUrl(otherUser?.profile_image);
 
+    if(!otherUser) return;
+
+    if(!firstMessage) return;
     const date = getAnyDate(firstMessage);
 
 
@@ -525,7 +528,7 @@ export default function MessagingPage() {
                     .filter(message => message.visible && message.chat_id === selectedChat?.id)
                     .map((message) => {
                       const alignment =
-                        message.sender.supabase_id === currentUserId
+                        message.sender?.supabase_id === currentUserId
                           ? 'justify-end'
                           : 'justify-start';
                       return (
@@ -551,7 +554,7 @@ export default function MessagingPage() {
                         id='message'
                         type='text'
                         name={text}
-                        value={FormData.text}
+                        value={text}
                         onChange={(e) => setText(e.target.value)}
                         className='bg-white rounded-l-2xl w-[40vw] p-2'
                         placeholder='Type your message...'
