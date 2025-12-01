@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@shared/contexts';
 import { supabase, UserAuthentication } from '@shared/api';
@@ -75,7 +75,8 @@ export default function MessagingPage() {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [chatWith, setChatWith] = useState<ChatUserPreview | null>(null);
   const [text, setText] = useState('');
-
+  const [element, setElement] = useState<HTMLDivElement | null>(null);
+  const lastMessageRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     void fetchUserProfile().then(async () => {
       const chats = await fetchChats();
@@ -88,6 +89,12 @@ export default function MessagingPage() {
     localStorage.setItem('chats', JSON.stringify(chats));
     if (chats.length > 0) setLoading(false);
   }, [currentUserId]);
+
+  useEffect(() => {
+    if (lastMessageRef.current)
+      lastMessageRef.current.scrollTop = lastMessageRef.current.scrollHeight;
+    // if(element) element.scrollTop = element.scrollHeight;
+  }, [selectedChat])
 
   // useEffect(() => {
   //     if(!currentUserId) return;
@@ -294,6 +301,7 @@ export default function MessagingPage() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    event.stopPropagation();
     // if (!validateForm()) return;
     if (!selectedChat) return;
     if (!userInfo) return;
@@ -332,6 +340,13 @@ export default function MessagingPage() {
     } finally {
       // setIsSubmitting(false);
       setText('');
+      setTimeout(() => {
+        lastMessageRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }, 0);
+
     }
   };
 
@@ -438,6 +453,11 @@ export default function MessagingPage() {
         </div>
       </div>
     );
+  };
+
+
+  const travel = (ref: HTMLDivElement | null) => {
+    if (ref) setElement(ref);
   };
 
   const MessageCard = ({
@@ -564,17 +584,11 @@ export default function MessagingPage() {
                         message.sender?.supabase_id === currentUserId
                           ? 'justify-end'
                           : 'justify-start';
-                      const travel = (ref: HTMLDivElement | null) => {
-                        if (ref) {
-                          ref.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      };
-
                       return (
                         <div
                           key={message.id}
+                          ref={lastMessageRef}
                           className={`flex ${alignment} min-w-[20vw]`}
-                          ref={(ref) => travel(ref)}
                         >
                           <MessageCard message={message} showRemove={true} />
                         </div>
