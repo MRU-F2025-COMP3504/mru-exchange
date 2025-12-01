@@ -3,7 +3,7 @@
 - [1. Abstract](#abstract)
 - [2. How to Access the Website](#how-to-access-the-website)
 - [3. Use-Case Guide](#use-case-guide)
-  - [Use-Case (1): Creating an Account](#use-case-1-creating-an-account)
+  - [Use-Case (1): Creating Account](#use-case-1-creating-an-account)
   - [Use-Case (2): Log-in](#use-case-2-log-in)
   - [Use-Case (3): Find Product](#use-case-3-find-a-product)
   - [Use-Case (4): Posting Product](#use-case-4-posting-a-product)
@@ -25,7 +25,7 @@ Simply go to [mruexchange.app](https://mruexchange.app/) to access the website!
 
 Here is detailed instructions on how to use the website!
 
-### Use Case 1: Creating an Account
+### Use Case 1: Creating Account
 
 1. Click the blue 'Create Account' Button
 2. Enter in your credentials, make sure every field is entered & you use your mount royal linked student email account. If you cant access your email you wont be able to verify your sign up.
@@ -33,13 +33,13 @@ Here is detailed instructions on how to use the website!
 4. Once you see the 'Check your email' page you can go over to your email and open the newly sent email from 'Supabase Auth'.
 5. Scroll down a bit till you see the 'Verify Your Email' button, then click on it.
 
-### Use Case 2: Log In
+### Use Case 2: Log-in
 
 1. Go back to the [entry page](https://mruexchange.app/) and click the white 'Sign in' button
 2. Enter your username and password that you entered with the create an account use case
 3. Click the blue 'Sign in' button. You're in!
 
-### Use Case 3: Find a Product
+### Use Case 3: Find Product
 
 1. After logging in, you are now in the home page. You can click on a 'Recently Listed' product at the bottom OR click on the 'Browse Products' button located in the middle of the screen
 2. All of the products are listed here. To find your desired product you have three options to go with:
@@ -48,7 +48,7 @@ Here is detailed instructions on how to use the website!
    Option 3: Use both the Category filter and key word search to find a product. Click on the 'Search' button once both are filled out.
 3. Click on the desried product.
 
-### Use Case 4: Posting a Product
+### Use Case 4: Posting Product
 
 1. From the [home page](https://mruexchange.app/home) click on the 'Sell something' button on the middle of the screen.
 2. Type in your product's title (make sure it is specific and accurate i.e the exact title of a book)
@@ -62,20 +62,20 @@ Here is detailed instructions on how to use the website!
 10. Here you can see a previewed version of your product, if you want to edit something about it, click on the 'Continue Editing' button at the bottom to go back to the 'Product Details' page.
 11. Click on the blue "Post Product" button below the previewed product. Once you see the "Successfully Posted Product" you will be directed to your products page.
 
-### Use Case 5: Buying a Product
+### Use Case 5: Buying Product
 
 1. From the home page click on a recently listed product OR go through use Case 3
 2. Click on the "Message Seller" button underneath the description
 3. You should see a new page with an open messaging tab with the seller, enter in your message and click the 'send' button
 
-### Use Case 6: Inquiry About a Seller or Services
+### Use Case 6: Inquiry About Seller or Service
 
 1. From the home page, scroll down to the bottom of the footer, click on the 'contact us' text link.
 2. Enter your inquiry into the text field. Be sure to leave a deatiled explanation.
 3. Click on the 'Submit' button.
 4. Wait 3-5 business days, check your mru student email for a response.
 
-### Use Case 7: Write a Review
+### Use Case 7: Write Review
 
 1. Click on the Product you purchased.
 2. Press the 'Write a Review' button underneath the product photo
