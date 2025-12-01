@@ -78,10 +78,10 @@ export default function MessagingPage() {
 
   useEffect(() => {
     void fetchUserProfile().then(async () => {
-      await fetchChats().then(async (chats: Chat[]) => {
-        await fetchMessages(chats).then(() => {
-          setLoading(false);
-        });
+      const chats = await fetchChats();
+
+      await fetchMessages(chats).then(() => {
+        setLoading(false);
       });
     });
 
