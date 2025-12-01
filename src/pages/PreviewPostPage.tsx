@@ -78,6 +78,7 @@ export default function PreviewPostPage() {
 
       result = builder.description(form);
       if (!result.ok) throw result.error;
+
       result = builder.images(form);
 
       if (!result.ok) throw result.error;
@@ -133,15 +134,15 @@ export default function PreviewPostPage() {
   };
 
   return (
-    <div className="bg-white min-h-screen">
-      <main className="flex justify-center p-12">
-        <div className="relative w-full max-w-6xl">
-          <div className="absolute -top-5 left-6 text-red-500 text-2xl font-bold">
+    <div className='bg-white min-h-screen'>
+      <main className='flex justify-center p-12'>
+        <div className='relative w-full max-w-6xl'>
+          <div className='absolute -top-5 left-6 text-red-500 text-2xl font-bold'>
             Preview
           </div>
 
           {/* Outer Box */}
-          <div className="bg-white rounded-2xl p-8 w-full max-w-6xl shadow-lg border border-gray-300">
+          <div className='bg-white rounded-2xl p-8 w-full max-w-6xl shadow-lg border border-gray-300'>
             {/* Product Details */}
             <section id='details' className='p-8 bg-[#A7E2FC] text-[#003A5F]'>
               {/* Product Information */}
@@ -175,37 +176,37 @@ export default function PreviewPostPage() {
                   <div className='flex'>
                     {imageUrls
                       ? imageUrls.map((value: string, i: number) => (
-                        <>
-                          <div className='my-2 mr-1'>
-                            <img
-                              id={'img' + i}
-                              src={imageUrls[i]}
-                              alt={product.title || 'Product'}
-                              className='w-[50px] h-[50px] object-cover rounded-lg cursor-pointer'
-                              onClick={(e) => {
-                                // Get elements.
-                                const thisImg: HTMLImageElement =
-                                  e.target as HTMLImageElement;
+                          <>
+                            <div className='my-2 mr-1'>
+                              <img
+                                id={'img' + i}
+                                src={imageUrls[i]}
+                                alt={product.title || 'Product'}
+                                className='w-[50px] h-[50px] object-cover rounded-lg cursor-pointer'
+                                onClick={(e) => {
+                                  // Get elements.
+                                  const thisImg: HTMLImageElement =
+                                    e.target as HTMLImageElement;
 
-                                // If it exists,
-                                if (mainImgRef.current) {
-                                  // Update its link.
-                                  mainImgRef.current.src = thisImg.src;
-                                }
-                              }}
-                              onError={(e) => {
-                                const target =
-                                  e.currentTarget as HTMLImageElement;
-                                target.style.display = 'none';
-                                if (target.parentElement) {
-                                  target.parentElement.innerHTML =
-                                    '<div class="w-full h-[300px] flex items-center justify-center bg-gray-200"><span class="text-gray-500">Image unavailable</span></div>';
-                                }
-                              }}
-                            />
-                          </div>
-                        </>
-                      ))
+                                  // If it exists,
+                                  if (mainImgRef.current) {
+                                    // Update its link.
+                                    mainImgRef.current.src = thisImg.src;
+                                  }
+                                }}
+                                onError={(e) => {
+                                  const target =
+                                    e.currentTarget as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  if (target.parentElement) {
+                                    target.parentElement.innerHTML =
+                                      '<div class="w-full h-[300px] flex items-center justify-center bg-gray-200"><span class="text-gray-500">Image unavailable</span></div>';
+                                  }
+                                }}
+                              />
+                            </div>
+                          </>
+                        ))
                       : null}
                   </div>
                 </div>
@@ -255,18 +256,18 @@ export default function PreviewPostPage() {
             </section>
           </div>
 
-          <div className="flex mt-8 justify-center gap-2">
+          <div className='flex mt-8 justify-center gap-2'>
             <button
               onClick={() => {
                 navigate('/post-product', { state: { product, images } });
               }}
-              className="px-8 py-3 rounded-lg bg-[#007fb5] text-white text-base cursor-pointer hover:bg-[#006699] transition-colors"
+              className='px-8 py-3 rounded-lg bg-[#007fb5] text-white text-base cursor-pointer hover:bg-[#006699] transition-colors'
             >
               ← Continue Editing
             </button>
             <button
               onClick={handleProductPosting}
-              className="px-8 py-3 bg-blue-600 text-white rounded-lg text-base font-medium cursor-pointer hover:bg-blue-700 transition-colors"
+              className='px-8 py-3 bg-blue-600 text-white rounded-lg text-base font-medium cursor-pointer hover:bg-blue-700 transition-colors'
             >
               Post Product
             </button>

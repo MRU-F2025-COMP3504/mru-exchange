@@ -44,7 +44,7 @@ export const FormUtils: FormUtils = {
         return err(
           `Invalid file detected in the form data (key: ${key}, input: ${JSON.stringify(input)})`,
         );
-      } else if (Object.keys(value).length === 0) {
+      } else if (Object.keys(input).length === 0) {
         return err(
           `No file found in the form data (key: ${key}, input: ${JSON.stringify(value)})`,
           value,
