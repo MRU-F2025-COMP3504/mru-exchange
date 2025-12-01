@@ -29,11 +29,6 @@ export interface AuthContext {
   user: NullableResult<User>;
 
   /**
-   * The current user profile result state.
-   */
-  profile: NullableResult<UserProfile>;
-
-  /**
    * @see {@link UserAuthentication.signup()}
    */
   signup: () => UserSignup;

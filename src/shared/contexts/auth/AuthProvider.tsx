@@ -26,9 +26,6 @@ interface AuthProvider {
 export function AuthProvider({ children }: AuthProvider): JSX.Element {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<NullableResult<User>>(() => empty());
-  const [profile, setProfile] = useState<NullableResult<UserProfile>>(() =>
-    empty(),
-  );
 
   /**
    * Hooks the `signup()` functionality.
@@ -67,17 +64,12 @@ export function AuthProvider({ children }: AuthProvider): JSX.Element {
    * Subscribes the authentication provider to user authentication events.
    */
   useEffect(() => {
-    const subscription = UserAuthentication.subscribe(async (_, result) => {
+    const subscription = UserAuthentication.subscribe((_, result) => {
       if (result.ok) {
-        const user = result.data.user;
-        const profile = await UserAuthentication.getUserProfile(user);
-
-        setUser(ok(user));
-        setProfile(profile);
+        setUser(ok(result.data.user));
         setLoading(false);
       } else {
         setUser(result);
-        setProfile(result);
       }
     });
 
@@ -91,7 +83,6 @@ export function AuthProvider({ children }: AuthProvider): JSX.Element {
       value={{
         loading,
         user,
-        profile,
         signup,
         signin,
         signout,

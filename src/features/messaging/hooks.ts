@@ -68,13 +68,13 @@ interface UseChat {
  * @see {@link UserMessaging} for more information
  */
 export function useChat(
+  sender: RequireProperty<UserProfile, 'supabase_id'>,
   receiver: RequireProperty<UserProfile, 'supabase_id'>,
 ): UseChat {
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<UserMessage[]>([]);
-  const { profile: sender } = useAuth();
   const [chat, setChat] = useState<DatabaseQueryResult<UserChat, 'id'>>(() =>
-    err('No user chat found', { sender, receiver }),
+    err('No user chat found', { sender: sender, receiver: receiver }),
   );
 
   /**
@@ -83,38 +83,31 @@ export function useChat(
    * @see {@link UseChat.refresh()}
    */
   const refresh = useCallback(async () => {
-    if (sender.ok) {
-      setLoading(true);
+    setLoading(true);
 
-      return await UserChatting.getByUsers(sender.data, receiver).then(
-        async (chat) => {
-          setChat(chat);
+    return await UserChatting.getByUsers(sender, receiver).then(
+      async (chat) => {
+        setChat(chat);
 
-          if (chat.ok) {
-            return HookUtils.load(
-              setLoading,
-              UserMessaging.getByChat(chat.data),
-            ).then((messages) => {
-              if (messages.ok) {
-                setMessages(messages.data);
-              }
+        if (chat.ok) {
+          return HookUtils.load(
+            setLoading,
+            UserMessaging.getByChat(chat.data),
+          ).then((messages) => {
+            if (messages.ok) {
+              setMessages(messages.data);
+            }
 
-              return messages;
-            });
-          }
+            return messages;
+          });
+        }
 
-          return err('No user chat found', chat) as DatabaseQueryResult<
-            UserMessage[],
-            '*'
-          >;
-        },
-      );
-    }
-
-    return err('No user profile found', sender) as DatabaseQueryResult<
-      UserMessage[],
-      '*'
-    >;
+        return err('No user chat found', chat) as DatabaseQueryResult<
+          UserMessage[],
+          '*'
+        >;
+      },
+    );
   }, [sender, receiver]);
 
   /**
@@ -125,10 +118,10 @@ export function useChat(
    */
   const show = useCallback(
     async (flag: boolean, array: RequireProperty<UserMessage, 'id'>[]) => {
-      if (sender.ok && chat.ok) {
+      if (chat.ok) {
         return HookUtils.load(
           setLoading,
-          UserMessaging.show(chat.data, sender.data, flag, array),
+          UserMessaging.show(chat.data, sender, flag, array),
         ).then(async (result) => {
           if (!result.ok) {
             return result;
@@ -144,13 +137,8 @@ export function useChat(
 
           return result;
         });
-      } else if (chat.error) {
-        return chat;
       } else {
-        return err('No user profile found', sender) as DatabaseQueryResult<
-          UserMessage[],
-          'id'
-        >;
+        return chat;
       }
     },
     [chat, sender, messages, refresh],
@@ -164,19 +152,14 @@ export function useChat(
    */
   const send = useCallback(
     async (message: string) => {
-      if (sender.ok && chat.ok) {
+      if (chat.ok) {
         return HookUtils.load(
           setLoading,
-          UserMessaging.send(chat.data, sender.data, message),
+          UserMessaging.send(chat.data, sender, message),
         );
-      } else if (chat.error) {
+      } else {
         return chat;
       }
-
-      return err('No user profile found', sender) as DatabaseQueryResult<
-        UserMessage,
-        'id'
-      >;
     },
     [chat, sender],
   );
@@ -271,10 +254,11 @@ interface UseChats {
  * @author Ramos Jacosalem (cjaco906)
  * @see {@link UserChatting} for more information
  */
-export function useChats(): UseChats {
+export function useChats(
+  user: RequireProperty<UserProfile, 'supabase_id'>,
+): UseChats {
   const [loading, setLoading] = useState(true);
   const [chats, setChats] = useState<UserChat[]>([]);
-  const { profile: sender } = useAuth();
 
   /**
    * Updates the callback state when its dependencies (i.e., sender) changes state.
@@ -282,11 +266,8 @@ export function useChats(): UseChats {
    * @see {@link UseChats.refresh()}
    */
   const refresh = useCallback(async () => {
-    if (sender.ok) {
-      return HookUtils.load(
-        setLoading,
-        UserChatting.getByUser(sender.data),
-      ).then((result) => {
+    return HookUtils.load(setLoading, UserChatting.getByUser(user)).then(
+      (result) => {
         if (result.ok) {
           setChats(result.data);
         } else {
@@ -294,14 +275,9 @@ export function useChats(): UseChats {
         }
 
         return result;
-      });
-    }
-
-    return err('No user profile found', sender) as DatabaseQueryResult<
-      UserChat[],
-      '*'
-    >;
-  }, [sender]);
+      },
+    );
+  }, [user]);
 
   /**
    * Hooks the `register()` and `getByUsers()` functionality.
@@ -310,30 +286,22 @@ export function useChats(): UseChats {
    * @see {@link UserChatting.register()}
    */
   const connect = useCallback(
-    async (receiver: RequireProperty<UserProfile, 'supabase_id'>) => {
-      if (sender.ok) {
-        setLoading(true);
-
-        return await UserChatting.getByUsers(sender.data, receiver).then(
-          async (chat) => {
-            if (chat.ok) {
-              return chat;
-            } else {
-              return HookUtils.load(
-                setLoading,
-                UserChatting.register(sender.data, receiver),
-              );
-            }
-          },
-        );
-      }
-
-      return err('No user profile found', sender) as DatabaseQueryResult<
-        UserChat,
-        '*'
-      >;
+    async (other: RequireProperty<UserProfile, 'supabase_id'>) => {
+      return HookUtils.load(
+        setLoading,
+        UserChatting.getByUsers(user, other).then(async (chat) => {
+          if (chat.ok) {
+            return chat;
+          } else {
+            return HookUtils.load(
+              setLoading,
+              UserChatting.register(user, other),
+            );
+          }
+        }),
+      );
     },
-    [sender],
+    [user],
   );
 
   /**
@@ -373,21 +341,17 @@ export function useChats(): UseChats {
   useEffect(() => {
     void refresh();
 
-    let subscription: RealtimeChannel;
-
-    if (sender.ok) {
-      /**
-       * Adds newly registered user chat from the user in real time.
-       */
-      subscription = UserChatting.subscribe(sender.data, (payload) => {
-        setChats((previous) => [...previous, payload.new]);
-      });
-    }
+    /**
+     * Adds newly registered user chat from the user in real time.
+     */
+    const subscription = UserChatting.subscribe(user, (payload) => {
+      setChats((previous) => [...previous, payload.new]);
+    });
 
     return () => {
       void subscription.unsubscribe().catch(console.error);
     };
-  }, [sender, refresh]);
+  }, [user, refresh]);
 
   return {
     loading,

@@ -105,7 +105,7 @@ export function useBookmarker(): UseBookmarker {
     err('No bookmarker found'),
   );
   const [products, setProducts] = useState<BookmarkedProduct[]>([]);
-  const { profile: buyer } = useAuth();
+  const { user: buyer } = useAuth();
   const navigate = useNavigate();
 
   /**
@@ -115,7 +115,11 @@ export function useBookmarker(): UseBookmarker {
    */
   const refresh = useCallback(async () => {
     if (buyer.ok) {
-      return await ProductBookmarking.get(buyer.data).then(async (result) => {
+      const id = {
+        supabase_id: buyer.data.id,
+      };
+
+      return await ProductBookmarking.get(id).then(async (result) => {
         setBookmarker(result);
 
         if (result.ok) {
@@ -132,7 +136,7 @@ export function useBookmarker(): UseBookmarker {
         } else {
           return HookUtils.load(
             setLoading,
-            ProductBookmarking.register(buyer.data),
+            ProductBookmarking.register(id),
           ).then((bookmarker) => {
             setBookmarker(bookmarker);
 
