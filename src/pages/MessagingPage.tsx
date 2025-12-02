@@ -77,6 +77,9 @@ export default function MessagingPage() {
   const [text, setText] = useState('');
   const [element, setElement] = useState<HTMLDivElement | null>(null);
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
+  const messageItem = useRef<HTMLDivElement | null>(null);
+  const deletePopup = useRef<HTMLDivElement | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
   useEffect(() => {
     void fetchUserProfile().then(async () => {
       const chats = await fetchChats();
@@ -153,6 +156,8 @@ export default function MessagingPage() {
 
   const fetchChats = async (): Promise<Chat[]> => {
     if (!currentUserId) throw Error('No user found');
+    console.log(currentUserId)
+
 
     try {
       console.log('Attempting to fetch chats');
@@ -310,16 +315,9 @@ export default function MessagingPage() {
     const sendText = form.get(text);
     if (!sendText) return;
 
-    const chatToSend: UserChat = {
-      created_at: selectedChat.created_at,
-      id: selectedChat.id,
-      user_id_1: selectedChat.user_id_1,
-      user_id_2: selectedChat.user_id_1,
-      visible: selectedChat.visible,
-    };
     // setIsSubmitting(true);
     try {
-      const update = await UserMessaging.send(chatToSend, userInfo, text);
+      const update = await UserMessaging.send(selectedChat, userInfo, text);
 
       if (!update.ok) {
         // setErrors({ general: 'Message failed to send' });
@@ -367,7 +365,7 @@ export default function MessagingPage() {
     else if (messageDate >= yesterdayStart && messageDate < yesterdayEnd)
       date = 'Yesterday';
     else date = messageDate.toLocaleDateString();
-
+    
     return date;
   };
 
@@ -382,7 +380,9 @@ export default function MessagingPage() {
       chat.user_id_1 === currentUserId
         ? [chat.user1, chat.user2]
         : [chat.user2, chat.user1];
-    const firstMessage = messages.find((msg) => msg.chat_id === chat.id);
+    const messagesByChat = messages.filter((msg) => msg.chat_id === chat.id);
+    const firstMessage = [...messagesByChat].sort((a,b) => new Date(b?.created_at).getTime() - new Date(a?.created_at).getTime())[0];
+    console.log(firstMessage)
     const isVisible = chat.visible;
     const imageUrl = getImageUrl(otherUser?.profile_image);
 
@@ -405,10 +405,10 @@ export default function MessagingPage() {
             {imageUrl ? (
               <img
                 src={imageUrl}
-                className={`aspect-square object-cover`}
+                className={`aspect-square object-cover rounded-xl`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/profile/${otherUser.id}`);
+                  navigate(`/seller/${otherUser.supabase_id}`);
                 }}
                 onError={(e) => {
                   const target = e.currentTarget as HTMLImageElement;
@@ -421,7 +421,7 @@ export default function MessagingPage() {
                 <span
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/profile/${otherUser.id}`);
+                    navigate(`/seller/${otherUser.supabase_id}`);
                   }}
                   className='text-gray-500 text-xs'
                 >
@@ -434,7 +434,7 @@ export default function MessagingPage() {
             <div
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/profile/${otherUser.id}`);
+                navigate(`/seller/${otherUser.supabase_id}`);
               }}
               className='px-4 font-bold font-black inline-block'
             >
@@ -455,10 +455,62 @@ export default function MessagingPage() {
     );
   };
 
+  function showDelete(): void {
+    deletePopup.current?.classList.remove('hidden');
+    deletePopup.current?.classList.add('flex');
+  }
+
+  function hideDelete(): void {
+    deletePopup.current?.classList.remove('hidden');
+    deletePopup.current?.classList.add('flex');
+  }
+
+  const deleteItem = async (message: UserMessage,) => {
+    if (!selectedChat) return;
+    if (!userInfo) return;
+    try {
+      const update = await UserMessaging.remove(selectedChat, userInfo, [message]);
+
+      if (!update.ok) {
+        // setErrors({ general: 'Message failed to delete' });
+        return;
+      } else {
+        const removedMessage = update.data;
+        console.log(removedMessage);
+        const mess = removedMessage[0];
+        const mes = messages.filter(message => message.id !== mess.id);
+        console.log(mes)
+        setMessages([...mes]);
+      }
+    } catch (error: any) {
+      console.error(error);
+    }
+  }
+
 
   const travel = (ref: HTMLDivElement | null) => {
     if (ref) setElement(ref);
   };
+
+  const handleMouseEnter = () => {
+    return setIsHovered(true);
+  }
+  const handleMouseLeave = () => {
+    return setIsHovered(true);
+  }
+
+  document.addEventListener('keyup', (e) => {
+    if (e.key === 'Escape') {
+      if (deletePopup.current) {
+        hideDelete();
+      }
+    }
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (messageItem.current) {
+        hideDelete();
+      }
+    }
+  });
 
   const MessageCard = ({
     message,
@@ -473,6 +525,7 @@ export default function MessagingPage() {
     const imageUrl = getImageUrl(message.sender?.profile_image);
 
     const date = getAnyDate(message);
+    if (!message) return;
 
     const senderBool = message.sender?.supabase_id === currentUserId;
     const bgColor = senderBool ? 'bg-blue-600' : 'bg-white';
@@ -495,25 +548,51 @@ export default function MessagingPage() {
                   target.src = '';
                   target.style.display = 'none';
                 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/seller/${message.sender?.supabase_id}`);
+                }}
               />
             ) : (
               <div className='aspect-square h-[3vh] mr-2 bg-gray-200 flex items-center justify-center rounded-4xl'>
-                <span className='text-gray-500 text-xs'>n/a</span>
+                <span className='text-gray-500 text-xs hover:cursor-pointer'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/seller/${message.sender?.supabase_id}`);
+                  }}>n/a</span>
               </div>
             )
           ) : null}
         </div>
         <div className='flex flex-col'>
           <div
+            ref={messageItem}
             className={`${bgColor} rounded-2xl py-1.5 shadow-md flex items-center`}
+            onClick={showDelete}
+          // onClick={(e) => {
+          //   const target = e.currentTarget as HTMLImageElement;
+          //   target.classList.add('bg-blue-900');           
+          // }}
+
+          // onMouseEnter={() => setIsHovered(true)}
+          // onMouseLeave={() => setIsHovered(false)}    
           >
+            {/* {isHovered ? <div>🗑️</div> : 's'} */}
             <div>
-              <div className='px-4 font-semibold'>{name}</div>
+              <div className='px-4 font-semibold hover:cursor-pointer'
+              onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/seller/${message.sender?.supabase_id}`);
+                }}>{name}</div>
               <div className='flex items-start h-full px-4 text-sm'>
                 <div className='flex-1 overflow-hidden'>
                   <div className={`${textColor}`}>
                     {' '}
-                    {message?.logged_message}{' '}
+                    {message?.logged_message}{' '}<div
+                      ref={deletePopup}
+                      className='hidden items-center hover:cursor-pointer'
+                      onClick={(e) => deleteItem(message)}
+                    >🗑️</div>
                   </div>
                 </div>
               </div>
@@ -554,7 +633,7 @@ export default function MessagingPage() {
                 </p>
               </div>
             ) : (
-              <div className='flex flex-col gap-6 min-w-[20vw]'>
+              <div className='flex flex-col overflow-y-auto max-h-[70vh] gap-6 min-w-[20vw]'>
                 {chats.map((chat) => (
                   <ChatCard key={chat.id} chat={chat} showRemove={true} />
                 ))}
@@ -567,7 +646,7 @@ export default function MessagingPage() {
             </main>
           ) : (
             <main className='flex flex-col w-2/3 items-center min-h-[60vh] rounded-2xl pb-5 bg-blue-300 relative'>
-              <div className='bg-white w-full rounded-t-2xl border-b-1 pl-3 '>
+              <div className='bg-white w-full rounded-t-2xl border-b-1 pl-3 text-center font-bold'>
                 {chatWith ? `Chat with ${chatWith.first_name}` : ''}
               </div>
 
