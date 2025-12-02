@@ -196,7 +196,7 @@ export default function SellerPage() {
   const profilePictureUrl = getProfilePictureUrl(sellerInfo.profile_image);
 
   return (
-    <div className='bg-[#F9FAFB] min-h-screen'>
+    <div className='bg-[#F9FAFB] grid grid-rows-[auto_1fr_auto] min-h-screen'>
       <Header />
 
       <main className='max-w-7xl mx-auto px-4 py-8'>

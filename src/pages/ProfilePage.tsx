@@ -461,10 +461,11 @@ export default function ProfilePage() {
   const profilePictureUrl = getProfilePictureUrl(userInfo?.profile_image);
 
   return (
-    <div className='bg-[#F9FAFB] min-h-screen'>
+    <div className='bg-[#F9FAFB] grid grid-rows-[auto_1fr_auto] min-h-screen'>
       <Header />
 
-      <main className='max-w-7xl mx-auto px-4 py-8'>
+      <main className='px-4 py-8'>
+        <div className='max-w-7xl mx-auto'>
         {/* Profile info section */}
         <div className='bg-white rounded-lg shadow p-6 mb-8'>
           <div className='flex items-start gap-6'>
@@ -654,6 +655,7 @@ export default function ProfilePage() {
             )}
           </div>
         )}
+        </div>
       </main>
 
       <Footer />
