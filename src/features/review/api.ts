@@ -91,6 +91,7 @@ interface UserReviewing {
    */
   create: (
     reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+    target?: RequireProperty<UserProfile, 'supabase_id'>,
   ) => ReviewPublisher;
 
   /**
@@ -200,6 +201,7 @@ export const UserReviewing: UserReviewing = {
   },
   create(
     reviewer: RequireProperty<UserProfile, 'supabase_id'>,
+    target?: RequireProperty<UserProfile, 'supabase_id'>,
   ): ReviewPublisher {
     const review: Partial<Review> = {};
 
@@ -250,6 +252,7 @@ export const UserReviewing: UserReviewing = {
             .insert({
               ...review,
               created_by_id: reviewer.supabase_id,
+              ...(target && { created_on_id: target.supabase_id }),
             } as Review)
             .select()
             .single(),

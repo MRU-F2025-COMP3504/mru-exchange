@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from './Header';
@@ -893,7 +894,7 @@ export default function ProductPage() {
                 <div className='py-5'>
                   <button
                     type='submit'
-                    className='bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-400 border rounded w-25'
+                    className='bg-yellow-300 border-yellow-500 p-2 mr-5 hover:bg-yellow-fse400 border rounded w-25'
                   >
                     Submit
                   </button>

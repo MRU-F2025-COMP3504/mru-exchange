@@ -405,7 +405,7 @@ export default function MessagingPage() {
             {imageUrl ? (
               <img
                 src={imageUrl}
-                className={`aspect-square object-cover rounded-xl`}
+                className={`aspect-square bg-gray-200 flex items-center justify-center rounded-4xl`}
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/seller/${otherUser.supabase_id}`);
