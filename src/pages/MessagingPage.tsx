@@ -542,7 +542,7 @@ export default function MessagingPage() {
             imageUrl ? (
               <img
                 src={imageUrl}
-                className={`w-full h-full object-cover`}
+                className={`aspect-square h-[4vh] mr-2 bg-gray-200 flex items-center justify-center rounded-4xl`}
                 onError={(e) => {
                   const target = e.currentTarget as HTMLImageElement;
                   target.src = '';
