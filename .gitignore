@@ -1,0 +1,39 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment variables
+# Note: .env is committed for team sharing in this project
+# In production, you should NOT commit the following env files
+.env.local
+.env.production
+
+# Supabase
+.supabase
+
+# Optional: Keep these files out if they contain sensitive testing data
+# test-data/
+# *.backup.sql
+
+.vercel
