@@ -9,7 +9,7 @@
     "docker": "docker compose -f compose.dev.yml up",
     "docker:build": "docker compose -f compose.dev.yml up --build",
     "docker:prune": "docker system prune -f",
-    "deploy": "git pull && docker stop production && docker system prune -f && docker compose up -d --build",
+    "deploy": "git checkout stable && git pull origin stable && docker stop production && docker system prune -f && docker compose up -d --build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
